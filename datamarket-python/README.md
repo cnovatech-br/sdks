@@ -30,11 +30,14 @@ client = DataMarket()  # reads DATAMARKET_API_KEY
 
 product = client.products.get("7894900011517", state="SP")
 
-print(product.product_name, product.market.median_price)
-for offer in product.offers[:3]:
-    print(offer.store_name, offer.price, offer.available)
+product.product_name  # "Refrigerante Coca-Cola 2L"
+product.market.median_price  # 9.49
+product.offers[0].store_name  # "Supermercado Modelo"
+product.offers[0].price  # 8.99
+product.offers[0].available  # True
 
-print(f"{product.usage.query_cost} unit spent, {product.usage.remaining} remaining")
+product.usage.query_cost  # 1
+product.usage.remaining  # 994
 ```
 
 Get a key at <https://datamarket.cnovatech.com.br>. `client.health()` checks
@@ -49,9 +52,10 @@ for it.
 Every call is billed in quota units, and every response says what it cost:
 
 ```python
-page = client.products.catalog(search="azeite", limit=50)  # 1 unit
-print(page.usage.query_cost, page.usage.remaining)
-print(client.usage.spent)  # units spent through this client
+page = client.products.catalog(search="azeite", limit=50)
+page.usage.query_cost  # 1
+page.usage.remaining  # 993
+client.usage.spent  # 2, through this client
 ```
 
 Paginated responses can be walked page by page or item by item, with a ceiling
@@ -59,10 +63,12 @@ on how much to spend:
 
 ```python
 position = client.stores.market_position(store_id, limit=1000)  # 8 units per page
-print(position.meta.pages, "pages;", position.estimate_remaining_cost(), "units to finish")
+position.meta.pages  # 4
+position.estimate_remaining_cost()  # 24, for the three pages not fetched yet
 
-for item in position.iter_all(max_units=40):
-    print(item.product_name, item.price_position)
+items = list(position.iter_all(max_units=40))
+items[0].product_name  # "Azeite Extra Virgem 500ml"
+items[0].price_position  # "above"
 ```
 
 `iter_all` never requests again the page you already paid for. It stops quietly
@@ -74,14 +80,16 @@ at `max_pages` and raises `BudgetExceededError` before a page that would cross
 
 ```python
 store = client.stores.find("Supermercado Modelo", state="SP")  # 1 unit
-competitors = client.stores.competitors(store.store_id, limit=5)  # 1 unit each
+store.store_id  # "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63"
 
-for competitor in competitors.data:
-    print(competitor.store_name, f"{competitor.overlap_pct:.0f}% of the assortment in common")
+competitors = client.stores.competitors(store.store_id, limit=5)  # 1 unit each
+competitors.data[0].store_name  # "Mercado Vizinho"
+competitors.data[0].overlap_pct  # 62.5, share of the assortment in common
 
 comparison = client.stores.compare(store.store_id, competitors.data[0].store_id)
-for item in comparison.data:
-    print(item.product_name, item.price_position, item.price_diff_pct)
+comparison.data[0].product_name  # "Azeite Extra Virgem 500ml"
+comparison.data[0].price_position  # "above"
+comparison.data[0].price_diff_pct  # 12.3
 ```
 
 ## Errors
@@ -94,13 +102,14 @@ client = DataMarket()
 try:
     product = client.products.get("0000000000000")
 except errors.EANNotFoundError as exc:
-    print(exc.hint)  # what the API suggests doing next
+    exc.hint  # what the API suggests doing next
 except errors.QuotaExceededError as exc:
-    print(exc.code, exc.upgrade_url)
+    exc.code  # "monthly_limit_exceeded"
+    exc.upgrade_url  # where to change plan
 except errors.APITimeoutError:
-    pass  # may have been billed; check client.account.usage() before repeating
+    ...  # may have been billed; check client.account.usage() before repeating
 except errors.DataMarketError as exc:
-    print(exc)  # status, code, message and correlation_id; never the key
+    str(exc)  # "HTTP 503 service_unavailable: ... [correlation_id=...]"; never the key
 ```
 
 Connection errors, 502/503/504 and the per-minute 429 are retried with backoff.
@@ -117,7 +126,7 @@ from cnovatech.datamarket import AsyncDataMarket
 async def main() -> None:
     async with AsyncDataMarket() as client:
         product = await client.products.get("7894900011517")
-        print(product.market.median_price)
+        product.market.median_price  # 9.49
 
 
 asyncio.run(main())
