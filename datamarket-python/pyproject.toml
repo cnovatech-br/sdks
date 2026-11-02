@@ -1,0 +1,95 @@
+[project]
+name = "cnovatech-datamarket"
+version = "0.1.0.dev0"
+description = "Official Python SDK for the Cnovatech Data Market API: price, availability and assortment intelligence for Brazilian supermarkets."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "Cnova Tech", email = "suporte@cnovatech.com.br" }]
+keywords = [
+    "cnovatech", "datamarket", "data market", "pricing", "retail",
+    "supermarket", "assortment", "ean", "sdk", "api",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: Other/Proprietary License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+# The core and this package are released together; the pin follows its minor series.
+dependencies = [
+    "cnovatech-sdk-core>=0.1.0.dev0,<1.0",
+]
+
+[project.optional-dependencies]
+pandas = ["cnovatech-sdk-core[pandas]"]
+
+[project.urls]
+Homepage = "https://datamarket.cnovatech.com.br"
+Documentation = "https://datamarket.cnovatech.com.br/redoc"
+Repository = "https://github.com/cnovatech/sdks"
+Changelog = "https://github.com/cnovatech/sdks/blob/main/datamarket-python/CHANGELOG.md"
+
+[tool.uv.sources]
+cnovatech-sdk-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+# `src/cnovatech/` has no __init__.py on purpose: it is a PEP 420 namespace
+# shared with `cnovatech-sdk-core` and the other product SDKs.
+[tool.hatch.build.targets.wheel]
+packages = ["src/cnovatech"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "CHANGELOG.md", "LICENSE", "pyproject.toml"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src", "tests"]
+mypy_path = "src:../core/src"
+strict = true
+warn_unreachable = true
+namespace_packages = true
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q --strict-markers --strict-config"
+markers = [
+    "live: calls the real API; needs --live and only touches free endpoints.",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["src/cnovatech/datamarket"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "if sys.version_info",
+    "@overload",
+    "raise NotImplementedError",
+    "\\.\\.\\.$",
+]

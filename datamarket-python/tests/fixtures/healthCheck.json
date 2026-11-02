@@ -1,0 +1,7 @@
+{
+  "status": "healthy",
+  "database": "connected",
+  "cache": "degraded",
+  "timestamp": "2026-11-02T21:46:19.294237+00:00Z",
+  "version": "1.0.0"
+}

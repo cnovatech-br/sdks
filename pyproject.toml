@@ -1,0 +1,90 @@
+# Workspace root of the Cnovatech Python SDKs.
+#
+# The root publishes nothing. Each member under `members` is its own
+# distribution with its own version. Settings that apply to every member
+# (dev dependencies, ruff) live here; mypy, pytest and coverage are configured
+# per member, because each package has to pass them on its own.
+
+[tool.uv.workspace]
+members = ["core", "datamarket-python"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "ruff>=0.9",
+    "mypy>=1.14",
+    "pandas>=2.0",
+    "pandas-stubs>=2.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["core/src", "datamarket-python/src"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "N",        # pep8-naming
+    "D",        # pydocstyle: every public symbol is documented
+    "ANN",      # flake8-annotations: complete type hints
+    "B",        # flake8-bugbear
+    "UP",       # pyupgrade
+    "SIM",      # flake8-simplify
+    "RUF",      # ruff-specific rules
+    "S",        # flake8-bandit
+    "T20",      # flake8-print: no print() in a library
+    "PT",       # flake8-pytest-style
+    "C4",       # flake8-comprehensions
+    "TC",       # flake8-type-checking
+    "ERA",      # eradicate: no commented-out code
+    "PIE",      # flake8-pie
+    "RET",      # flake8-return
+    "PERF",     # perflint
+    "FBT",      # flake8-boolean-trap: booleans are keyword-only
+    "ARG",      # flake8-unused-arguments
+    "G",        # flake8-logging-format
+    "LOG",      # flake8-logging
+    "ISC",      # flake8-implicit-str-concat
+    "RSE",      # flake8-raise
+    "TID",      # flake8-tidy-imports
+]
+ignore = [
+    "E501",     # line length is the formatter's job
+    "D105",     # magic methods need no docstring
+    "D107",     # __init__ is documented on the class
+    "D203",     # incompatible with D211
+    "D213",     # incompatible with D212
+    "ANN401",   # Any is legitimate at the JSON boundary
+    "ISC001",   # conflicts with the formatter
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["cnovatech"]
+combine-as-imports = true
+# tomllib joined the standard library in 3.11, after this project's floor.
+extra-standard-library = ["tomllib"]
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "cnovatech.sdk_core.models.APIResponse"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = [
+    "S101",     # assert is the point of a test
+    "S105",     # fake credentials in tests
+    "S106",
+    "D",        # test names say what they check
+    "ANN",      # mypy still checks test signatures
+    "FBT",      # literal booleans in assertions and parametrize
+]
+"scripts/*" = ["T20"]
