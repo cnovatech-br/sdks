@@ -10,7 +10,8 @@ project uses [Semantic Versioning](https://semver.org/).
 
 - `DataMarket` and `AsyncDataMarket` clients with configuration from arguments
   or `DATAMARKET_API_KEY` / `DATAMARKET_BASE_URL`, connection pooling, context
-  manager support and a `repr` that masks the key.
+  manager support and a `repr` that masks the key. `max_retries` and
+  `max_units_per_request` are enforced by the shared core.
 - `health()` on both clients: unauthenticated, free of quota cost.
 - `cnovatech.datamarket.errors` with `DataMarketError` as the root of every
   exception the SDK raises.

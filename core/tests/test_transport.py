@@ -11,6 +11,7 @@ from cnovatech.sdk_core.config import ClientConfig, ProductSettings, build_clien
 from cnovatech.sdk_core.errors import (
     APIConnectionError,
     APITimeoutError,
+    BudgetExceededError,
     ConfigurationError,
     NotFoundError,
     QuotaExceededError,
@@ -18,20 +19,21 @@ from cnovatech.sdk_core.errors import (
     ServerError,
     UnexpectedResponseError,
 )
-from cnovatech.sdk_core.models import APIResponse, Health, parser_for
+from cnovatech.sdk_core.models import APIResponse, parser_for
 from cnovatech.sdk_core.operation import Operation
-from cnovatech.sdk_core.transport import AsyncTransport, SyncTransport, prepare_request
+from cnovatech.sdk_core.transport import (
+    AsyncTransport,
+    SyncTransport,
+    prepare_request,
+    translate_transport_error,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-HEALTH_PAYLOAD = {
-    "status": "healthy",
-    "database": "connected",
-    "cache": "healthy",
-    "timestamp": "2026-11-02T21:46:19+00:00",
-    "version": "1.0.0",
-}
+
+class Status(APIResponse):
+    status: str
 
 
 class Thing(APIResponse):
@@ -49,14 +51,23 @@ def thing_operation(**params: Any) -> Operation[Thing]:
     return Operation(method="GET", path="/things/1", parse=parser_for(Thing), params=params)
 
 
-def health_operation() -> Operation[Health]:
+def status_operation() -> Operation[Status]:
     return Operation(
         method="GET",
-        path="/health",
-        parse=parser_for(Health),
+        path="/status",
+        parse=parser_for(Status),
         requires_auth=False,
         under_api_prefix=False,
     )
+
+
+def costly_operation(estimated_cost: int) -> Operation[Thing]:
+    return Operation(
+        method="GET", path="/things", parse=parser_for(Thing), estimated_cost=estimated_cost
+    )
+
+
+# --- request preparation ----------------------------------------------------
 
 
 def test_prepared_request_for_an_authenticated_call(config: ClientConfig) -> None:
@@ -74,15 +85,15 @@ def test_prepared_request_for_an_authenticated_call(config: ClientConfig) -> Non
 
 
 def test_prepared_request_for_a_public_call_outside_the_prefix(config: ClientConfig) -> None:
-    prepared = prepare_request(config, health_operation())
+    prepared = prepare_request(config, status_operation())
 
-    assert prepared.url == "https://api.example.test/health"
+    assert prepared.url == "https://api.example.test/status"
     assert "X-API-Key" not in prepared.headers
 
 
 def test_each_request_gets_its_own_correlation_id(config: ClientConfig) -> None:
-    first = prepare_request(config, health_operation())
-    second = prepare_request(config, health_operation())
+    first = prepare_request(config, status_operation())
+    second = prepare_request(config, status_operation())
 
     assert first.correlation_id != second.correlation_id
 
@@ -123,10 +134,62 @@ def test_public_call_works_without_api_key(
     json_response: Callable[..., Any],
 ) -> None:
     transport = make_sync_transport(
-        json_response(200, HEALTH_PAYLOAD), transport_config=config_without_key
+        json_response(200, {"status": "healthy"}), transport_config=config_without_key
     )
 
-    assert transport.execute(health_operation()).healthy is True
+    assert transport.execute(status_operation()).status == "healthy"
+
+
+def test_call_above_the_per_request_budget_is_refused_before_sending(
+    product: ProductSettings,
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+    json_response: Callable[..., Any],
+) -> None:
+    capped = build_client_config(
+        product, api_key="ex_test_key", max_units_per_request=20, environ={}
+    )
+    transport = make_sync_transport(json_response(200, {}), transport_config=capped)
+
+    with pytest.raises(BudgetExceededError, match="40 quota units") as excinfo:
+        transport.execute(costly_operation(40))
+
+    assert excinfo.value.estimated_cost == 40
+    assert excinfo.value.limit == 20
+    assert excinfo.value.spent == 0
+    assert sent_requests == []
+
+
+def test_call_within_the_per_request_budget_is_sent(
+    product: ProductSettings,
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+    json_response: Callable[..., Any],
+) -> None:
+    capped = build_client_config(
+        product, api_key="ex_test_key", max_units_per_request=20, environ={}
+    )
+    payload = {"identifier": "1", "name": "Milk"}
+    transport = make_sync_transport(json_response(200, payload), transport_config=capped)
+
+    transport.execute(costly_operation(20))
+
+    assert len(sent_requests) == 1
+
+
+def test_without_a_budget_any_cost_is_sent(
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+    json_response: Callable[..., Any],
+) -> None:
+    payload = {"identifier": "1", "name": "Milk"}
+
+    make_sync_transport(json_response(200, payload)).execute(costly_operation(10_000))
+
+    assert len(sent_requests) == 1
+
+
+# --- response interpretation ------------------------------------------------
 
 
 def test_successful_response_is_parsed_and_annotated(
@@ -166,6 +229,23 @@ def test_correlation_id_falls_back_to_the_one_sent(
 
     assert thing.request_info is not None
     assert thing.request_info.correlation_id == sent_requests[0].headers["X-Correlation-ID"]
+
+
+def test_error_without_echoed_correlation_id_keeps_the_one_sent(
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+) -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            502, text="<html>Bad Gateway</html>", headers={"Content-Type": "text/html"}
+        )
+
+    with pytest.raises(ServerError) as excinfo:
+        make_sync_transport(handler, max_retries=0).execute(thing_operation())
+
+    assert excinfo.value.correlation_id == sent_requests[0].headers["X-Correlation-ID"]
+    assert excinfo.value.correlation_id is not None
+    assert excinfo.value.correlation_id in str(excinfo.value)
 
 
 def test_html_with_status_200_is_an_unexpected_response(
@@ -266,24 +346,30 @@ def test_error_families(
     headers: dict[str, str],
     expected: type[Exception],
 ) -> None:
+    transport = make_sync_transport(
+        json_response(status_code, payload, headers=headers), max_retries=0
+    )
+
     with pytest.raises(expected):
-        make_sync_transport(json_response(status_code, payload, headers=headers)).execute(
-            thing_operation()
-        )
+        transport.execute(thing_operation())
+
+
+# --- transport failures -----------------------------------------------------
 
 
 def test_connection_failure_is_wrapped(make_sync_transport: Callable[..., SyncTransport]) -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("boom")
 
-    with pytest.raises(APIConnectionError, match=r"api\.example\.test: ConnectError") as excinfo:
-        make_sync_transport(handler).execute(thing_operation())
+    with pytest.raises(APIConnectionError, match=r"api\.example\.test \(ConnectError\)") as excinfo:
+        make_sync_transport(handler, max_retries=0).execute(thing_operation())
 
     assert isinstance(excinfo.value.__cause__, httpx.ConnectError)
+    assert excinfo.value.retryable is True
     assert "ex_test_key" not in str(excinfo.value)
 
 
-def test_timeout_is_wrapped_and_warns_about_billing(
+def test_read_timeout_is_wrapped_and_warns_about_billing(
     make_sync_transport: Callable[..., SyncTransport],
 ) -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
@@ -293,7 +379,46 @@ def test_timeout_is_wrapped_and_warns_about_billing(
         make_sync_transport(handler).execute(thing_operation())
 
     assert "billed" in str(excinfo.value)
+    assert excinfo.value.retryable is False
     assert isinstance(excinfo.value, APIConnectionError)
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        httpx.ConnectTimeout("slow"),
+        httpx.PoolTimeout("busy"),
+        httpx.WriteTimeout("slow"),
+        httpx.WriteError("closed"),
+        httpx.ProxyError("refused"),
+    ],
+)
+def test_failures_before_the_request_is_sent_are_retryable(
+    config: ClientConfig, exc: httpx.TransportError
+) -> None:
+    error = translate_transport_error(config, prepare_request(config, thing_operation()), exc)
+
+    assert type(error) is APIConnectionError
+    assert error.retryable is True
+    assert "was not sent" in str(error)
+    assert type(exc).__name__ in str(error)
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [httpx.ReadError("dropped"), httpx.RemoteProtocolError("closed"), httpx.CloseError("late")],
+)
+def test_failures_while_reading_the_response_are_not_retryable(
+    config: ClientConfig, exc: httpx.TransportError
+) -> None:
+    error = translate_transport_error(config, prepare_request(config, thing_operation()), exc)
+
+    assert type(error) is APIConnectionError
+    assert error.retryable is False
+    assert "may have been processed and billed" in str(error)
+
+
+# --- lifecycle --------------------------------------------------------------
 
 
 def test_close_leaves_an_injected_client_open(config: ClientConfig) -> None:
@@ -315,7 +440,7 @@ def test_close_closes_the_client_it_created(config: ClientConfig) -> None:
         pass
 
     with pytest.raises(RuntimeError):
-        transport.execute(health_operation())
+        transport.execute(status_operation())
 
 
 def test_http_client_and_transport_are_mutually_exclusive(config: ClientConfig) -> None:
@@ -346,18 +471,21 @@ def test_transport_exposes_its_config(config: ClientConfig) -> None:
     transport.close()
 
 
+# --- async ------------------------------------------------------------------
+
+
 async def test_async_transport_parses_a_successful_response(
     make_async_transport: Callable[..., AsyncTransport],
     sent_requests: list[httpx.Request],
     json_response: Callable[..., Any],
 ) -> None:
-    async with make_async_transport(json_response(200, HEALTH_PAYLOAD)) as transport:
-        health = await transport.execute(health_operation())
+    async with make_async_transport(json_response(200, {"status": "healthy"})) as transport:
+        status = await transport.execute(status_operation())
 
-    assert health.healthy is True
-    assert health.request_info is not None
-    assert health.request_info.path == "/health"
-    assert str(sent_requests[0].url) == "https://api.example.test/health"
+    assert status.status == "healthy"
+    assert status.request_info is not None
+    assert status.request_info.path == "/status"
+    assert str(sent_requests[0].url) == "https://api.example.test/status"
 
 
 async def test_async_transport_raises_mapped_errors(
@@ -388,9 +516,26 @@ async def test_async_transport_wraps_connection_failures(
     def handler(_request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("boom")
 
-    async with make_async_transport(handler) as transport:
+    async with make_async_transport(handler, max_retries=0) as transport:
         with pytest.raises(APIConnectionError):
             await transport.execute(thing_operation())
+
+
+async def test_async_budget_guard_refuses_before_sending(
+    product: ProductSettings,
+    make_async_transport: Callable[..., AsyncTransport],
+    sent_requests: list[httpx.Request],
+    json_response: Callable[..., Any],
+) -> None:
+    capped = build_client_config(
+        product, api_key="ex_test_key", max_units_per_request=1, environ={}
+    )
+
+    async with make_async_transport(json_response(200, {}), transport_config=capped) as transport:
+        with pytest.raises(BudgetExceededError):
+            await transport.execute(costly_operation(2))
+
+    assert sent_requests == []
 
 
 async def test_async_close_leaves_an_injected_client_open(config: ClientConfig) -> None:

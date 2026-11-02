@@ -174,3 +174,44 @@ def test_api_key_never_appears_in_repr(product: ProductSettings) -> None:
 )
 def test_mask_api_key(raw_key: str | None, masked: str) -> None:
     assert mask_api_key(None if raw_key is None else SecretStr(raw_key)) == masked
+
+
+def test_blank_explicit_api_key_falls_back_to_environment(product: ProductSettings) -> None:
+    config = build_client_config(product, api_key="  ", environ={"EXAMPLE_API_KEY": "ex_env"})
+
+    assert config.api_key is not None
+    assert config.api_key.get_secret_value() == "ex_env"
+
+
+def test_blank_explicit_base_url_falls_back_to_environment(product: ProductSettings) -> None:
+    config = build_client_config(
+        product, base_url="  ", environ={"EXAMPLE_BASE_URL": "https://staging.example.test"}
+    )
+
+    assert config.base_url == "https://staging.example.test"
+
+
+def test_blank_environment_values_fall_back_to_defaults(product: ProductSettings) -> None:
+    config = build_client_config(product, environ={"EXAMPLE_API_KEY": "", "EXAMPLE_BASE_URL": " "})
+
+    assert config.api_key is None
+    assert config.base_url == "https://api.example.test"
+
+
+@pytest.mark.parametrize("timeout", [float("nan"), float("inf"), httpx.Timeout(float("nan"))])
+def test_non_finite_timeout_is_rejected(
+    product: ProductSettings, timeout: float | httpx.Timeout
+) -> None:
+    with pytest.raises(ConfigurationError, match="read timeout"):
+        build_client_config(product, timeout=timeout, environ={})
+
+
+def test_boolean_timeout_is_rejected(product: ProductSettings) -> None:
+    with pytest.raises(ConfigurationError, match="timeout must be a number"):
+        build_client_config(product, timeout=True, environ={})
+
+
+def test_user_agent_is_computed_once(product: ProductSettings) -> None:
+    config = build_client_config(product, environ={})
+
+    assert config.user_agent is config.user_agent

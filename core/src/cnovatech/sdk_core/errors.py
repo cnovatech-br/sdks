@@ -50,16 +50,58 @@ class ConfigurationError(CnovatechError, ValueError):
     """The client was configured with a missing or invalid value. Nothing was sent."""
 
 
+class BudgetExceededError(CnovatechError):
+    """A call or an iteration would cost more quota than the configured ceiling.
+
+    Raised before the request is sent, so nothing was billed.
+
+    Attributes:
+        estimated_cost: Units the refused request was expected to consume.
+        limit: The ceiling that would have been crossed.
+        spent: Units already consumed by the iteration that stopped, if any.
+        items_yielded: Items delivered before the iteration stopped, if any.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        estimated_cost: int,
+        limit: int,
+        spent: int = 0,
+        items_yielded: int = 0,
+    ) -> None:
+        super().__init__(message)
+        self.estimated_cost = estimated_cost
+        self.limit = limit
+        self.spent = spent
+        self.items_yielded = items_yielded
+
+
 class APIConnectionError(CnovatechError):
-    """No response was received: DNS, TCP, TLS or a similar transport failure."""
+    """No usable response was received: DNS, TCP, TLS or a similar transport failure.
+
+    Attributes:
+        retryable: Whether the request can be repeated without risk of a second
+            charge, which is the case only when it never reached the API. The
+            SDK retries on its own only when this is true.
+    """
+
+    def __init__(self, message: str, *, retryable: bool) -> None:
+        super().__init__(message)
+        self.message = message
+        self.retryable = retryable
 
 
 class APITimeoutError(APIConnectionError):
-    """The API did not answer within the configured timeout.
+    """The API did not answer within the read timeout.
 
-    The SDK never retries a read timeout on its own: the server may already
-    have processed and billed the request, and a repeat could be charged again.
+    Never retried by the SDK: the server may already have processed and billed
+    the request, and a repeat could be charged again.
     """
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, retryable=False)
 
 
 class UnexpectedResponseError(CnovatechError):
@@ -68,7 +110,7 @@ class UnexpectedResponseError(CnovatechError):
     Attributes:
         status_code: HTTP status of the response.
         content_type: Value of the ``Content-Type`` header, if any.
-        correlation_id: Identifier echoed by the API, if any.
+        correlation_id: Identifier of the request, for support.
     """
 
     def __init__(
@@ -103,7 +145,7 @@ class APIStatusError(CnovatechError):
             from the status when the body does not carry one.
         message: Human-readable message from the body.
         body: Decoded JSON body, or an empty mapping when the body was not JSON.
-        correlation_id: Identifier echoed by the API. Quote it in support requests.
+        correlation_id: Identifier of the request. Quote it in support requests.
         hint: What the API suggests doing next, when it says.
         usage: Quota accounting sent with the error, when present.
         retry_after: Seconds to wait before trying again, from ``Retry-After``.
@@ -197,8 +239,8 @@ class UnprocessableEntityError(APIStatusError):
 class RateLimitError(APIStatusError):
     """429 ``rate_limit_exceeded``: too many requests in the current minute.
 
-    Safe to retry after :attr:`retry_after` seconds. The SDK retries it on its
-    own up to ``max_retries`` times before raising.
+    Safe to repeat after :attr:`retry_after` seconds. The SDK retries it on
+    its own up to ``max_retries`` times before raising.
     """
 
 
@@ -259,15 +301,23 @@ def error_class_for(
     return _STATUS_TO_ERROR.get(status_code, APIStatusError)
 
 
+def response_error_code(response: httpx.Response) -> str:
+    """The ``error`` code of an error response, or the default for its status."""
+    body = _json_object(response)
+    return _text(body.get("error")) or _DEFAULT_CODES.get(response.status_code, "error")
+
+
 def error_from_response(
     response: httpx.Response,
     *,
     overrides: Mapping[str, type[APIStatusError]] | None = None,
+    fallback_correlation_id: str | None = None,
 ) -> APIStatusError:
     """Build the exception that describes an error response.
 
     Tolerates bodies that are not JSON, such as HTML from a gateway, by falling
-    back to the status code and reason phrase.
+    back to the status code and reason phrase. ``fallback_correlation_id`` is
+    the identifier the SDK sent, used when the response does not echo one.
     """
     body = _json_object(response)
     status_code = response.status_code
@@ -279,11 +329,22 @@ def error_from_response(
         code=code,
         message=message,
         body=body,
-        correlation_id=response.headers.get(CORRELATION_ID_HEADER),
+        correlation_id=response.headers.get(CORRELATION_ID_HEADER) or fallback_correlation_id,
         hint=_text(body.get("what_to_do")),
         usage=_usage(body.get("usage")),
-        retry_after=_retry_after(response.headers.get(RETRY_AFTER_HEADER)),
+        retry_after=parse_retry_after(response.headers.get(RETRY_AFTER_HEADER)),
     )
+
+
+def parse_retry_after(value: str | None) -> int | None:
+    """Seconds from a ``Retry-After`` header, or ``None`` when absent or not a delay in seconds."""
+    if value is None:
+        return None
+    try:
+        seconds = int(value.strip())
+    except ValueError:
+        return None
+    return seconds if seconds >= 0 else None
 
 
 def _json_object(response: httpx.Response) -> Mapping[str, Any]:
@@ -305,9 +366,3 @@ def _usage(value: object) -> Usage | None:
         return Usage.model_validate(value)
     except pydantic.ValidationError:
         return None
-
-
-def _retry_after(value: str | None) -> int | None:
-    if value is None or not value.strip().isdigit():
-        return None
-    return int(value)

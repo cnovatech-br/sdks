@@ -12,8 +12,9 @@ import logging
 
 from .config import ClientConfig, ProductSettings, build_client_config
 from .metadata import read_distribution_version
-from .models import APIResponse, Health, RequestInfo, Usage, parser_for
+from .models import APIResponse, RequestInfo, Usage, parser_for
 from .operation import Operation
+from .retry import RetryPolicy
 from .transport import AsyncTransport, SyncTransport
 
 __version__ = read_distribution_version("cnovatech-sdk-core")
@@ -27,10 +28,10 @@ __all__ = [
     "APIResponse",
     "AsyncTransport",
     "ClientConfig",
-    "Health",
     "Operation",
     "ProductSettings",
     "RequestInfo",
+    "RetryPolicy",
     "SyncTransport",
     "Usage",
     "__version__",

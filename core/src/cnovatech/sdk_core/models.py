@@ -23,7 +23,7 @@ class RequestInfo:
         method: HTTP method of the request.
         path: Request path, without the query string.
         status_code: HTTP status of the final response.
-        correlation_id: Identifier echoed by the API. Quote it in support requests.
+        correlation_id: Identifier of the request. Quote it in support requests.
         attempts: Attempts made, including the one that produced the response.
         elapsed_seconds: Wall-clock time from the first attempt to the final response.
     """
@@ -75,21 +75,6 @@ class Usage(BaseModel):
     used: int | None = None
     limit: int | None = None
     remaining: int | None = None
-
-
-class Health(APIResponse):
-    """Result of the unauthenticated health check."""
-
-    status: str
-    database: str
-    cache: str
-    timestamp: str
-    version: str
-
-    @property
-    def healthy(self) -> bool:
-        """Whether the API reported itself as healthy."""
-        return self.status == "healthy"
 
 
 ModelT = TypeVar("ModelT", bound=BaseModel)

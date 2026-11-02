@@ -25,9 +25,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-# The core and this package are released together; the pin follows its minor series.
+# The core and this package are released together; the pin follows the core's
+# minor series and moves with every release.
 dependencies = [
-    "cnovatech-sdk-core>=0.1.0.dev0,<1.0",
+    "cnovatech-sdk-core>=0.1.0.dev0,<0.2",
 ]
 
 [project.optional-dependencies]

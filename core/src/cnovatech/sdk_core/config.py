@@ -8,6 +8,7 @@ sent.
 
 from __future__ import annotations
 
+import math
 import os
 import sys
 from dataclasses import dataclass, field
@@ -75,6 +76,7 @@ class ClientConfig:
     timeout: httpx.Timeout
     max_retries: int
     max_units_per_request: int | None
+    user_agent: str
 
     @property
     def hostname(self) -> str:
@@ -88,17 +90,6 @@ class ClientConfig:
         if read_timeout is None:
             raise ConfigurationError("The read timeout must be set.")
         return float(read_timeout)
-
-    @property
-    def user_agent(self) -> str:
-        """Identify the product SDK, the core, Python and httpx, in that order."""
-        python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
-        core_version = read_distribution_version(CORE_DISTRIBUTION_NAME)
-        return (
-            f"{self.product.distribution_name}/{self.product.version} "
-            f"{CORE_DISTRIBUTION_NAME}/{core_version} "
-            f"python/{python_version} httpx/{httpx.__version__}"
-        )
 
     @property
     def masked_api_key(self) -> str:
@@ -116,6 +107,17 @@ def mask_api_key(api_key: SecretStr | None) -> str:
     return "****"
 
 
+def build_user_agent(product: ProductSettings) -> str:
+    """Identify the product SDK, the core, Python and httpx, in that order."""
+    python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    core_version = read_distribution_version(CORE_DISTRIBUTION_NAME)
+    return (
+        f"{product.distribution_name}/{product.version} "
+        f"{CORE_DISTRIBUTION_NAME}/{core_version} "
+        f"python/{python_version} httpx/{httpx.__version__}"
+    )
+
+
 def build_client_config(
     product: ProductSettings,
     *,
@@ -129,21 +131,26 @@ def build_client_config(
     """Resolve and validate the settings of a client.
 
     Explicit arguments win over environment variables, which win over the
-    product defaults. ``environ`` replaces ``os.environ`` in tests.
+    product defaults. A blank string counts as not given, at every level.
+    ``environ`` replaces ``os.environ`` in tests.
 
     Raises:
         ConfigurationError: A value is invalid. Nothing has been sent.
     """
     env = os.environ if environ is None else environ
-    api_key_from_env = env.get(product.env_prefix + API_KEY_ENV_SUFFIX)
-    base_url_from_env = env.get(product.env_prefix + BASE_URL_ENV_SUFFIX)
+    api_key_value = _first_present(api_key, env.get(product.env_prefix + API_KEY_ENV_SUFFIX))
+    base_url_value = (
+        _first_present(base_url, env.get(product.env_prefix + BASE_URL_ENV_SUFFIX))
+        or product.default_base_url
+    )
     return ClientConfig(
         product=product,
-        api_key=_resolve_api_key(api_key, api_key_from_env),
-        base_url=validate_base_url(base_url or base_url_from_env or product.default_base_url),
+        api_key=SecretStr(api_key_value) if api_key_value is not None else None,
+        base_url=validate_base_url(base_url_value),
         timeout=build_timeout(timeout),
         max_retries=_validate_max_retries(max_retries),
         max_units_per_request=_validate_max_units_per_request(max_units_per_request),
+        user_agent=build_user_agent(product),
     )
 
 
@@ -174,11 +181,13 @@ def build_timeout(timeout: float | httpx.Timeout) -> httpx.Timeout:
 
     A number sets the read timeout only; connect, write and pool keep their
     defaults. An ``httpx.Timeout`` is used as given. The read timeout must be
-    greater than zero and at most :data:`MAX_READ_TIMEOUT_SECONDS`.
+    a finite number greater than zero and at most :data:`MAX_READ_TIMEOUT_SECONDS`.
     """
     if isinstance(timeout, httpx.Timeout):
         resolved = timeout
     else:
+        if isinstance(timeout, bool):
+            raise ConfigurationError("timeout must be a number of seconds or an httpx.Timeout.")
         try:
             read_seconds = float(timeout)
         except (TypeError, ValueError) as exc:
@@ -192,7 +201,12 @@ def build_timeout(timeout: float | httpx.Timeout) -> httpx.Timeout:
             pool=DEFAULT_POOL_TIMEOUT_SECONDS,
         )
     read_timeout = resolved.read
-    if read_timeout is None or read_timeout <= 0 or read_timeout > MAX_READ_TIMEOUT_SECONDS:
+    if (
+        read_timeout is None
+        or not math.isfinite(read_timeout)
+        or read_timeout <= 0
+        or read_timeout > MAX_READ_TIMEOUT_SECONDS
+    ):
         raise ConfigurationError(
             "The read timeout must be greater than 0 and at most "
             f"{MAX_READ_TIMEOUT_SECONDS:g} seconds, the server's own limit; got {read_timeout!r}."
@@ -200,11 +214,12 @@ def build_timeout(timeout: float | httpx.Timeout) -> httpx.Timeout:
     return resolved
 
 
-def _resolve_api_key(explicit: str | None, from_env: str | None) -> SecretStr | None:
-    value = explicit if explicit is not None else from_env
-    if value is None or not value.strip():
-        return None
-    return SecretStr(value.strip())
+def _first_present(*candidates: str | None) -> str | None:
+    """The first candidate that is not ``None`` or blank, stripped."""
+    for candidate in candidates:
+        if candidate is not None and candidate.strip():
+            return candidate.strip()
+    return None
 
 
 def _validate_max_retries(max_retries: int) -> int:

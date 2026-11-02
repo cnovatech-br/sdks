@@ -18,6 +18,8 @@ from cnovatech.sdk_core.errors import (
     UnprocessableEntityError,
     error_class_for,
     error_from_response,
+    parse_retry_after,
+    response_error_code,
 )
 
 
@@ -204,6 +206,44 @@ def test_non_numeric_retry_after_is_ignored() -> None:
     )
 
     assert error_from_response(response).retry_after is None
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, None),
+        ("7", 7),
+        (" 12 ", 12),
+        ("0", 0),
+        ("-1", None),
+        ("soon", None),
+        ("²", None),
+        ("Wed, 21 Oct 2026 07:28:00 GMT", None),
+    ],
+)
+def test_parse_retry_after(value: str | None, expected: int | None) -> None:
+    assert parse_retry_after(value) == expected
+
+
+def test_correlation_id_falls_back_to_the_one_sent_when_not_echoed() -> None:
+    response = httpx.Response(503, json={"error": "service_unavailable"})
+
+    error = error_from_response(response, fallback_correlation_id="sent-by-sdk")
+
+    assert error.correlation_id == "sent-by-sdk"
+
+
+def test_echoed_correlation_id_wins_over_the_fallback() -> None:
+    response = httpx.Response(503, json={}, headers={"X-Correlation-ID": "echoed"})
+
+    assert error_from_response(response, fallback_correlation_id="sent").correlation_id == "echoed"
+
+
+def test_response_error_code_defaults_by_status() -> None:
+    assert response_error_code(httpx.Response(503, text="down")) == "service_unavailable"
+    assert response_error_code(httpx.Response(429, json={"error": "insufficient_quota"})) == (
+        "insufficient_quota"
+    )
 
 
 def test_json_body_that_is_not_an_object_is_ignored() -> None:
