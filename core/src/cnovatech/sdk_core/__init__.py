@@ -8,6 +8,8 @@ boundary.
 
 from __future__ import annotations
 
+import logging
+
 from .config import ClientConfig, ProductSettings, build_client_config
 from .metadata import read_distribution_version
 from .models import APIResponse, Health, RequestInfo, Usage, parser_for
@@ -15,6 +17,11 @@ from .operation import Operation
 from .transport import AsyncTransport, SyncTransport
 
 __version__ = read_distribution_version("cnovatech-sdk-core")
+
+# Libraries log but never configure logging. The null handler keeps Python from
+# printing "No handlers could be found" when the application has not set up
+# logging; the application routes the `cnovatech` logger wherever it wants.
+logging.getLogger("cnovatech").addHandler(logging.NullHandler())
 
 __all__ = [
     "APIResponse",

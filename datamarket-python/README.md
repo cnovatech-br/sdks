@@ -1,95 +1,183 @@
 # cnovatech-datamarket
 
 Official Python SDK for the [Cnovatech Data Market](https://datamarket.cnovatech.com.br)
-API: price, availability and assortment intelligence for more than 150,000
-products across 240+ online supermarkets in 23 Brazilian states, collected daily.
+API: daily prices, availability and assortment of more than 150,000 products
+across 240+ online supermarkets in 23 Brazilian states.
 
-> **Pre-release.** The client, its configuration and `health()` are implemented.
-> The resources listed below are the committed design and arrive in the next
-> releases. Nothing here is published to PyPI yet.
+- Synchronous and asynchronous clients with the same surface
+- Every response carries its quota cost; pagination can be capped by cost
+- Retries only where a repeat cannot be billed twice
+- Typed end to end: pydantic models, `py.typed`, `mypy --strict`
+
+> **Status: pre-release.** Client configuration and `health()` are available
+> today. The resources below ship in this order: account and product lookup,
+> catalogue and pagination, store analytics. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Installation
 
 ```bash
-pip install cnovatech-datamarket            # httpx and pydantic, nothing else
-pip install "cnovatech-datamarket[pandas]"  # adds .to_dataframe() to list responses
+pip install cnovatech-datamarket
 ```
 
-Python 3.10 or newer.
+Add `[pandas]` for `to_dataframe()` on list responses. Python 3.10 or newer.
 
 ## Quick start
 
 ```python
 from cnovatech.datamarket import DataMarket
 
-client = DataMarket()  # reads DATAMARKET_API_KEY from the environment
+client = DataMarket()  # reads DATAMARKET_API_KEY
 
-page = client.products.catalog(search="coca cola 2l", brand="COCA-COLA")
-product = client.products.get(page.data[0].ean, state="SP")
+product = client.products.get("7894900011517", state="SP")
 
 print(product.product_name, product.market.median_price)
-for offer in product.offers[:5]:
+for offer in product.offers[:3]:
     print(offer.store_name, offer.price, offer.available)
 
-print(
-    "cost:",
-    page.usage.query_cost + product.usage.query_cost,
-    "units;",
-    "remaining:",
-    product.usage.remaining,
-)
+print(f"{product.usage.query_cost} unit spent, {product.usage.remaining} remaining")
 ```
 
-## What the SDK guarantees
+Get a key at <https://datamarket.cnovatech.com.br>. `client.health()` checks
+the API without a key and without cost.
 
-- **Visible cost.** Every response carries `.usage` (`query_cost`, `used`,
-  `limit`, `remaining`) and the client accumulates `client.usage.spent`.
-  Automatic pagination accepts `max_pages` and `max_units`.
-- **Retries that never bill twice.** Connection errors, 502/503/504 and the
-  per-minute 429 are retried (honouring `Retry-After`). Read timeouts and
-  quota errors are never retried.
-- **A realistic timeout.** 150 s of read timeout: the first lookup of an
-  uncached product can take about 90 s on the API; afterwards it answers in
-  under a second.
-- **Typed errors.** `EANNotFoundError`, `QuotaExceededError`, `RateLimitError`,
-  `FilterRequiredError`... each with `status_code`, `code`, `correlation_id`
-  and `usage`.
-- **Sync and async** with the same surface: `DataMarket` and `AsyncDataMarket`.
-- **Typed end to end.** Pydantic models, `py.typed`, `mypy --strict`.
-- **The key never leaks** into `repr`, logs or tracebacks.
+The first lookup of a product the API has not cached yet can take up to 90
+seconds; after that it answers in under a second. The default timeout allows
+for it.
 
-## Resources
+## Quota
 
-| Resource | Methods |
-|---|---|
-| `client.products` | `catalog`, `departments`, `brands`, `by_brand`, `get`, `price_history`, `coverage` |
-| `client.stores` | `list`, `find`, `assortment`, `competitors`, `competitiveness`, `compare`, `market_position`, `opportunities` |
-| `client.brands` | `stores` |
-| `client.account` | `profile`, `usage`, `logs`, `api_keys` |
-| `client` | `health`, `usage`, `rate_limit` |
+Every call is billed in quota units, and every response says what it cost:
+
+```python
+page = client.products.catalog(search="azeite", limit=50)  # 1 unit
+print(page.usage.query_cost, page.usage.remaining)
+print(client.usage.spent)  # units spent through this client
+```
+
+Paginated responses can be walked page by page or item by item, with a ceiling
+on how much to spend:
+
+```python
+position = client.stores.market_position(store_id, limit=1000)  # 8 units per page
+print(position.meta.pages, "pages;", position.estimate_remaining_cost(), "units to finish")
+
+for item in position.iter_all(max_units=40):
+    print(item.product_name, item.price_position)
+```
+
+`iter_all` never requests again the page you already paid for. It stops quietly
+at `max_pages` and raises `BudgetExceededError` before a page that would cross
+`max_units`. To refuse any single call above a budget, build the client with
+`DataMarket(max_units_per_request=20)`.
+
+## Stores and competitors
+
+```python
+store = client.stores.find("Supermercado Modelo", state="SP")  # 1 unit
+competitors = client.stores.competitors(store.store_id, limit=5)  # 1 unit each
+
+for competitor in competitors.data:
+    print(competitor.store_name, f"{competitor.overlap_pct:.0f}% of the assortment in common")
+
+comparison = client.stores.compare(store.store_id, competitors.data[0].store_id)
+for item in comparison.data:
+    print(item.product_name, item.price_position, item.price_diff_pct)
+```
+
+## Errors
+
+```python
+from cnovatech.datamarket import DataMarket, errors
+
+client = DataMarket()
+
+try:
+    product = client.products.get("0000000000000")
+except errors.EANNotFoundError as exc:
+    print(exc.hint)  # what the API suggests doing next
+except errors.QuotaExceededError as exc:
+    print(exc.code, exc.upgrade_url)
+except errors.APITimeoutError:
+    pass  # may have been billed; check client.account.usage() before repeating
+except errors.DataMarketError as exc:
+    print(exc)  # status, code, message and correlation_id; never the key
+```
+
+Connection errors, 502/503/504 and the per-minute 429 are retried with backoff.
+Read timeouts and quota errors never are.
+
+## Async
+
+```python
+import asyncio
+
+from cnovatech.datamarket import AsyncDataMarket
+
+
+async def main() -> None:
+    async with AsyncDataMarket() as client:
+        product = await client.products.get("7894900011517")
+        print(product.market.median_price)
+
+
+asyncio.run(main())
+```
+
+## pandas
+
+```python
+assortment = client.stores.assortment(store.store_id, limit=1000)
+frame = assortment.to_dataframe()  # one row per item; usage and meta as columns
+```
 
 ## Configuration
 
-| Setting | Constructor argument | Environment variable | Default |
-|---|---|---|---|
-| API key | `api_key` | `DATAMARKET_API_KEY` | none; only `health()` works without it |
-| Base URL | `base_url` | `DATAMARKET_BASE_URL` | `https://datamarket.cnovatech.com.br` |
-| Read timeout | `timeout` | | 150 s |
-| Retries | `max_retries` | | 2 |
-| Per-call budget | `max_units_per_request` | | off |
+| Argument | Environment variable | Default |
+|---|---|---|
+| `api_key` | `DATAMARKET_API_KEY` | required, except for `health()` |
+| `base_url` | `DATAMARKET_BASE_URL` | `https://datamarket.cnovatech.com.br` |
+| `timeout` | | 150 s read timeout; pass `httpx.Timeout` to set every phase |
+| `max_retries` | | 2 |
+| `max_units_per_request` | | no limit |
+| `http_client` | | your own `httpx.Client`, for proxies, certificates or a shared pool |
 
-## Development
+## Logging
 
-This package lives in the [Cnovatech SDKs workspace](../README.md). From the
-workspace root:
+The SDK logs through the standard `logging` module under the `cnovatech`
+namespace and installs no handler of its own. At DEBUG it records each request's
+method, path, status and duration; retries are logged at INFO, and a WARNING is
+emitted when the remaining quota drops below 10%. Keys, headers and bodies are
+never logged.
 
-```bash
-make install     # workspace virtualenv with every package and the dev tools
-make check       # ruff, boundary check, mypy --strict, tests with coverage
-make live        # smoke test against the real API; free endpoints only
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("cnovatech").setLevel(logging.DEBUG)
 ```
+
+## Resources
+
+| Resource | Methods | Cost |
+|---|---|---|
+| `client.products` | `catalog`, `departments`, `brands`, `by_brand`, `get`, `price_history` | 1 unit |
+| | `coverage` | ceil(codes / 250) units; up to 500 codes per call |
+| `client.stores` | `list`, `find` | 1 unit |
+| | `competitors`, `competitiveness` | 1 unit per competitor |
+| | `assortment`, `compare`, `market_position`, `opportunities` | ceil(rows / 250) × 2 units per page |
+| `client.brands` | `stores` | 1 unit |
+| `client.account` | `profile`, `usage`, `logs`, `api_keys` | free |
+| `client` | `health`, `usage`, `rate_limit`, `close` | free |
+
+Each method's docstring states its cost. The API reference is at
+<https://datamarket.cnovatech.com.br/redoc>.
+
+## Support
+
+- Issues and feature requests: <https://github.com/cnovatech/sdks/issues>
+- Email: <suporte@cnovatech.com.br>
 
 ## License
 
-To be defined before the first release. The Data Market API terms of use are at
+To be defined before the first stable release. The API terms of use are at
 <https://cnovatech.com.br/termos-de-uso>.
