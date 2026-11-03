@@ -13,6 +13,7 @@ or in ``.env``::
 
 from __future__ import annotations
 
+import contextlib
 import json
 import sys
 from pathlib import Path
@@ -57,6 +58,7 @@ class Recorder:
         self.responses: list[tuple[str, int, Any]] = []
 
     def __call__(self, response: httpx.Response) -> None:
+        """Record one response. Installed as an httpx ``response`` event hook."""
         response.read()
         try:
             payload = response.json()
@@ -142,14 +144,11 @@ def exercise(client: DataMarket) -> None:
     client.stores.market_position(store_id, limit=5)
     client.stores.opportunities(store_id, limit=5)
 
-    try:
+    # Both errors are expected and free; their bodies become the error fixtures.
+    with contextlib.suppress(errors.EANNotFoundError):
         client.products.get(UNKNOWN_EAN)
-    except errors.EANNotFoundError:
-        pass
-    try:
+    with contextlib.suppress(errors.FilterRequiredError):
         client.products.catalog(page=21)
-    except errors.FilterRequiredError:
-        pass
 
 
 def main() -> int:
