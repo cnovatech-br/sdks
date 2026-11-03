@@ -1,22 +1,96 @@
 {
   "data": [
     {
-      "ean": "7894900011517",
-      "product_name": "Refrigerante Coca-Cola 2L",
+      "ean": "7894900701517",
+      "product_name": "REFRIGERANTE ZERO ACUCAR COCA-COLA PET 2L",
       "brand": "COCA-COLA",
-      "category": "Refrigerantes",
-      "department": "Bebidas",
-      "image_url": null,
-      "store_count": 183,
-      "availability_pct": 91.3,
-      "min_price": 7.49,
-      "max_price": 12.99,
-      "avg_price": 9.62,
-      "median_price": 9.49,
-      "price_range": 5.5,
-      "price_cv_pct": 11.2
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/183445/6571bea7558925a4e8897d22.jpg?v=638375499951770000",
+      "store_count": 215,
+      "availability_pct": 97.7,
+      "min_price": 8.98,
+      "max_price": 17.9,
+      "avg_price": 11.88,
+      "median_price": 11.8,
+      "price_range": 8.92,
+      "price_cv_pct": 10.4
+    },
+    {
+      "ean": "7894900025019",
+      "product_name": "REFRIGERANTE COCA-COLA CAFE ESPRESSO LATA 220ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/190290/6571c45a558925a4e8899811.jpg?v=638375514533570000",
+      "store_count": 209,
+      "availability_pct": 83.7,
+      "min_price": 2.18,
+      "max_price": 4.5,
+      "avg_price": 3.18,
+      "median_price": 3.18,
+      "price_range": 2.32,
+      "price_cv_pct": 10.1
+    },
+    {
+      "ean": "7894900011609",
+      "product_name": "REFRIGERANTE ORIGINAL COCA-COLA GARRAFA 600ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/182991/6571be40558925a4e8897b70.jpg?v=638375498920300000",
+      "store_count": 209,
+      "availability_pct": 94.7,
+      "min_price": 4.49,
+      "max_price": 7.99,
+      "avg_price": 5.93,
+      "median_price": 5.95,
+      "price_range": 3.5,
+      "price_cv_pct": 11.3
+    },
+    {
+      "ean": "7894900700015",
+      "product_name": "REFRIGERANTE COCA-COLA ZERO ACUCAR 350ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://amigao.vteximg.com.br/arquivos/ids/171583/refrigerante-coca-cola-zero-acucar-350ml.jpg?v=638773189246970000",
+      "store_count": 207,
+      "availability_pct": 92.8,
+      "min_price": 3.49,
+      "max_price": 6.0,
+      "avg_price": 4.37,
+      "median_price": 4.39,
+      "price_range": 2.51,
+      "price_cv_pct": 9.4
+    },
+    {
+      "ean": "7894900701609",
+      "product_name": "REFRIGERANTE COCA-COLA SEM ACUCAR PET 600ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/183434/6571bea7558925a4e8897d26.jpg?v=638375499951300000",
+      "store_count": 200,
+      "availability_pct": 94.0,
+      "min_price": 4.49,
+      "max_price": 7.59,
+      "avg_price": 5.92,
+      "median_price": 5.96,
+      "price_range": 3.1,
+      "price_cv_pct": 10.8
     }
   ],
-  "meta": { "page": 1, "limit": 50, "total": 1, "pages": 1 },
-  "usage": { "query_cost": 1, "used": 4, "limit": 1000, "remaining": 996 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 171,
+    "pages": 35
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

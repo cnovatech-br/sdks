@@ -4,6 +4,7 @@ import datetime
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from conftest import load_fixture
 
 from cnovatech.datamarket import errors, models
 
@@ -11,29 +12,32 @@ if TYPE_CHECKING:
     from conftest import FakeAPI
 
 CATALOG = "/api/v1/market/products/catalog"
-PRODUCT = "/api/v1/market/products/ean/7894900011517"
+PRODUCT_FIXTURE = load_fixture("getProductByEan.json")
+EAN = PRODUCT_FIXTURE["ean"]
+PRODUCT = f"/api/v1/market/products/ean/{EAN}"
 
 
 def test_catalog_sends_filters_and_returns_a_page(api: FakeAPI) -> None:
-    api.respond("GET", CATALOG, "getCatalog.json")
+    expected = load_fixture("getCatalog.json")
+    api.respond("GET", CATALOG, expected)
 
     with api.client() as client:
-        page = client.products.catalog(search="coca cola 2l", state="sp", min_price=5, limit=50)
+        page = client.products.catalog(search="coca cola 2l", state="sp", min_price=5, limit=5)
 
     assert isinstance(page, models.CatalogPage)
-    assert page.data[0].ean == "7894900011517"
-    assert page.data[0].median_price == 9.49
-    assert page.meta.pages == 1
+    assert [product.ean for product in page] == [item["ean"] for item in expected["data"]]
+    assert page.data[0].median_price == expected["data"][0]["median_price"]
+    assert page.meta.pages == expected["meta"]["pages"]
+    assert page.has_next is True
+    assert page.estimate_remaining_cost() == expected["meta"]["pages"] - 1
     assert page.usage.query_cost == 1
-    assert page.has_next is False
-    assert page.estimate_remaining_cost() == 0
     assert client.usage.spent == 1
     assert api.last_params == {
         "search": "coca cola 2l",
         "state": "SP",
         "min_price": "5",
         "page": "1",
-        "limit": "50",
+        "limit": "5",
     }
     assert api.last_request.headers["X-API-Key"] == "dm_test_key"
     assert page.request_info is not None
@@ -41,12 +45,11 @@ def test_catalog_sends_filters_and_returns_a_page(api: FakeAPI) -> None:
 
 
 def test_catalog_pages_are_walked_without_refetching_the_first(api: FakeAPI) -> None:
-    first = {
-        **api_fixture("getCatalog.json"),
-        "meta": {"page": 1, "limit": 1, "total": 2, "pages": 2},
-    }
-    second = {**first, "meta": {"page": 2, "limit": 1, "total": 2, "pages": 2}}
-    second["data"] = [first["data"][1]]
+    fixture = load_fixture("getCatalog.json")
+    first: dict[str, Any] = {**fixture, "meta": {"page": 1, "limit": 1, "total": 2, "pages": 2}}
+    first["data"] = [fixture["data"][0]]
+    second: dict[str, Any] = {**first, "meta": {"page": 2, "limit": 1, "total": 2, "pages": 2}}
+    second["data"] = [fixture["data"][1]]
     api.respond("GET", CATALOG, first, params={"page": "1"})
     api.respond("GET", CATALOG, second, params={"page": "2"})
 
@@ -55,7 +58,7 @@ def test_catalog_pages_are_walked_without_refetching_the_first(api: FakeAPI) -> 
         assert page.estimate_remaining_cost() == 1
         eans = [product.ean for product in page.iter_all(max_units=1)]
 
-    assert eans == ["7894900011517", "7894900027013", "7894900027013"]
+    assert eans == [fixture["data"][0]["ean"], fixture["data"][1]["ean"]]
     assert [dict(request.url.params)["page"] for request in api.requests] == ["1", "2"]
     assert client.usage.spent == 2
 
@@ -89,70 +92,73 @@ def test_catalog_rejects_invalid_arguments_before_sending(
 
 
 def test_departments(api: FakeAPI) -> None:
-    api.respond("GET", "/api/v1/market/products/departments", "listDepartments.json")
+    expected = load_fixture("listDepartments.json")
+    api.respond("GET", "/api/v1/market/products/departments", expected)
 
     with api.client() as client:
         departments = client.products.departments()
 
-    assert departments.summary.category_count == 3
-    assert departments.data[0].department == "Bebidas"
-    assert departments.data[0].categories[1].category == "Cervejas"
-    assert departments.to_dataframe()["department"].tolist() == ["Bebidas", "Mercearia"]
+    assert departments.summary.category_count == expected["summary"]["category_count"]
+    assert departments.data[0].department == expected["data"][0]["department"]
+    assert (
+        departments.data[0].categories[0].category
+        == (expected["data"][0]["categories"][0]["category"])
+    )
+    assert departments.to_dataframe()["department"].tolist() == [
+        item["department"] for item in expected["data"]
+    ]
 
 
 def test_brands(api: FakeAPI) -> None:
-    api.respond("GET", "/api/v1/market/products/brands", "listBrands.json")
+    expected = load_fixture("listBrands.json")
+    api.respond("GET", "/api/v1/market/products/brands", expected)
 
     with api.client() as client:
-        page = client.products.brands(search="coca", department="Bebidas")
+        page = client.products.brands(search="coca", department="BEBIDAS", limit=5)
 
     assert isinstance(page, models.BrandsPage)
-    assert [brand.brand for brand in page] == ["COCA-COLA", "GALLO"]
-    assert page.data[0].categories == ["Refrigerantes", "Sucos", "Águas"]
-    assert api.last_params == {
-        "search": "coca",
-        "department": "Bebidas",
-        "page": "1",
-        "limit": "50",
-    }
+    assert [brand.brand for brand in page] == [item["brand"] for item in expected["data"]]
+    assert page.data[0].categories == expected["data"][0]["categories"]
+    assert api.last_params == {"search": "coca", "department": "BEBIDAS", "page": "1", "limit": "5"}
 
 
 def test_products_by_brand(api: FakeAPI) -> None:
-    api.respond("GET", "/api/v1/market/products/by-brand", "getProductsByBrand.json")
+    expected = load_fixture("getProductsByBrand.json")
+    api.respond("GET", "/api/v1/market/products/by-brand", expected)
 
     with api.client() as client:
-        page = client.products.by_brand("COCA-COLA", category="Refrigerantes", limit=100)
+        page = client.products.by_brand("COCA-COLA", category="REFRIGERANTES", limit=5)
 
     assert isinstance(page, models.ProductsByBrandPage)
-    assert page.data[0].price_cv_pct == 11.2
+    assert page.data[0].price_cv_pct == expected["data"][0]["price_cv_pct"]
     assert api.last_params == {
         "brand": "COCA-COLA",
-        "category": "Refrigerantes",
+        "category": "REFRIGERANTES",
         "page": "1",
-        "limit": "100",
+        "limit": "5",
     }
 
 
 def test_get_product_by_ean(api: FakeAPI) -> None:
-    api.respond("GET", PRODUCT, "getProductByEan.json")
+    api.respond("GET", PRODUCT, PRODUCT_FIXTURE)
+    first_offer = PRODUCT_FIXTURE["offers"][0]
 
     with api.client() as client:
-        product = client.products.get(" 7894900011517 ", state="sp", sort_by="store_name")
+        product = client.products.get(f" {EAN} ", state="sp", sort_by="store_name")
 
     assert isinstance(product, models.Product)
-    assert product.market.median_price == 9.49
-    assert product.offers[0].store_name == "Supermercado Modelo"
-    assert product.offers[0].collected_at == datetime.datetime(
-        2026, 11, 2, 6, 12, 44, tzinfo=datetime.timezone(datetime.timedelta(hours=-3))
+    assert product.market.median_price == PRODUCT_FIXTURE["market"]["median_price"]
+    assert product.offers[0].store_name == first_offer["store_name"]
+    assert product.offers[0].collected_at == datetime.datetime.fromisoformat(
+        first_offer["collected_at"]
     )
-    assert product.offers[1].available is False
-    assert product.usage.remaining == 995
+    assert product.usage.query_cost == 1
     assert api.last_params == {"state": "SP", "sort_by": "store_name", "sort_order": "asc"}
 
     frame = product.to_dataframe()
-    assert len(frame) == 2
-    assert frame["market_median_price"].tolist() == [9.49, 9.49]
-    assert frame["price"].tolist() == [8.99, 9.49]
+    assert len(frame) == len(PRODUCT_FIXTURE["offers"])
+    assert set(frame["market_median_price"]) == {PRODUCT_FIXTURE["market"]["median_price"]}
+    assert frame["price"].tolist() == [offer["price"] for offer in PRODUCT_FIXTURE["offers"]]
 
 
 def test_get_rejects_a_malformed_ean_before_sending(api: FakeAPI) -> None:
@@ -181,46 +187,52 @@ def test_get_unknown_ean_is_typed_and_not_billed(api: FakeAPI) -> None:
 
 
 def test_price_history(api: FakeAPI) -> None:
-    api.respond("GET", f"{PRODUCT}/price-history", "getProductPriceHistory.json")
+    expected = load_fixture("getProductPriceHistory.json")
+    api.respond("GET", f"{PRODUCT}/price-history", expected)
 
     with api.client() as client:
         history = client.products.price_history(
-            "7894900011517", days=30, granularity="weekly", state="SP", store_limit=10
+            EAN, days=7, granularity="daily", state="PR", store_limit=3
         )
 
-    assert history.market_series[0].date == datetime.date(2026, 10, 31)
-    assert history.store_series[0].points[1].price == 8.99
-    assert history.has_more is True
+    assert history.period_days == expected["period_days"]
+    assert history.market_series[0].date == datetime.date.fromisoformat(
+        expected["market_series"][0]["date"]
+    )
+    assert (
+        history.store_series[0].points[0].price == expected["store_series"][0]["points"][0]["price"]
+    )
     assert api.last_params == {
-        "days": "30",
-        "granularity": "weekly",
-        "state": "SP",
-        "store_limit": "10",
+        "days": "7",
+        "granularity": "daily",
+        "state": "PR",
+        "store_limit": "3",
     }
 
     market = history.to_dataframe()
-    assert market["median_price"].tolist() == [9.49, 9.59]
-    assert market["ean"].tolist() == ["7894900011517", "7894900011517"]
+    assert market["median_price"].tolist() == [
+        bucket["median_price"] for bucket in expected["market_series"]
+    ]
+    assert set(market["ean"]) == {EAN}
 
     stores = history.to_dataframe(series="stores")
-    assert stores["store_name"].tolist() == ["Supermercado Modelo", "Supermercado Modelo"]
-    assert stores["price"].tolist() == [8.99, 8.99]
+    assert len(stores) == sum(len(series["points"]) for series in expected["store_series"])
+    assert stores["store_name"].iloc[0] == expected["store_series"][0]["store_name"]
     assert "points" not in stores.columns
 
 
 def test_coverage_posts_the_codes(api: FakeAPI) -> None:
-    api.respond("POST", "/api/v1/market/products/coverage", "checkCatalogCoverage.json")
+    expected = load_fixture("checkCatalogCoverage.json")
+    api.respond("POST", "/api/v1/market/products/coverage", expected)
 
     with api.client() as client:
-        coverage = client.products.coverage([" 7894900011517", "7891991000826", "0000000000000"])
+        coverage = client.products.coverage([f" {EAN}", "0000000000000"])
 
-    assert coverage.summary.coverage_pct == 66.67
-    assert [item.found for item in coverage.data] == [True, True, False]
+    assert coverage.summary.coverage_pct == expected["summary"]["coverage_pct"]
+    assert [item.found for item in coverage.data] == [item["found"] for item in expected["data"]]
     assert api.last_request.method == "POST"
     assert api.last_request.headers["Content-Type"] == "application/json"
-    assert api.last_request.read() == (
-        b'{"eans":["7894900011517","7891991000826","0000000000000"]}'
-    )
+    assert api.last_request.read() == f'{{"eans":["{EAN}","0000000000000"]}}'.encode()
 
 
 def test_coverage_estimates_its_cost_and_honours_the_budget(api: FakeAPI) -> None:
@@ -238,26 +250,20 @@ def test_coverage_estimates_its_cost_and_honours_the_budget(api: FakeAPI) -> Non
 
 def test_coverage_rejects_more_than_500_codes(api: FakeAPI) -> None:
     with api.client() as client, pytest.raises(errors.InvalidRequestError, match="at most 500"):
-        client.products.coverage(["7894900011517"] * 501)
+        client.products.coverage([EAN] * 501)
 
 
 async def test_async_products_share_the_same_operations(api: FakeAPI) -> None:
-    api.respond("GET", PRODUCT, "getProductByEan.json")
-    api.respond("GET", CATALOG, "getCatalog.json")
+    catalog = load_fixture("getCatalog.json")
+    api.respond("GET", PRODUCT, PRODUCT_FIXTURE)
+    api.respond("GET", CATALOG, catalog)
 
     async with api.async_client() as client:
-        product = await client.products.get("7894900011517")
-        page = await client.products.catalog(search="coca")
-        eans = [item.ean async for item in page.iter_all()]
+        product = await client.products.get(EAN)
+        page = await client.products.catalog(search="coca", limit=5)
+        eans = [item.ean async for item in page.iter_all(max_pages=0)]
 
-    assert product.product_name == "Refrigerante Coca-Cola 2L"
+    assert product.product_name == PRODUCT_FIXTURE["product_name"]
     assert isinstance(page, models.AsyncCatalogPage)
-    assert eans == ["7894900011517", "7894900027013"]
+    assert eans == [item["ean"] for item in catalog["data"]]
     assert client.usage.spent == 2
-
-
-def api_fixture(name: str) -> dict[str, Any]:
-    from conftest import load_fixture
-
-    payload: dict[str, Any] = load_fixture(name)
-    return payload

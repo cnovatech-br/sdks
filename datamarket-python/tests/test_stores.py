@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
+from conftest import load_fixture
 
 from cnovatech.datamarket import errors, models
 from cnovatech.datamarket.resources.stores import select_store
@@ -11,9 +12,12 @@ from cnovatech.datamarket.resources.stores import select_store
 if TYPE_CHECKING:
     from conftest import FakeAPI
 
-STORE_ID = "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63"
-COMPETITOR_ID = "7a1d3c5e-9b2f-4e6a-8c0d-1f3b5a7c9e2b"
 STORES = "/api/v1/market/stores"
+ASSORTMENT_FIXTURE = load_fixture("getStoreAssortment.json")
+COMPARISON_FIXTURE = load_fixture("getCompetitorProducts.json")
+STORE_ID = ASSORTMENT_FIXTURE["store"]["store_id"]
+STORE_NAME = ASSORTMENT_FIXTURE["store"]["store_name"]
+COMPETITOR_ID = COMPARISON_FIXTURE["competitor"]["store_id"]
 STORE = f"{STORES}/{STORE_ID}"
 
 
@@ -21,32 +25,51 @@ def store(name: str, store_id: str = STORE_ID) -> models.Store:
     return models.Store(store_id=store_id, store_name=name, state="SP")
 
 
+def stores_page(*names: str) -> dict[str, Any]:
+    """A listing page with the given store names, for the lookup-by-name tests."""
+    return {
+        "data": [
+            {
+                "store_id": f"{index:08x}-0000-4000-8000-000000000000",
+                "store_name": name,
+                "state": "SP",
+            }
+            for index, name in enumerate(names)
+        ],
+        "meta": {"page": 1, "limit": 100, "total": len(names), "pages": 1 if names else 0},
+        "usage": {"query_cost": 1},
+    }
+
+
 def test_list_stores(api: FakeAPI) -> None:
-    api.respond("GET", STORES, "listStores.json")
+    expected = load_fixture("listStores.json")
+    api.respond("GET", STORES, expected)
 
     with api.client() as client:
-        page = client.stores.list(search="modelo", state="sp", city="São Paulo")
+        page = client.stores.list(search="max", state="pr", city="Quedas do Iguacu", limit=5)
 
     assert isinstance(page, models.StoresPage)
-    assert page.data[0].store_id == STORE_ID
-    assert page.data[0].last_collected_date == datetime.date(2026, 11, 2)
-    assert page.data[1].omnichannel is True
+    assert page.data[0].store_id == expected["data"][0]["store_id"]
+    assert page.data[0].last_collected_date == datetime.date.fromisoformat(
+        expected["data"][0]["last_collected_date"]
+    )
+    assert page.meta.total == expected["meta"]["total"]
     assert api.last_params == {
-        "search": "modelo",
-        "state": "SP",
-        "city": "São Paulo",
+        "search": "max",
+        "state": "PR",
+        "city": "Quedas do Iguacu",
         "page": "1",
-        "limit": "50",
+        "limit": "5",
     }
 
 
 def test_find_prefers_the_exact_name(api: FakeAPI) -> None:
-    api.respond("GET", STORES, "listStores.json")
+    api.respond("GET", STORES, stores_page("Supermercado Modelo", "Supermercado Modelo Express"))
 
     with api.client() as client:
         found = client.stores.find("supermercado modelo", state="SP")
 
-    assert found.store_id == STORE_ID
+    assert found.store_name == "Supermercado Modelo"
     assert api.last_params == {
         "search": "supermercado modelo",
         "state": "SP",
@@ -57,7 +80,7 @@ def test_find_prefers_the_exact_name(api: FakeAPI) -> None:
 
 
 def test_find_is_ambiguous_without_an_exact_match(api: FakeAPI) -> None:
-    api.respond("GET", STORES, "listStores.json")
+    api.respond("GET", STORES, stores_page("Supermercado Modelo", "Supermercado Modelo Express"))
 
     with api.client() as client, pytest.raises(errors.AmbiguousStoreError) as excinfo:
         client.stores.find("Modelo")
@@ -71,12 +94,7 @@ def test_find_is_ambiguous_without_an_exact_match(api: FakeAPI) -> None:
 
 
 def test_find_without_results(api: FakeAPI) -> None:
-    empty = {
-        "data": [],
-        "meta": {"page": 1, "limit": 100, "total": 0, "pages": 0},
-        "usage": {"query_cost": 1},
-    }
-    api.respond("GET", STORES, empty)
+    api.respond("GET", STORES, stores_page())
 
     with api.client() as client, pytest.raises(errors.StoreNotFoundError) as excinfo:
         client.stores.find("Loja Inexistente")
@@ -101,22 +119,24 @@ def test_select_store_with_several_exact_matches_is_ambiguous() -> None:
 
 
 def test_assortment_costs_two_units_per_block_of_250_rows(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/assortment", "getStoreAssortment.json")
+    api.respond("GET", f"{STORE}/assortment", ASSORTMENT_FIXTURE)
 
     with api.client() as client:
-        page = client.stores.assortment(STORE_ID.upper(), limit=100)
+        page = client.stores.assortment(STORE_ID.upper(), limit=5)
 
     assert isinstance(page, models.AssortmentPage)
-    assert page.store.store_name == "Supermercado Modelo"
-    assert page.data[0].wholesale_min_qty == 6
-    assert page.data[0].collected_date == datetime.date(2026, 11, 2)
+    assert page.store.store_name == STORE_NAME
+    assert page.data[0].collected_date == datetime.date.fromisoformat(
+        ASSORTMENT_FIXTURE["data"][0]["collected_date"]
+    )
     assert page.page_cost_estimate == 2
     assert page.usage.query_cost == 2
+    assert page.estimate_remaining_cost() == (ASSORTMENT_FIXTURE["meta"]["pages"] - 1) * 2
     assert api.last_request.url.path == f"{STORE}/assortment"
 
     frame = page.to_dataframe()
-    assert frame["store_name"].tolist() == ["Supermercado Modelo", "Supermercado Modelo"]
-    assert frame["ean"].tolist() == ["7894900011517", "7891991000826"]
+    assert set(frame["store_name"]) == {STORE_NAME}
+    assert frame["ean"].tolist() == [item["ean"] for item in ASSORTMENT_FIXTURE["data"]]
 
 
 def test_assortment_above_the_budget_is_refused_before_sending(api: FakeAPI) -> None:
@@ -157,95 +177,115 @@ def test_unknown_store_is_typed(api: FakeAPI) -> None:
 
 
 def test_competitors_cost_one_unit_each(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/competitors", "getStoreCompetitors.json")
+    expected = load_fixture("getStoreCompetitors.json")
+    api.respond("GET", f"{STORE}/competitors", expected)
 
-    with api.client(max_units_per_request=5) as client:
-        competitors = client.stores.competitors(STORE_ID, limit=5)
+    with api.client(max_units_per_request=2) as client:
+        competitors = client.stores.competitors(STORE_ID, limit=2)
 
-    assert competitors.data[0].store_name == "Mercado Vizinho"
-    assert competitors.data[0].overlap_pct == 62.5
-    assert competitors.meta.total == 2
-    assert api.last_params == {"min_overlap_pct": "10.0", "limit": "5"}
+    assert competitors.data[0].store_name == expected["data"][0]["store_name"]
+    assert competitors.data[0].overlap_pct == expected["data"][0]["overlap_pct"]
+    assert competitors.meta.total == expected["meta"]["total"]
+    assert competitors.usage.query_cost == 2
+    assert api.last_params == {"min_overlap_pct": "10.0", "limit": "2"}
 
-    with api.client(max_units_per_request=5) as client, pytest.raises(errors.BudgetExceededError):
-        client.stores.competitors(STORE_ID, limit=6)
+    with (
+        api.client(max_units_per_request=2) as client,
+        pytest.raises(errors.BudgetExceededError),
+    ):
+        client.stores.competitors(STORE_ID, limit=3)
 
 
 def test_competitiveness(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/competitiveness", "getStoreCompetitiveness.json")
+    expected = load_fixture("getStoreCompetitiveness.json")
+    api.respond("GET", f"{STORE}/competitiveness", expected)
 
     with api.client() as client:
-        result = client.stores.competitiveness(STORE_ID, limit=5, market_scope="same_state")
+        result = client.stores.competitiveness(STORE_ID, limit=2, market_scope="same_state")
 
-    assert result.summary.competitiveness_score == 57.3
-    assert result.data[0].median_price_diff_pct == -2.4
-    assert api.last_params == {"min_overlap_pct": "5.0", "limit": "5", "market_scope": "same_state"}
+    assert result.summary.competitiveness_score == expected["summary"]["competitiveness_score"]
+    assert result.data[0].below_pct == expected["data"][0]["below_pct"]
+    assert api.last_params == {"min_overlap_pct": "5.0", "limit": "2", "market_scope": "same_state"}
 
 
 def test_compare_with_a_competitor(api: FakeAPI) -> None:
-    api.respond(
-        "GET", f"{STORE}/competitors/{COMPETITOR_ID}/products", "getCompetitorProducts.json"
-    )
+    api.respond("GET", f"{STORE}/competitors/{COMPETITOR_ID}/products", COMPARISON_FIXTURE)
 
     with api.client() as client:
-        page = client.stores.compare(STORE_ID, COMPETITOR_ID, price_position="below", search="coca")
+        page = client.stores.compare(
+            STORE_ID, COMPETITOR_ID, price_position="above", search="kleenex", limit=5
+        )
 
     assert isinstance(page, models.ComparisonPage)
-    assert page.competitor.store_name == "Mercado Vizinho"
-    assert page.summary.below_count == 3100
-    assert page.data[0].price_position == "below"
-    assert page.data[1].price_diff_pct is None
+    assert page.competitor.store_name == COMPARISON_FIXTURE["competitor"]["store_name"]
+    assert page.summary.below_count == COMPARISON_FIXTURE["summary"]["below_count"]
+    assert page.data[0].price_position == COMPARISON_FIXTURE["data"][0]["price_position"]
     assert page.page_cost_estimate == 2
     assert api.last_params == {
-        "price_position": "below",
-        "search": "coca",
+        "price_position": "above",
+        "search": "kleenex",
         "sort_by": "price_diff_pct",
         "sort_order": "desc",
         "page": "1",
-        "limit": "50",
+        "limit": "5",
     }
 
     frame = page.to_dataframe()
-    assert frame["competitor_store_name"].tolist() == ["Mercado Vizinho", "Mercado Vizinho"]
-    assert frame["competitor_price"].tolist() == [9.49, 3.29]
+    assert set(frame["competitor_store_name"]) == {COMPARISON_FIXTURE["competitor"]["store_name"]}
+    assert frame["competitor_price"].tolist() == [
+        item["competitor_price"] for item in COMPARISON_FIXTURE["data"]
+    ]
 
 
 def test_market_position(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/market-position", "getStoreMarketPosition.json")
+    expected = load_fixture("getStoreMarketPosition.json")
+    api.respond("GET", f"{STORE}/market-position", expected)
 
     with api.client() as client:
-        page = client.stores.market_position(STORE_ID, state="sp")
+        page = client.stores.market_position(STORE_ID, state="pr", limit=5)
 
     assert isinstance(page, models.MarketPositionPage)
-    assert page.summary.comparable_count == 11900
-    assert page.data[0].market.mode_price == 9.49
+    assert page.summary.comparable_count == expected["summary"]["comparable_count"]
+    assert page.data[0].market.mode_price == expected["data"][0]["market"]["mode_price"]
+    assert page.page_cost_estimate == 2
+    assert api.last_params == {"market_scope": "all", "state": "PR", "page": "1", "limit": "5"}
+
+
+def test_market_position_default_page_costs_eight_units(api: FakeAPI) -> None:
+    api.respond("GET", f"{STORE}/market-position", load_fixture("getStoreMarketPosition.json"))
+
+    with api.client() as client:
+        page = client.stores.market_position(STORE_ID)
+
     assert page.page_cost_estimate == 8
-    assert page.usage.query_cost == 8
-    assert api.last_params == {"market_scope": "all", "state": "SP", "page": "1", "limit": "1000"}
+    assert api.last_params["limit"] == "1000"
 
 
 def test_opportunities(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/opportunities", "getStoreOpportunities.json")
+    expected = load_fixture("getStoreOpportunities.json")
+    api.respond("GET", f"{STORE}/opportunities", expected)
 
     with api.client() as client:
-        page = client.stores.opportunities(STORE_ID, opportunity_type="decrease", min_diff_pct=20)
+        page = client.stores.opportunities(
+            STORE_ID, opportunity_type="increase", min_diff_pct=20, limit=5
+        )
 
     assert isinstance(page, models.OpportunitiesPage)
-    assert page.data[0].opportunity_type == "decrease"
-    assert page.data[0].price_rank == 140
-    assert page.summary.increase_count == 1200
+    assert page.data[0].opportunity_type == expected["data"][0]["opportunity_type"]
+    assert page.data[0].price_rank == expected["data"][0]["price_rank"]
+    assert page.summary.increase_count == expected["summary"]["increase_count"]
     assert api.last_params == {
-        "opportunity_type": "decrease",
+        "opportunity_type": "increase",
         "min_diff_pct": "20",
         "max_diff_pct": "100.0",
         "min_store_count": "3",
         "page": "1",
-        "limit": "50",
+        "limit": "5",
     }
 
 
 def test_opportunity_type_is_omitted_when_not_given(api: FakeAPI) -> None:
-    api.respond("GET", f"{STORE}/opportunities", "getStoreOpportunities.json")
+    api.respond("GET", f"{STORE}/opportunities", load_fixture("getStoreOpportunities.json"))
 
     with api.client() as client:
         client.stores.opportunities(STORE_ID)
@@ -254,14 +294,15 @@ def test_opportunity_type_is_omitted_when_not_given(api: FakeAPI) -> None:
 
 
 async def test_async_stores(api: FakeAPI) -> None:
-    api.respond("GET", STORES, "listStores.json")
-    api.respond("GET", f"{STORE}/market-position", "getStoreMarketPosition.json")
+    api.respond("GET", STORES, stores_page(STORE_NAME))
+    api.respond("GET", f"{STORE}/market-position", load_fixture("getStoreMarketPosition.json"))
 
     async with api.async_client() as client:
-        found = await client.stores.find("Supermercado Modelo")
-        page = await client.stores.market_position(found.store_id, limit=1000)
-        items = [item async for item in page.iter_all(max_units=0)]
+        found = await client.stores.find(STORE_NAME)
+        page = await client.stores.market_position(STORE_ID, limit=5)
+        items = [item async for item in page.iter_all(max_pages=0)]
 
+    assert found.store_name == STORE_NAME
     assert isinstance(page, models.AsyncMarketPositionPage)
-    assert [item.ean for item in items] == ["7894900011517"]
-    assert client.usage.spent == 9
+    assert len(items) == len(page.data)
+    assert client.usage.spent == 3

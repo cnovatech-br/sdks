@@ -1,26 +1,92 @@
 {
-  "ean": "7894900011517",
+  "ean": "7894900027013",
   "granularity": "daily",
-  "period_days": 30,
+  "period_days": 7,
   "currency": "BRL",
   "market_series": [
-    { "date": "2026-10-31", "median_price": 9.49, "min_price": 7.49, "max_price": 12.99, "store_count": 180 },
-    { "date": "2026-11-01", "median_price": 9.59, "min_price": 7.49, "max_price": 12.99, "store_count": 181 }
+    {
+      "date": "2026-10-27",
+      "median_price": 11.49,
+      "min_price": 9.29,
+      "max_price": 13.99,
+      "store_count": 163
+    },
+    {
+      "date": "2026-10-28",
+      "median_price": 11.49,
+      "min_price": 9.29,
+      "max_price": 13.99,
+      "store_count": 165
+    },
+    {
+      "date": "2026-10-29",
+      "median_price": 11.49,
+      "min_price": 9.29,
+      "max_price": 13.99,
+      "store_count": 156
+    },
+    {
+      "date": "2026-10-30",
+      "median_price": 11.49,
+      "min_price": 8.98,
+      "max_price": 13.99,
+      "store_count": 156
+    },
+    {
+      "date": "2026-10-31",
+      "median_price": 11.49,
+      "min_price": 9.29,
+      "max_price": 13.99,
+      "store_count": 159
+    }
   ],
-  "store_count": 183,
+  "store_count": 149,
   "has_more": true,
   "store_series": [
     {
-      "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-      "store_name": "Supermercado Modelo",
-      "city": "São Paulo",
-      "state": "SP",
-      "last_collected_at": "2026-11-02T06:12:44-03:00",
+      "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+      "store_name": "Alvorada Max",
+      "city": "Quedas do Iguacu",
+      "state": "PR",
+      "last_collected_at": "2026-10-28T05:03:33-03:00",
       "points": [
-        { "date": "2026-10-31", "price": 8.99 },
-        { "date": "2026-11-01", "price": 8.99 }
+        {
+          "date": "2026-10-28",
+          "price": 11.49
+        }
+      ]
+    },
+    {
+      "store_id": "ddda1794-3075-4f44-a649-60167bd7e524",
+      "store_name": "Armazem Alianca",
+      "city": "Paragominas",
+      "state": "PA",
+      "last_collected_at": "2026-10-28T04:59:56-03:00",
+      "points": [
+        {
+          "date": "2026-10-28",
+          "price": 11.49
+        }
+      ]
+    },
+    {
+      "store_id": "d00f01d6-c513-47c4-a280-3e0fa21a4b1c",
+      "store_name": "Badotti",
+      "city": "Xanxere",
+      "state": "SC",
+      "last_collected_at": "2026-10-28T05:09:26-03:00",
+      "points": [
+        {
+          "date": "2026-10-28",
+          "price": 11.99
+        }
       ]
     }
   ],
-  "usage": { "query_cost": 1, "used": 6, "limit": 1000, "remaining": 994 }
+  "usage": {
+    "query_cost": 1,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

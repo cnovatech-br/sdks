@@ -9,9 +9,9 @@ across 240+ online supermarkets in 23 Brazilian states.
 - Retries only where a repeat cannot be billed twice
 - Typed end to end: pydantic models, `py.typed`, `mypy --strict`
 
-> **Status: pre-release.** Every read endpoint of the API is implemented and
-> tested offline against recorded responses. Validation against production
-> and the first release to PyPI are next. See [CHANGELOG.md](CHANGELOG.md).
+> **Status: pre-release.** Every read endpoint of the API is implemented,
+> validated against production and tested offline against recorded responses.
+> The first release to PyPI is next. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Installation
 

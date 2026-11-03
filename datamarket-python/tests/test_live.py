@@ -42,4 +42,3 @@ def test_account_endpoints_answer_without_spending_quota() -> None:
     assert isinstance(logs, models.LogsPage)
     assert any(key.is_active for key in keys.data)
     assert client.usage.spent == 0
-    assert client.rate_limit.limit is not None

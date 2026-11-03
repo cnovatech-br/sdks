@@ -1,36 +1,138 @@
 {
   "store": {
-    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-    "store_name": "Supermercado Modelo",
-    "city": "São Paulo",
-    "state": "SP",
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
     "channel": "e-commerce"
   },
-  "summary": { "product_count": 12480, "comparable_count": 11900, "unavailable_count": 580 },
+  "summary": {
+    "product_count": 5546,
+    "comparable_count": 4283,
+    "unavailable_count": 1043
+  },
   "data": [
     {
-      "ean": "7894900011517",
-      "product_name": "Refrigerante Coca-Cola 2L",
-      "brand": "COCA-COLA",
-      "department": "Bebidas",
-      "category": "Refrigerantes",
-      "image_url": null,
-      "price": 8.99,
-      "list_price": 9.99,
+      "ean": "7896104993842",
+      "product_name": "ABS MILI PROTECAO TOTAL SECA C/ABAS PC8U",
+      "brand": "MILI",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://edge.osuper.com.br/DSI8Z9tfI9Ck1jm5K-oaKiDi1mU=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://produtos-osuper.s3.sa-east-1.amazonaws.com/934f78e66b9c78d0e284108858d811ec5c3aff07/413319-37597fc0.jpg",
+      "price": 4.39,
+      "list_price": null,
       "available": true,
-      "price_position": "below",
-      "price_diff_pct": -5.27,
+      "price_position": "aligned",
+      "price_diff_pct": -4.36,
       "market": {
-        "store_count": 182,
-        "min_price": 7.49,
-        "max_price": 12.99,
-        "avg_price": 9.62,
-        "median_price": 9.49,
-        "mode_price": 9.49,
-        "availability_pct": 91.3
+        "store_count": 30,
+        "min_price": 2.99,
+        "max_price": 7.89,
+        "avg_price": 4.73,
+        "median_price": 4.59,
+        "mode_price": 4.99,
+        "availability_pct": 83.3
+      }
+    },
+    {
+      "ean": "7891010031633",
+      "product_name": "ABSORVENTE ADAPT PLUS COM 8 UN COM ABAS SEMPRE LIVRE",
+      "brand": "SEMPRE LIVRE",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/196389/6571c9a4558925a4e889afa5.jpg?v=638375528073230000",
+      "price": 8.99,
+      "list_price": null,
+      "available": true,
+      "price_position": "much_above",
+      "price_diff_pct": 12.52,
+      "market": {
+        "store_count": 114,
+        "min_price": 4.79,
+        "max_price": 11.99,
+        "avg_price": 8.2,
+        "median_price": 7.99,
+        "mode_price": 7.99,
+        "availability_pct": 88.6
+      }
+    },
+    {
+      "ean": "7896007551705",
+      "product_name": "ABSORVENTE COM ABAS 2 EM 1 INTIMUS 8 UN",
+      "brand": "INTIMUS",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/193987/6571c78f558925a4e889a658.jpg?v=638375522742470000",
+      "price": 13.49,
+      "list_price": null,
+      "available": true,
+      "price_position": "aligned",
+      "price_diff_pct": 2.35,
+      "market": {
+        "store_count": 22,
+        "min_price": 12.99,
+        "max_price": 14.99,
+        "avg_price": 13.72,
+        "median_price": 13.18,
+        "mode_price": 13.18,
+        "availability_pct": 13.6
+      }
+    },
+    {
+      "ean": "7891010694593",
+      "product_name": "ABSORVENTE COM ABAS ADAP PLUS NOITE E DIA SEMPRE LIVRE COM 8 UN",
+      "brand": "SEMPRE LIVRE",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/188511/6571c2d3558925a4e88990ca.jpg?v=638375510662830000",
+      "price": 12.99,
+      "list_price": null,
+      "available": true,
+      "price_position": "above",
+      "price_diff_pct": 8.34,
+      "market": {
+        "store_count": 112,
+        "min_price": 6.99,
+        "max_price": 17.99,
+        "avg_price": 12.38,
+        "median_price": 11.99,
+        "mode_price": 11.99,
+        "availability_pct": 80.4
+      }
+    },
+    {
+      "ean": "7896104992494",
+      "product_name": "ABSORVENTE COM ABAS COBERTURA SUAVE PROTECAO TOTAL MILI COM 32UN",
+      "brand": "MILI",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/217548/6633d6dd254681ffec67086a.jpg?v=638502701827700000",
+      "price": 16.69,
+      "list_price": null,
+      "available": true,
+      "price_position": "aligned",
+      "price_diff_pct": 4.84,
+      "market": {
+        "store_count": 56,
+        "min_price": 9.99,
+        "max_price": 20.59,
+        "avg_price": 15.75,
+        "median_price": 15.92,
+        "mode_price": 15.99,
+        "availability_pct": 89.3
       }
     }
   ],
-  "meta": { "page": 1, "limit": 1000, "total": 1, "pages": 1 },
-  "usage": { "query_cost": 8, "used": 23, "limit": 1000, "remaining": 977 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 5546,
+    "pages": 1110
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

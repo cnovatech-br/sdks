@@ -1,31 +1,59 @@
 {
   "store": {
-    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-    "store_name": "Supermercado Modelo",
-    "city": "São Paulo",
-    "state": "SP",
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
     "channel": "e-commerce"
   },
-  "summary": { "product_count": 12480, "competitiveness_score": 57.3 },
+  "summary": {
+    "product_count": 5546,
+    "competitiveness_score": 43.08
+  },
   "data": [
     {
-      "store_id": "7a1d3c5e-9b2f-4e6a-8c0d-1f3b5a7c9e2b",
-      "store_name": "Mercado Vizinho",
-      "city": "Campinas",
+      "store_id": "222940dc-510d-41d5-ad6d-800fdc1833d4",
+      "store_name": "Lar em Casa",
+      "city": "Medianeira",
+      "state": "PR",
+      "channel": "e-commerce",
+      "common_product_count": 2583,
+      "unavailable_count": 836,
+      "below_count": 724,
+      "aligned_count": 459,
+      "above_count": 564,
+      "below_pct": 41.44,
+      "aligned_pct": 26.27,
+      "above_pct": 32.28,
+      "median_price_diff_pct": 0.0,
+      "competitiveness_score": 54.58
+    },
+    {
+      "store_id": "6340b619-4048-451a-bd8b-73cf1dd82060",
+      "store_name": "Shibata",
+      "city": "Itaquaquecetuba",
       "state": "SP",
       "channel": "e-commerce",
-      "common_product_count": 7800,
-      "unavailable_count": 420,
-      "below_count": 3100,
-      "aligned_count": 2500,
-      "above_count": 1780,
-      "below_pct": 42.0,
-      "aligned_pct": 33.88,
-      "above_pct": 24.12,
-      "median_price_diff_pct": -2.4,
-      "competitiveness_score": 58.9
+      "common_product_count": 2654,
+      "unavailable_count": 887,
+      "below_count": 374,
+      "aligned_count": 368,
+      "above_count": 1025,
+      "below_pct": 21.17,
+      "aligned_pct": 20.83,
+      "above_pct": 58.01,
+      "median_price_diff_pct": 8.34,
+      "competitiveness_score": 31.58
     }
   ],
-  "meta": { "limit": 20, "total": 1 },
-  "usage": { "query_cost": 1, "used": 13, "limit": 1000, "remaining": 987 }
+  "meta": {
+    "limit": 2,
+    "total": 2
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

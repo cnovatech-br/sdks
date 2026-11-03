@@ -1,44 +1,150 @@
 {
   "data": [
     {
-      "ean": "7894900011517",
-      "product_name": "Refrigerante Coca-Cola 2L",
+      "ean": "7894900027013",
+      "product_name": "REFRIGERANTE COCA-COLA PET 2L",
       "brand": "COCA-COLA",
-      "category": "Refrigerantes",
-      "department": "Bebidas",
-      "image_url": null,
-      "store_count": 183,
-      "state_count": 19,
-      "states": ["SP", "RJ", "MG"],
-      "channels": ["e-commerce"],
-      "min_price": 7.49,
-      "max_price": 12.99,
-      "avg_price": 9.62,
-      "median_price": 9.49,
-      "price_range": 5.5,
-      "price_range_pct": 73.43,
-      "availability_pct": 91.3
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/192050/6571c5df558925a4e8899eef.jpg?v=638375518430000000",
+      "store_count": 187,
+      "state_count": 22,
+      "states": [
+        "AL",
+        "AM",
+        "BA",
+        "CE",
+        "ES"
+      ],
+      "channels": [
+        "e-commerce"
+      ],
+      "min_price": 8.98,
+      "max_price": 22.99,
+      "avg_price": 11.8,
+      "median_price": 11.69,
+      "price_range": 14.01,
+      "price_range_pct": 156.01,
+      "availability_pct": 96.3
     },
     {
-      "ean": "7894900027013",
-      "product_name": "Refrigerante Coca-Cola Zero 2L",
+      "ean": "7894900709926",
+      "product_name": "COCA-COLA ZERO 2LTS",
       "brand": "COCA-COLA",
-      "category": "Refrigerantes",
-      "department": "Bebidas",
-      "image_url": "https://images.example.test/7894900027013.jpg",
-      "store_count": 171,
-      "state_count": 18,
-      "states": ["SP", "RJ"],
-      "channels": ["e-commerce"],
-      "min_price": 7.99,
-      "max_price": 12.99,
-      "avg_price": 9.8,
-      "median_price": 9.69,
-      "price_range": 5.0,
-      "price_range_pct": 62.58,
-      "availability_pct": 88.9
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/a3576df7-c554-4743-a212-ea3834854843.jpg",
+      "store_count": 7,
+      "state_count": 4,
+      "states": [
+        "AM",
+        "CE",
+        "PI",
+        "SP"
+      ],
+      "channels": [
+        "e-commerce"
+      ],
+      "min_price": 9.99,
+      "max_price": 13.9,
+      "avg_price": 11.69,
+      "median_price": 11.38,
+      "price_range": 3.91,
+      "price_range_pct": 39.14,
+      "availability_pct": 100.0
+    },
+    {
+      "ean": "7894900011517",
+      "product_name": "REFRIGERANTE COCA COLA ORIGINAL 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://www.sondadelivery.com.br/Arquivos/ProdutosSku/85316/7894900027013.jpg",
+      "store_count": 51,
+      "state_count": 11,
+      "states": [
+        "AL",
+        "ES",
+        "GO",
+        "MG",
+        "PI"
+      ],
+      "channels": [
+        "e-commerce"
+      ],
+      "min_price": 7.29,
+      "max_price": 17.9,
+      "avg_price": 12.05,
+      "median_price": 11.99,
+      "price_range": 10.61,
+      "price_range_pct": 145.54,
+      "availability_pct": 92.2
+    },
+    {
+      "ean": "7894900701517",
+      "product_name": "REFRIGERANTE ZERO ACUCAR COCA-COLA PET 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/183445/6571bea7558925a4e8897d22.jpg?v=638375499951770000",
+      "store_count": 215,
+      "state_count": 23,
+      "states": [
+        "AL",
+        "AM",
+        "BA",
+        "CE",
+        "ES"
+      ],
+      "channels": [
+        "e-commerce"
+      ],
+      "min_price": 8.98,
+      "max_price": 17.9,
+      "avg_price": 11.88,
+      "median_price": 11.8,
+      "price_range": 8.92,
+      "price_range_pct": 99.33,
+      "availability_pct": 97.7
+    },
+    {
+      "ean": "7894900014211",
+      "product_name": "REFRIGERANTE COCA-COLA RETORNAVEL 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/189350/6571c38c558925a4e889941c.jpg?v=638375512480100000",
+      "store_count": 53,
+      "state_count": 8,
+      "states": [
+        "MG",
+        "PB",
+        "PR",
+        "RJ",
+        "RS"
+      ],
+      "channels": [
+        "e-commerce"
+      ],
+      "min_price": 5.98,
+      "max_price": 10.99,
+      "avg_price": 8.19,
+      "median_price": 7.99,
+      "price_range": 5.01,
+      "price_range_pct": 83.78,
+      "availability_pct": 88.7
     }
   ],
-  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
-  "usage": { "query_cost": 1, "used": 1, "limit": 1000, "remaining": 999 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 39,
+    "pages": 8
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

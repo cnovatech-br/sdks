@@ -1,55 +1,107 @@
 {
   "store": {
-    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-    "store_name": "Supermercado Modelo",
-    "city": "São Paulo",
-    "state": "SP",
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
     "channel": "e-commerce"
   },
   "competitor": {
-    "store_id": "7a1d3c5e-9b2f-4e6a-8c0d-1f3b5a7c9e2b",
-    "store_name": "Mercado Vizinho",
-    "city": "Campinas",
+    "store_id": "6340b619-4048-451a-bd8b-73cf1dd82060",
+    "store_name": "Shibata",
+    "city": "Itaquaquecetuba",
     "state": "SP",
     "channel": "e-commerce"
   },
   "summary": {
-    "common_product_count": 7800,
-    "below_count": 3100,
-    "aligned_count": 2500,
-    "above_count": 1780,
-    "unavailable_count": 420
+    "common_product_count": 2654,
+    "below_count": 374,
+    "aligned_count": 368,
+    "above_count": 1025,
+    "unavailable_count": 887
   },
   "data": [
     {
-      "ean": "7894900011517",
-      "product_name": "Refrigerante Coca-Cola 2L",
-      "brand": "COCA-COLA",
-      "department": "Bebidas",
-      "category": "Refrigerantes",
-      "image_url": null,
-      "price": 8.99,
+      "ean": "7891172171666",
+      "product_name": "LENCO DE PAPEL BOLSO DIA A DIA KLEENEX 10 UN",
+      "brand": "KLEENEX",
+      "department": "HIGIENE E BELEZA",
+      "category": "CUIDADOS PESSOAIS",
+      "image_url": "https://carrefourbr.vteximg.com.br/arquivos/ids/196201370/lenco-de-papel-folha-tripla-suave-kleenex-dia-a-dia-pacote-10-folhas-1.jpg?v=638906046582700000",
+      "price": 2.99,
       "available": true,
-      "competitor_price": 9.49,
+      "competitor_price": 0.99,
       "competitor_available": true,
-      "price_diff_pct": -5.27,
-      "price_position": "below"
+      "price_diff_pct": 202.02,
+      "price_position": "above"
     },
     {
-      "ean": "7891991000826",
-      "product_name": "Cerveja Skol 350ml",
-      "brand": "SKOL",
-      "department": "Bebidas",
-      "category": "Cervejas",
-      "image_url": null,
-      "price": 3.19,
-      "available": false,
-      "competitor_price": 3.29,
+      "ean": "7897013586231",
+      "product_name": "LAMPADA BULBO ELGIN LED 9W BIV 6500K",
+      "brand": "ELGIN",
+      "department": "BAZAR E UTILIDADES",
+      "category": "PILHAS E ELETRO",
+      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/969468/g.jpg?v=639047107160600000",
+      "price": 9.99,
+      "available": true,
+      "competitor_price": 3.9,
       "competitor_available": true,
-      "price_diff_pct": null,
-      "price_position": "unavailable"
+      "price_diff_pct": 156.15,
+      "price_position": "above"
+    },
+    {
+      "ean": "7500435157476",
+      "product_name": "APARELHO DEPILATORIO ULTRAGRIP PRESTOBARBA GILLETTE COM 2UN",
+      "brand": "GILLETTE",
+      "department": "HIGIENE E BELEZA",
+      "category": "BARBA E DEPILACAO",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/218097/6675b75f48a079339b1d4376.jpg?v=638545874977430000",
+      "price": 9.99,
+      "available": true,
+      "competitor_price": 3.99,
+      "competitor_available": true,
+      "price_diff_pct": 150.38,
+      "price_position": "above"
+    },
+    {
+      "ean": "7891150022003",
+      "product_name": "SAPONACEO CREMOSO MULTIUSO CIF LIMAO SQUEEZE 250ML",
+      "brand": "CIF",
+      "department": "LIMPEZA",
+      "category": "PRODUTOS DE LIMPEZA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/197262/6571ca5c558925a4e889b33c.jpg?v=638375529916430000",
+      "price": 15.99,
+      "available": true,
+      "competitor_price": 7.99,
+      "competitor_available": true,
+      "price_diff_pct": 100.13,
+      "price_position": "above"
+    },
+    {
+      "ean": "7891150034341",
+      "product_name": "SOPONACEO CREMOSO MULTIUSO LARANJA CIF 250ML",
+      "brand": "CIF",
+      "department": "LIMPEZA",
+      "category": "PRODUTOS DE LIMPEZA",
+      "image_url": "https://www.sondadelivery.com.br/Arquivos/ProdutosSku/1439405/7891150034341-(2).jpg",
+      "price": 15.99,
+      "available": true,
+      "competitor_price": 7.99,
+      "competitor_available": true,
+      "price_diff_pct": 100.13,
+      "price_position": "above"
     }
   ],
-  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
-  "usage": { "query_cost": 2, "used": 15, "limit": 1000, "remaining": 985 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 2654,
+    "pages": 531
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

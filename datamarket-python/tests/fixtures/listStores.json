@@ -1,26 +1,66 @@
 {
   "data": [
     {
-      "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-      "store_name": "Supermercado Modelo",
-      "city": "São Paulo",
-      "state": "SP",
+      "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+      "store_name": "Alvorada Max",
+      "city": "Quedas do Iguacu",
+      "state": "PR",
       "channel": "e-commerce",
       "omnichannel": false,
-      "product_count": 12480,
-      "last_collected_date": "2026-11-02"
+      "product_count": 5546,
+      "last_collected_date": "2026-10-28"
     },
     {
-      "store_id": "c2e4a6b8-1d3f-4a5c-9e7b-0f2d4c6a8e1b",
-      "store_name": "Supermercado Modelo Express",
-      "city": "São Paulo",
-      "state": "SP",
+      "store_id": "9519c557-458a-4f9e-9dce-a707f2ab18be",
+      "store_name": "Americanas",
+      "city": "Rio de Janeiro",
+      "state": "RJ",
       "channel": "e-commerce",
       "omnichannel": true,
-      "product_count": 3210,
-      "last_collected_date": "2026-11-01"
+      "product_count": 25012,
+      "last_collected_date": "2026-10-27"
+    },
+    {
+      "store_id": "db74d0a3-f8e1-41a3-a5b9-381f62b0eddb",
+      "store_name": "Angeloni",
+      "city": "Porto Belo",
+      "state": "SC",
+      "channel": "e-commerce",
+      "omnichannel": true,
+      "product_count": 21526,
+      "last_collected_date": "2026-10-27"
+    },
+    {
+      "store_id": "ed8f5b21-6fa5-4c32-9290-a7a33b9c5728",
+      "store_name": "Apoio Entrega",
+      "city": "Contagem",
+      "state": "MG",
+      "channel": "e-commerce",
+      "omnichannel": false,
+      "product_count": 7144,
+      "last_collected_date": "2026-10-26"
+    },
+    {
+      "store_id": "ddda1794-3075-4f44-a649-60167bd7e524",
+      "store_name": "Armazem Alianca",
+      "city": "Paragominas",
+      "state": "PA",
+      "channel": "e-commerce",
+      "omnichannel": false,
+      "product_count": 2992,
+      "last_collected_date": "2026-10-28"
     }
   ],
-  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
-  "usage": { "query_cost": 1, "used": 8, "limit": 1000, "remaining": 992 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 266,
+    "pages": 54
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

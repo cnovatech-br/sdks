@@ -1,40 +1,130 @@
 {
   "store": {
-    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
-    "store_name": "Supermercado Modelo",
-    "city": "São Paulo",
-    "state": "SP",
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
     "channel": "e-commerce"
   },
   "summary": {
-    "product_count": 11900,
-    "increase_count": 1200,
-    "decrease_count": 900,
-    "comfortable_count": 9800,
-    "avg_abs_price_diff_pct": 8.4
+    "product_count": 3799,
+    "increase_count": 499,
+    "decrease_count": 449,
+    "comfortable_count": 2851,
+    "avg_abs_price_diff_pct": 10.75
   },
   "data": [
     {
-      "ean": "7891991000826",
-      "product_name": "Cerveja Skol 350ml",
-      "brand": "SKOL",
-      "category": "Cervejas",
-      "department": "Bebidas",
-      "image_url": null,
-      "price": 3.99,
-      "price_diff": 0.7,
-      "price_diff_pct": 21.28,
-      "price_rank": 140,
+      "ean": "7896306612862",
+      "product_name": "CHOC. BARRA TRENTO CHOCO COCO COB CHOCOL PA 32G",
+      "brand": "TRENTO",
+      "category": "CHOCOLATES",
+      "department": "MERCEARIA",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/316b9e92-ad74-41ef-87ea-3e7462a553dc.jpg",
+      "price": 2.99,
+      "price_diff": -36.85,
+      "price_diff_pct": -92.49,
+      "price_rank": 2,
+      "opportunity_type": "increase",
+      "market": {
+        "store_count": 3,
+        "min_price": 2.49,
+        "max_price": 43.04,
+        "avg_price": 28.46,
+        "median_price": 39.84
+      }
+    },
+    {
+      "ean": "7897013586231",
+      "product_name": "LAMPADA BULBO ELGIN LED 9W BIV 6500K",
+      "brand": "ELGIN",
+      "category": "PILHAS E ELETRO",
+      "department": "BAZAR E UTILIDADES",
+      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/969468/g.jpg?v=639047107160600000",
+      "price": 9.99,
+      "price_diff": 4.76,
+      "price_diff_pct": 90.83,
+      "price_rank": 23,
       "opportunity_type": "decrease",
       "market": {
-        "store_count": 149,
-        "min_price": 2.79,
-        "max_price": 4.49,
-        "avg_price": 3.31,
-        "median_price": 3.29
+        "store_count": 24,
+        "min_price": 1.98,
+        "max_price": 12.99,
+        "avg_price": 5.72,
+        "median_price": 5.24
+      }
+    },
+    {
+      "ean": "7622202256714",
+      "product_name": "LACTA CHOCOLATE LAKA 336G C-12",
+      "brand": "LACTA",
+      "category": "CHOCOLATES",
+      "department": "MERCEARIA",
+      "image_url": "https://edge.osuper.com.br/9gkkrGix2_8ACdfNc3gR0tmUbaU=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://osuper-ecommerce-zaleski.s3.sa-east-1.amazonaws.com/d106569f-download-29jfif.undefined",
+      "price": 4.29,
+      "price_diff": -31.82,
+      "price_diff_pct": -88.12,
+      "price_rank": 1,
+      "opportunity_type": "increase",
+      "market": {
+        "store_count": 3,
+        "min_price": 4.49,
+        "max_price": 40.07,
+        "avg_price": 26.89,
+        "median_price": 36.11
+      }
+    },
+    {
+      "ean": "7896045506057",
+      "product_name": "CERVEJA LONG NECK HEINEKEN 0.0% 330 ML C/6UND",
+      "brand": "HEINEKEN",
+      "category": "CERVEJAS",
+      "department": "BEBIDAS",
+      "image_url": "https://d21wiczbqxib04.cloudfront.net/nEmTXhOBzT51qX79Ghf2PytvTo0=/fit-in/400x400/filters:fill(FFFFFF):background_color(white)/https://osuper-product-vault.s3.sa-east-1.amazonaws.com/934f78e66b9c78d0e28410895cd91de55932fe02/136032-ec400a61.jpg",
+      "price": 42.99,
+      "price_diff": 18.18,
+      "price_diff_pct": 73.24,
+      "price_rank": 7,
+      "opportunity_type": "decrease",
+      "market": {
+        "store_count": 6,
+        "min_price": 6.95,
+        "max_price": 41.94,
+        "avg_price": 24.62,
+        "median_price": 24.82
+      }
+    },
+    {
+      "ean": "7896419713852",
+      "product_name": "STEAK DE FRANGO EMPANADO LAR 100G",
+      "brand": "LAR",
+      "category": "CARNES CONGELADAS",
+      "department": "CONGELADOS",
+      "image_url": "https://muffatosupermercados.vteximg.com.br/arquivos/ids/248309/7896419713852.jpg?v=636862848563400000",
+      "price": 2.89,
+      "price_diff": 1.19,
+      "price_diff_pct": 70.0,
+      "price_rank": 35,
+      "opportunity_type": "decrease",
+      "market": {
+        "store_count": 35,
+        "min_price": 0.99,
+        "max_price": 2.99,
+        "avg_price": 1.83,
+        "median_price": 1.7
       }
     }
   ],
-  "meta": { "page": 1, "limit": 50, "total": 1, "pages": 1 },
-  "usage": { "query_cost": 2, "used": 25, "limit": 1000, "remaining": 975 }
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 3799,
+    "pages": 760
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": null,
+    "limit": null,
+    "remaining": null
+  }
 }

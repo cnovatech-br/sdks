@@ -1,9 +1,9 @@
 """Call every endpoint of the Data Market API through the SDK and record the responses.
 
 Two purposes: prove that every model parses what production really returns,
-and refresh the test fixtures with real, anonymised data. The smallest
-possible requests are used; the run costs about 21 quota units and prints the
-exact figure at the end.
+and refresh the test fixtures with real data, anonymised and with every list
+cut to its first five items. The smallest possible requests are used; the run
+costs about 21 quota units and prints the exact figure at the end.
 
 Usage, from the workspace root with ``DATAMARKET_API_KEY`` in the environment
 or in ``.env``::
@@ -93,6 +93,18 @@ def operation_id(path: str, status_code: int, payload: Any) -> str | None:
     return None
 
 
+def trim_lists(payload: Any, *, limit: int = 5) -> Any:
+    """Keep at most ``limit`` items in every list, so fixtures stay small and readable.
+
+    Counts in summaries and ``meta`` still describe the full response.
+    """
+    if isinstance(payload, dict):
+        return {key: trim_lists(value, limit=limit) for key, value in payload.items()}
+    if isinstance(payload, list):
+        return [trim_lists(item, limit=limit) for item in payload[:limit]]
+    return payload
+
+
 def anonymise(name: str, payload: Any) -> Any:
     """Strip account identity from the fixtures that carry it."""
     if name == "getProfile" and isinstance(payload, dict):
@@ -171,9 +183,9 @@ def main() -> int:
         if name is None or payload is None:
             continue
         target = FIXTURES_DIR / f"{name}.json"
+        content = trim_lists(anonymise(name, payload))
         target.write_text(
-            json.dumps(anonymise(name, payload), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
+            json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         written.append(name)
 
