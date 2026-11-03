@@ -110,6 +110,31 @@ def test_rows_field_can_be_renamed() -> None:
     assert "stats_median" in frame.columns
 
 
+def test_columns_are_the_union_of_every_row() -> None:
+    class Entry(APIResponse):
+        name: str
+        details: dict[str, Any] = Field(default_factory=dict)
+
+    class Entries(TabularResponse):
+        data: list[Entry]
+
+    entries = Entries.model_validate(
+        {
+            "data": [
+                {"name": "a", "details": {"page": 1}},
+                {"name": "b", "details": {"state": "SP"}},
+                {"name": "c"},
+            ]
+        }
+    )
+
+    frame = entries.to_dataframe()
+
+    assert list(frame.columns) == ["name", "details_page", "details_state"]
+    assert frame["details_page"].tolist()[0] == 1
+    assert frame["details_state"].isna().tolist() == [True, False, True]
+
+
 def test_missing_pandas_gives_an_actionable_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 

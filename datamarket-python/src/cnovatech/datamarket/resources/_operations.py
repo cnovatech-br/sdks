@@ -532,4 +532,9 @@ def health() -> Operation[Health]:
 
 
 def _iso_date(value: datetime.date | str | None) -> str | None:
-    return value.isoformat() if isinstance(value, datetime.date) else value
+    """``YYYY-MM-DD`` for a date; a datetime keeps its calendar day; strings pass through."""
+    if isinstance(value, datetime.datetime):
+        return value.date().isoformat()
+    if isinstance(value, datetime.date):
+        return value.isoformat()
+    return value

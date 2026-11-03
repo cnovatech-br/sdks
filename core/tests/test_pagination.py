@@ -171,6 +171,14 @@ def test_pages_without_usage_spend_nothing_against_the_budget() -> None:
     assert pages[0].usage is None
 
 
+def test_an_empty_page_is_still_truthy() -> None:
+    empty = ItemsPage.model_validate(payload(1, 1, names=[]))
+
+    assert len(empty) == 0
+    assert bool(empty) is True
+    assert list(empty) == []
+
+
 def test_detached_page_cannot_paginate() -> None:
     page = ItemsPage.model_validate(payload(1, 2))
 

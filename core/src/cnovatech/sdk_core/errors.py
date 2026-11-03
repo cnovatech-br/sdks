@@ -312,8 +312,7 @@ def error_class_for(
 
 def response_error_code(response: httpx.Response) -> str:
     """The ``error`` code of an error response, or the default for its status."""
-    body = _json_object(response)
-    return _text(body.get("error")) or _DEFAULT_CODES.get(response.status_code, "error")
+    return _error_code(_json_object(response), response.status_code)
 
 
 def error_from_response(
@@ -331,7 +330,7 @@ def error_from_response(
     """
     body = _json_object(response)
     status_code = response.status_code
-    code = _text(body.get("error")) or _DEFAULT_CODES.get(status_code, "error")
+    code = _error_code(body, status_code)
     message = _text(body.get("message")) or response.reason_phrase or f"HTTP {status_code}"
     error_class = error_class_for(status_code, code, overrides, status_overrides)
     return error_class(
@@ -355,6 +354,10 @@ def parse_retry_after(value: str | None) -> int | None:
     except ValueError:
         return None
     return seconds if seconds >= 0 else None
+
+
+def _error_code(body: Mapping[str, Any], status_code: int) -> str:
+    return _text(body.get("error")) or _DEFAULT_CODES.get(status_code, "error")
 
 
 def _json_object(response: httpx.Response) -> Mapping[str, Any]:

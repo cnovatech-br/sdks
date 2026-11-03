@@ -41,6 +41,10 @@ class _PageBase(TabularResponse, Generic[ItemT]):
     def __len__(self) -> int:
         return len(self.data)
 
+    def __bool__(self) -> bool:
+        """A page is always truthy: an empty page is still a complete, billed response."""
+        return True
+
     @property
     def has_next(self) -> bool:
         """Whether the API has a page after this one."""

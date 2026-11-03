@@ -55,5 +55,4 @@ build:  ## Build sdist and wheel of every package into dist/
 
 clean:  ## Remove build output and tool caches
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov
-	find . -name __pycache__ -type d -prune -exec rm -rf {} +
-	find . -name '.pytest_cache' -o -name '.mypy_cache' -o -name '.coverage' | xargs rm -rf
+	find . -path ./.venv -prune -o \( -name __pycache__ -o -name .pytest_cache -o -name .mypy_cache \) -type d -print -prune | xargs rm -rf

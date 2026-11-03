@@ -45,8 +45,8 @@ _CONSTRUCTOR_DOC = """
             phase. The default of 150 s covers the first lookup of an uncached
             product, which can take about 90 s.
         max_retries: Extra attempts for failures that cannot have been billed:
-            connection errors, 502/503/504 and the per-minute 429. Read
-            timeouts and quota errors are never retried.
+            connection errors, 502/503 and the per-minute 429. Read timeouts,
+            504 and quota errors are never retried.
         max_units_per_request: Refuse, before sending, any call estimated to
             cost more than this many quota units. Off by default.
         http_client: Your own httpx client, for proxies, certificates or a

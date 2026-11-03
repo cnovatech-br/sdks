@@ -20,7 +20,6 @@ from cnovatech.datamarket.models.stores import (
 )
 from cnovatech.datamarket.resources import _operations as operations
 from cnovatech.datamarket.resources._base import AsyncResource, SyncResource
-from cnovatech.sdk_core import pricing
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -40,6 +39,14 @@ if TYPE_CHECKING:
     )
 
 FIND_PAGE_SIZE = 100
+# Pages a lookup by name may read before giving up on an exact match.
+FIND_MAX_PAGES = 5
+
+
+def exact_matches(name: str, stores: Sequence[Store]) -> list[Store]:
+    """The stores whose name equals ``name``, ignoring case and surrounding spaces."""
+    wanted = name.strip().casefold()
+    return [store for store in stores if store.store_name.strip().casefold() == wanted]
 
 
 def select_store(name: str, candidates: Sequence[Store]) -> Store:
@@ -49,8 +56,7 @@ def select_store(name: str, candidates: Sequence[Store]) -> Store:
     no exact match, a single candidate is accepted; none raises
     :class:`StoreNotFoundError` and several raise :class:`AmbiguousStoreError`.
     """
-    wanted = name.strip().casefold()
-    exact = [store for store in candidates if store.store_name.strip().casefold() == wanted]
+    exact = exact_matches(name, candidates)
     if len(exact) == 1:
         return exact[0]
     if len(candidates) == 1 and not exact:
@@ -99,19 +105,24 @@ class Stores(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     def find(self, name: str, *, state: str | None = None, city: str | None = None) -> Store:
-        """One store by name. Cost: 1 unit.
+        """One store by name. Cost: 1 unit per page searched, usually one.
 
-        An exact name, ignoring case, wins over partial matches. Raises
-        :class:`StoreNotFoundError` when nothing matches and
+        An exact name, ignoring case, wins over partial matches. The search
+        reads up to five pages of 100 results until it finds an exact match.
+        Raises :class:`StoreNotFoundError` when nothing matches and
         :class:`AmbiguousStoreError`, with the candidates, when several stores
         match and none exactly. ``state`` and ``city`` narrow the search.
         """
-        page = self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
-        return select_store(name, page.data)
+        first = self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
+        candidates: list[Store] = []
+        for page in first.iter_pages(max_pages=FIND_MAX_PAGES - 1):
+            candidates.extend(page.data)
+            if exact_matches(name, page.data):
+                break
+        return select_store(name, candidates)
 
     def assortment(self, store_id: str, *, page: int = 1, limit: int = 100) -> AssortmentPage:
         """The products a store sells, with price and conditions at the last collection.
@@ -127,7 +138,6 @@ class Stores(SyncResource):
         return self._execute_paginated(
             partial(operations.assortment, AssortmentPage, store_id=store_id, limit=limit),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     def competitors(
@@ -217,7 +227,6 @@ class Stores(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     def market_position(
@@ -251,7 +260,6 @@ class Stores(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     def opportunities(
@@ -294,7 +302,6 @@ class Stores(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
 
@@ -323,13 +330,17 @@ class AsyncStores(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     async def find(self, name: str, *, state: str | None = None, city: str | None = None) -> Store:
         """One store by name. See :meth:`Stores.find`."""
-        page = await self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
-        return select_store(name, page.data)
+        first = await self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
+        candidates: list[Store] = []
+        async for page in first.iter_pages(max_pages=FIND_MAX_PAGES - 1):
+            candidates.extend(page.data)
+            if exact_matches(name, page.data):
+                break
+        return select_store(name, candidates)
 
     async def assortment(
         self, store_id: str, *, page: int = 1, limit: int = 100
@@ -338,7 +349,6 @@ class AsyncStores(AsyncResource):
         return await self._execute_paginated(
             partial(operations.assortment, AsyncAssortmentPage, store_id=store_id, limit=limit),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     async def competitors(
@@ -395,7 +405,6 @@ class AsyncStores(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     async def market_position(
@@ -418,7 +427,6 @@ class AsyncStores(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )
 
     async def opportunities(
@@ -447,5 +455,4 @@ class AsyncStores(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.export_cost(limit),
         )

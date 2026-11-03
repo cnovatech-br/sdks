@@ -112,8 +112,9 @@ except errors.DataMarketError as exc:
     str(exc)  # "HTTP 503 service_unavailable: ... [correlation_id=...]"; never the key
 ```
 
-Connection errors, 502/503/504 and the per-minute 429 are retried with backoff.
-Read timeouts and quota errors never are.
+Connection errors, 502/503 and the per-minute 429 are retried with backoff.
+Read timeouts, 504 and quota errors never are: the request may already have
+been processed and billed.
 
 ## Async
 

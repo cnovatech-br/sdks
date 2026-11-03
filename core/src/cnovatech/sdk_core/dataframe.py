@@ -44,7 +44,20 @@ def build_dataframe(
     rows = payload.pop(rows_field, None) or []
     envelope = flatten_envelope(payload) if include_envelope else {}
     records = [{**envelope, **flatten(row)} for row in rows if isinstance(row, dict)]
-    return records_to_dataframe(records, columns=list(records[0]) if records else list(envelope))
+    return records_to_dataframe(records, columns=column_union(records) or list(envelope))
+
+
+def column_union(records: Sequence[Mapping[str, Any]]) -> list[str]:
+    """Every key seen across the records, in order of first appearance.
+
+    Rows need not share the same keys: free-form objects and fields the API
+    adds to some rows only still get a column.
+    """
+    seen: dict[str, None] = {}
+    for record in records:
+        for key in record:
+            seen.setdefault(key, None)
+    return list(seen)
 
 
 def records_to_dataframe(

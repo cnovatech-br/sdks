@@ -15,7 +15,6 @@ from cnovatech.datamarket.models.products import (
 )
 from cnovatech.datamarket.resources import _operations as operations
 from cnovatech.datamarket.resources._base import AsyncResource, SyncResource
-from cnovatech.sdk_core import pricing
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -78,7 +77,6 @@ class Products(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     def departments(self) -> DepartmentsResponse:
@@ -117,7 +115,6 @@ class Products(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     def by_brand(
@@ -148,7 +145,6 @@ class Products(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     def get(
@@ -252,7 +248,6 @@ class AsyncProducts(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     async def departments(self) -> DepartmentsResponse:
@@ -279,7 +274,6 @@ class AsyncProducts(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     async def by_brand(
@@ -302,7 +296,6 @@ class AsyncProducts(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=pricing.query_cost(),
         )
 
     async def get(

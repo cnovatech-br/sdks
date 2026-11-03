@@ -7,7 +7,12 @@ from typing import TYPE_CHECKING, ClassVar, Literal
 
 from pydantic import Field
 
-from cnovatech.sdk_core.dataframe import flatten, flatten_envelope, records_to_dataframe
+from cnovatech.sdk_core.dataframe import (
+    column_union,
+    flatten,
+    flatten_envelope,
+    records_to_dataframe,
+)
 
 from .common import Record, TabularResponse, Usage
 
@@ -85,5 +90,4 @@ class PriceHistory(TabularResponse):
             for store in stores
             for point in store.get("points", [])
         ]
-        columns = list(records[0]) if records else list(envelope)
-        return records_to_dataframe(records, columns=columns)
+        return records_to_dataframe(records, columns=column_union(records) or list(envelope))

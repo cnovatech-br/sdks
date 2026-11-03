@@ -140,6 +140,8 @@ def exercise(client: DataMarket) -> None:
     client.products.departments()
     brands = client.products.brands(limit=5)
     catalog = client.products.catalog(search=SAMPLE_SEARCH, limit=5)
+    if not catalog.data:
+        raise RuntimeError(f"The catalogue returned nothing for {SAMPLE_SEARCH!r}.")
     product = client.products.get(catalog.data[0].ean)
     client.products.price_history(product.ean, days=7, store_limit=3)
     client.products.by_brand(product.brand or brands.data[0].brand, limit=5)
@@ -163,37 +165,52 @@ def exercise(client: DataMarket) -> None:
         client.products.catalog(page=21)
 
 
-def main() -> int:
-    """Run the capture and write the fixtures. Returns the process exit status."""
-    recorder = Recorder()
-    http_client = httpx.Client(event_hooks={"response": [recorder]})
-    try:
-        with DataMarket(http_client=http_client) as client:
-            exercise(client)
-            spent = client.usage.spent
-    except errors.ConfigurationError as exc:
-        print(f"Cannot run: {exc}", file=sys.stderr)
-        return 2
-    finally:
-        http_client.close()
-
+def write_fixtures(responses: list[tuple[str, int, Any]]) -> list[str]:
+    """Write one fixture per recorded response that has a name. Returns the names written."""
     written: list[str] = []
-    for path, status_code, payload in recorder.responses:
+    for path, status_code, payload in responses:
         name = operation_id(path, status_code, payload)
         if name is None or payload is None:
             continue
-        target = FIXTURES_DIR / f"{name}.json"
         content = trim_lists(anonymise(name, payload))
-        target.write_text(
+        (FIXTURES_DIR / f"{name}.json").write_text(
             json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         written.append(name)
+    return written
 
+
+def main() -> int:
+    """Run the capture and write the fixtures. Returns the process exit status.
+
+    Whatever was recorded before a failure is still written, so the quota
+    already spent is not wasted on a second run.
+    """
+    recorder = Recorder()
+    http_client = httpx.Client(event_hooks={"response": [recorder]})
+    spent = 0
+    status = 0
+    try:
+        with DataMarket(http_client=http_client) as client:
+            try:
+                exercise(client)
+            finally:
+                spent = client.usage.spent
+    except errors.ConfigurationError as exc:
+        print(f"Cannot run: {exc}", file=sys.stderr)
+        return 2
+    except (errors.DataMarketError, RuntimeError) as exc:
+        print(f"Stopped early: {exc}", file=sys.stderr)
+        status = 1
+    finally:
+        http_client.close()
+
+    written = write_fixtures(recorder.responses)
     print(f"{len(written)} fixtures written to {FIXTURES_DIR}")
     for name in sorted(written):
         print(f"  {name}.json")
     print(f"Quota spent in this run: {spent} units")
-    return 0
+    return status
 
 
 if __name__ == "__main__":

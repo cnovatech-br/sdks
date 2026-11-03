@@ -62,7 +62,7 @@ def test_backoff_jitter_keeps_between_half_and_all_of_the_nominal_delay() -> Non
     assert RetryPolicy(1, random_fraction=lambda: 0.5).backoff(1) == 0.375
 
 
-@pytest.mark.parametrize("status_code", [502, 503, 504])
+@pytest.mark.parametrize("status_code", [502, 503])
 def test_gateway_errors_are_repeated(status_code: int) -> None:
     policy = RetryPolicy(2, random_fraction=lambda: 1.0)
 
@@ -73,8 +73,9 @@ def test_gateway_errors_are_repeated(status_code: int) -> None:
     assert decision.delay_seconds == 0.5
 
 
-@pytest.mark.parametrize("status_code", [400, 401, 404, 422, 500])
+@pytest.mark.parametrize("status_code", [400, 401, 404, 422, 500, 504])
 def test_other_statuses_are_not_repeated(status_code: int) -> None:
+    # 504 included: the gateway gave up, but the application may still be billing the request.
     assert RetryPolicy(2).after_response(httpx.Response(status_code), attempt=1) is None
 
 
@@ -285,7 +286,7 @@ async def test_async_transport_recovers_from_a_gateway_error(
     sequence: Callable[..., Any],
     sleeps: list[float],
 ) -> None:
-    async with make_async_transport(sequence(httpx.Response(504), ok())) as transport:
+    async with make_async_transport(sequence(httpx.Response(503), ok())) as transport:
         thing = await transport.execute(thing_operation())
 
     assert thing.request_info is not None

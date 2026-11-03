@@ -20,8 +20,10 @@ if TYPE_CHECKING:
 
     from .errors import APIConnectionError
 
-# Gateway failures: the application never answered, so nothing was billed.
-RETRYABLE_STATUS_CODES = frozenset({502, 503, 504})
+# Gateway failures that happen before the application answers, so nothing was
+# billed. 504 is left out on purpose: a gateway that gives up on a slow request
+# reports it while the application may still be processing and billing it.
+RETRYABLE_STATUS_CODES = frozenset({502, 503})
 PER_MINUTE_LIMIT_STATUS = 429
 
 BACKOFF_BASE_SECONDS = 0.5
@@ -76,9 +78,11 @@ class RetryPolicy:
     def after_response(self, response: httpx.Response, attempt: int) -> RetryDecision | None:
         """Decision after attempt number ``attempt`` received ``response``. ``None`` means accept it.
 
-        502, 503 and 504 come from the gateway and are repeated with backoff.
-        A 429 is repeated only when it is the per-minute limit, waiting for
-        ``Retry-After``; quota errors are never repeated.
+        502 and 503 come from the gateway before the application answers and
+        are repeated with backoff. A 504 is not: the application may still be
+        processing, and billing, the request. A 429 is repeated only when it
+        is the per-minute limit, waiting for ``Retry-After``; quota errors are
+        never repeated.
         """
         if attempt >= self.max_attempts:
             return None

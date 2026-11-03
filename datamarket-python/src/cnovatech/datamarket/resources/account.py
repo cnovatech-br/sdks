@@ -58,7 +58,6 @@ class Account(SyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=0,
         )
 
     def api_keys(self) -> ApiKeys:
@@ -99,7 +98,6 @@ class AsyncAccount(AsyncResource):
                 limit=limit,
             ),
             page=page,
-            page_cost_estimate=0,
         )
 
     async def api_keys(self) -> ApiKeys:

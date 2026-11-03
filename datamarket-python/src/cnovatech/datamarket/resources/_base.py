@@ -27,20 +27,18 @@ class SyncResource:
         return self._transport.execute(operation)
 
     def _execute_paginated(
-        self,
-        build: Callable[..., Operation[SyncPageT]],
-        *,
-        page: int,
-        page_cost_estimate: int,
+        self, build: Callable[..., Operation[SyncPageT]], *, page: int
     ) -> SyncPageT:
         """Fetch ``page`` and give it the means to fetch the pages after it.
 
-        ``build`` receives ``page=`` and returns the operation for that page.
+        ``build`` receives ``page=`` and returns the operation for that page,
+        validated and with its cost estimate, which becomes the page's.
         """
 
         def fetch(page_number: int) -> SyncPageT:
-            result = self._transport.execute(build(page=page_number))
-            result.attach_pagination(fetch, page_cost_estimate=page_cost_estimate)
+            operation = build(page=page_number)
+            result = self._transport.execute(operation)
+            result.attach_pagination(fetch, page_cost_estimate=operation.estimated_cost)
             return result
 
         return fetch(page)
@@ -56,17 +54,14 @@ class AsyncResource:
         return await self._transport.execute(operation)
 
     async def _execute_paginated(
-        self,
-        build: Callable[..., Operation[AsyncPageT]],
-        *,
-        page: int,
-        page_cost_estimate: int,
+        self, build: Callable[..., Operation[AsyncPageT]], *, page: int
     ) -> AsyncPageT:
         """Fetch ``page`` and give it the means to fetch the pages after it."""
 
         async def fetch(page_number: int) -> AsyncPageT:
-            result = await self._transport.execute(build(page=page_number))
-            result.attach_pagination(fetch, page_cost_estimate=page_cost_estimate)
+            operation = build(page=page_number)
+            result = await self._transport.execute(operation)
+            result.attach_pagination(fetch, page_cost_estimate=operation.estimated_cost)
             return result
 
         return await fetch(page)

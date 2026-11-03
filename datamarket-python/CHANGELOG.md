@@ -22,8 +22,9 @@ project uses [Semantic Versioning](https://semver.org/).
 - Paginated responses (`CatalogPage`, `AssortmentPage`, ...) with
   `next_page()`, `iter_pages()` and `iter_all()` capped by `max_pages` or
   `max_units`, plus `estimate_remaining_cost()`.
-- `stores.find(name)`: an exact name wins; `StoreNotFoundError` and
-  `AmbiguousStoreError` with the candidates otherwise.
+- `stores.find(name)`: reads up to five pages of results until an exact name
+  matches; `StoreNotFoundError` and `AmbiguousStoreError` with the
+  candidates otherwise.
 - `to_dataframe()` on every list response, with the `pandas` extra.
 - `client.usage` (units spent through the client, last balance) and
   `client.rate_limit` (per-minute limit from the API's headers).
