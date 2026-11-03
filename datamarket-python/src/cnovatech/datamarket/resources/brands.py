@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from cnovatech.datamarket.resources import _operations as operations
-from cnovatech.datamarket.resources._base import AsyncResource, SyncResource
+from cnovatech.sdk_core.resource import AsyncResource, SyncResource
 
 if TYPE_CHECKING:
     from cnovatech.datamarket.models.brands import StoresByBrandResponse

@@ -11,7 +11,7 @@ from cnovatech.datamarket import errors
 from cnovatech.datamarket.models.account import LogsPage
 from cnovatech.datamarket.models.stores import AssortmentPage
 from cnovatech.datamarket.resources import _operations as operations
-from cnovatech.sdk_core import pricing
+from cnovatech.datamarket.resources._pricing import export_cost
 
 if TYPE_CHECKING:
     from conftest import FakeAPI
@@ -41,7 +41,7 @@ def test_log_dates_are_sent_as_calendar_days(
 def test_page_cost_follows_the_validated_limit() -> None:
     operation = operations.assortment(AssortmentPage, store_id=STORE_ID, limit=1000, page=1)
 
-    assert operation.estimated_cost == pricing.export_cost(1000) == 8
+    assert operation.estimated_cost == export_cost(1000) == 8
 
 
 def test_an_invalid_limit_is_an_sdk_error_even_for_paginated_calls(api: FakeAPI) -> None:

@@ -46,3 +46,51 @@ class Operation(Generic[ResultT]):
     requires_auth: bool = True
     under_api_prefix: bool = True
     status_overrides: Mapping[int, type[APIStatusError]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class Endpoint:
+    """Where an endpoint lives, declared once and shared by every call to it.
+
+    Attributes:
+        method: HTTP method.
+        path: Path template, with ``{name}`` placeholders for path parameters.
+        under_api_prefix: Whether the path sits under the product's API prefix.
+        requires_auth: Whether the API key must be sent.
+    """
+
+    method: Literal["GET", "POST"]
+    path: str
+    under_api_prefix: bool = True
+    requires_auth: bool = True
+
+    def full_path(self, api_prefix: str) -> str:
+        """The path as the API serves it, with the prefix when it applies."""
+        return f"{api_prefix}{self.path}" if self.under_api_prefix else self.path
+
+    def operation(
+        self,
+        parse: Callable[[Any], ResultT],
+        *,
+        params: Mapping[str, Any] | None = None,
+        json_body: Any = None,
+        estimated_cost: int = 0,
+        status_overrides: Mapping[int, type[APIStatusError]] | None = None,
+        **path_params: str,
+    ) -> Operation[ResultT]:
+        """Build one call to this endpoint.
+
+        ``path_params`` fill the template's placeholders and must already be
+        validated and safe for a URL path.
+        """
+        return Operation(
+            method=self.method,
+            path=self.path.format(**path_params) if path_params else self.path,
+            parse=parse,
+            params=params if params is not None else {},
+            json_body=json_body,
+            estimated_cost=estimated_cost,
+            requires_auth=self.requires_auth,
+            under_api_prefix=self.under_api_prefix,
+            status_overrides=status_overrides if status_overrides is not None else {},
+        )

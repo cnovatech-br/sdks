@@ -135,6 +135,43 @@ def test_columns_are_the_union_of_every_row() -> None:
     assert frame["details_state"].isna().tolist() == [True, False, True]
 
 
+def test_nested_rows_repeat_the_parent_on_each_child() -> None:
+    class Point(APIResponse):
+        day: str
+        value: float
+
+    class Series(APIResponse):
+        label: str
+        points: list[Point] = Field(default_factory=list)
+
+    class History(TabularResponse):
+        rows_field: ClassVar[str] = "series.points"
+
+        code: str
+        totals: list[Point] = Field(default_factory=list)
+        series: list[Series] = Field(default_factory=list)
+
+    history = History.model_validate(
+        {
+            "code": "c",
+            "totals": [{"day": "d1", "value": 9.0}],
+            "series": [
+                {
+                    "label": "a",
+                    "points": [{"day": "d1", "value": 1.0}, {"day": "d2", "value": 2.0}],
+                },
+                {"label": "b", "points": []},
+            ],
+        }
+    )
+
+    frame = history.to_dataframe()
+
+    assert list(frame.columns) == ["code", "label", "day", "value"]
+    assert frame["label"].tolist() == ["a", "a"]
+    assert frame["value"].tolist() == [1.0, 2.0]
+
+
 def test_missing_pandas_gives_an_actionable_error(monkeypatch: pytest.MonkeyPatch) -> None:
     real_import = builtins.__import__
 

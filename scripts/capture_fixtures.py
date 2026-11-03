@@ -5,6 +5,10 @@ and refresh the test fixtures with real data, anonymised and with every list
 cut to its first five items. The smallest possible requests are used; the run
 costs about 21 quota units and prints the exact figure at the end.
 
+Fixtures are named after the ``operationId`` of the matching path in the
+OpenAPI document kept next to them, so a new endpoint only needs the document
+refreshed.
+
 Usage, from the workspace root with ``DATAMARKET_API_KEY`` in the environment
 or in ``.env``::
 
@@ -15,6 +19,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -22,24 +27,12 @@ from typing import Any
 import httpx
 
 from cnovatech.datamarket import DataMarket, errors
+from cnovatech.datamarket._config import PRODUCT_SETTINGS
 
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "datamarket-python" / "tests" / "fixtures"
+OPENAPI_DOCUMENT = FIXTURES_DIR / "openapi.json"
 UNKNOWN_EAN = "0000000000000"
 SAMPLE_SEARCH = "coca cola 2l"
-
-OPERATION_IDS = {
-    "/health": "healthCheck",
-    "/api/v1/user/profile": "getProfile",
-    "/api/v1/user/usage": "getUsage",
-    "/api/v1/user/logs": "getUserLogs",
-    "/api/v1/user/api-keys": "listApiKeys",
-    "/api/v1/market/products/departments": "listDepartments",
-    "/api/v1/market/products/brands": "listBrands",
-    "/api/v1/market/products/catalog": "getCatalog",
-    "/api/v1/market/products/by-brand": "getProductsByBrand",
-    "/api/v1/market/products/coverage": "checkCatalogCoverage",
-    "/api/v1/market/stores": "listStores",
-}
 
 ANONYMISED_PROFILE = {
     "id": "a3b1c2d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
@@ -50,12 +43,15 @@ ANONYMISED_PROFILE = {
     "phone": None,
 }
 
+Recorded = tuple[str, str, int, Any]
+"""Method, path, status and decoded body of one response."""
+
 
 class Recorder:
-    """Keeps the raw JSON of every response the client received, keyed by request path."""
+    """Keeps the raw JSON of every response the client received."""
 
     def __init__(self) -> None:
-        self.responses: list[tuple[str, int, Any]] = []
+        self.responses: list[Recorded] = []
 
     def __call__(self, response: httpx.Response) -> None:
         """Record one response. Installed as an httpx ``response`` event hook."""
@@ -64,31 +60,34 @@ class Recorder:
             payload = response.json()
         except ValueError:
             payload = None
-        self.responses.append((response.request.url.path, response.status_code, payload))
+        request = response.request
+        self.responses.append((request.method, request.url.path, response.status_code, payload))
 
 
-def operation_id(path: str, status_code: int, payload: Any) -> str | None:
-    """Name of the fixture for a recorded response, or ``None`` when it is not kept."""
+def route_names() -> list[tuple[str, re.Pattern[str], str]]:
+    """``(method, path pattern, operationId)`` for every operation of the OpenAPI document."""
+    document = json.loads(OPENAPI_DOCUMENT.read_text(encoding="utf-8"))
+    routes: list[tuple[str, re.Pattern[str], str]] = []
+    for template, item in document["paths"].items():
+        literals = re.split(r"\{[^/]+\}", template)
+        pattern = re.compile("^" + "[^/]+".join(re.escape(piece) for piece in literals) + "$")
+        for method, operation in item.items():
+            if isinstance(operation, dict) and "operationId" in operation:
+                routes.append((method.upper(), pattern, operation["operationId"]))
+    return routes
+
+
+def fixture_name(recorded: Recorded, routes: list[tuple[str, re.Pattern[str], str]]) -> str | None:
+    """Name of the fixture for a recorded response, or ``None`` when it is not kept.
+
+    Error responses are kept only for the codes the SDK types specially.
+    """
+    method, path, status_code, payload = recorded
     if status_code >= 400:
         code = payload.get("error") if isinstance(payload, dict) else None
-        return f"error_{code}" if code in {"ean_not_found", "filter_required"} else None
-    if path in OPERATION_IDS:
-        return OPERATION_IDS[path]
-    if "/price-history" in path:
-        return "getProductPriceHistory"
-    if "/products/ean/" in path:
-        return "getProductByEan"
-    if "/brands/" in path and path.endswith("/stores"):
-        return "getStoresByBrand"
-    for suffix, name in (
-        ("/assortment", "getStoreAssortment"),
-        ("/competitiveness", "getStoreCompetitiveness"),
-        ("/products", "getCompetitorProducts"),
-        ("/competitors", "getStoreCompetitors"),
-        ("/market-position", "getStoreMarketPosition"),
-        ("/opportunities", "getStoreOpportunities"),
-    ):
-        if path.endswith(suffix):
+        return f"error_{code}" if code in PRODUCT_SETTINGS.error_overrides else None
+    for route_method, pattern, name in routes:
+        if route_method == method and pattern.match(path):
             return name
     return None
 
@@ -165,11 +164,13 @@ def exercise(client: DataMarket) -> None:
         client.products.catalog(page=21)
 
 
-def write_fixtures(responses: list[tuple[str, int, Any]]) -> list[str]:
+def write_fixtures(responses: list[Recorded]) -> list[str]:
     """Write one fixture per recorded response that has a name. Returns the names written."""
+    routes = route_names()
     written: list[str] = []
-    for path, status_code, payload in responses:
-        name = operation_id(path, status_code, payload)
+    for recorded in responses:
+        name = fixture_name(recorded, routes)
+        payload = recorded[3]
         if name is None or payload is None:
             continue
         content = trim_lists(anonymise(name, payload))

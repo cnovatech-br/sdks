@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import dataclasses
 import uuid
 from typing import TYPE_CHECKING, Any
 
 import httpx
 import pytest
+from conftest import EXAMPLE_PRODUCT, Thing, json_response, thing_operation, thing_payload
 from pydantic import ConfigDict
 
-from cnovatech.sdk_core.config import ClientConfig, ProductSettings, build_client_config
+from cnovatech.sdk_core.config import ClientConfig, build_client_config
 from cnovatech.sdk_core.errors import (
     APIConnectionError,
     APITimeoutError,
@@ -19,7 +21,7 @@ from cnovatech.sdk_core.errors import (
     ServerError,
     UnexpectedResponseError,
 )
-from cnovatech.sdk_core.models import APIResponse, parser_for
+from cnovatech.sdk_core.models import APIResponse
 from cnovatech.sdk_core.operation import Operation
 from cnovatech.sdk_core.transport import (
     AsyncTransport,
@@ -36,26 +38,17 @@ class Status(APIResponse):
     status: str
 
 
-class Thing(APIResponse):
-    identifier: str
-    name: str
-
-
 class StrictThing(APIResponse):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     identifier: str
 
 
-def thing_operation(**params: Any) -> Operation[Thing]:
-    return Operation(method="GET", path="/things/1", parse=parser_for(Thing), params=params)
-
-
 def status_operation() -> Operation[Status]:
     return Operation(
         method="GET",
         path="/status",
-        parse=parser_for(Status),
+        parse=Status.model_validate,
         requires_auth=False,
         under_api_prefix=False,
     )
@@ -63,7 +56,7 @@ def status_operation() -> Operation[Status]:
 
 def costly_operation(estimated_cost: int) -> Operation[Thing]:
     return Operation(
-        method="GET", path="/things", parse=parser_for(Thing), estimated_cost=estimated_cost
+        method="GET", path="/things", parse=Thing.model_validate, estimated_cost=estimated_cost
     )
 
 
@@ -98,27 +91,19 @@ def test_each_request_gets_its_own_correlation_id(config: ClientConfig) -> None:
     assert first.correlation_id != second.correlation_id
 
 
-def test_custom_api_key_header(config: ClientConfig) -> None:
-    product = ProductSettings(
-        distribution_name="cnovatech-example",
-        version="1.2.3",
-        env_prefix="EXAMPLE_",
-        default_base_url="https://api.example.test",
-        api_key_header="Authorization",
-    )
+def test_custom_api_key_header() -> None:
+    product = dataclasses.replace(EXAMPLE_PRODUCT, api_key_header="Authorization")
     custom = build_client_config(product, api_key="ex_test_key", environ={})
 
     prepared = prepare_request(custom, thing_operation())
 
     assert prepared.headers["Authorization"] == "ex_test_key"
-    assert config.product.api_key_header == "X-API-Key"
 
 
 def test_missing_api_key_fails_before_any_request(
     config_without_key: ClientConfig,
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     transport = make_sync_transport(json_response(200, {}), transport_config=config_without_key)
 
@@ -131,7 +116,6 @@ def test_missing_api_key_fails_before_any_request(
 def test_public_call_works_without_api_key(
     config_without_key: ClientConfig,
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     transport = make_sync_transport(
         json_response(200, {"status": "healthy"}), transport_config=config_without_key
@@ -141,13 +125,11 @@ def test_public_call_works_without_api_key(
 
 
 def test_call_above_the_per_request_budget_is_refused_before_sending(
-    product: ProductSettings,
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     capped = build_client_config(
-        product, api_key="ex_test_key", max_units_per_request=20, environ={}
+        EXAMPLE_PRODUCT, api_key="ex_test_key", max_units_per_request=20, environ={}
     )
     transport = make_sync_transport(json_response(200, {}), transport_config=capped)
 
@@ -161,16 +143,13 @@ def test_call_above_the_per_request_budget_is_refused_before_sending(
 
 
 def test_call_within_the_per_request_budget_is_sent(
-    product: ProductSettings,
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     capped = build_client_config(
-        product, api_key="ex_test_key", max_units_per_request=20, environ={}
+        EXAMPLE_PRODUCT, api_key="ex_test_key", max_units_per_request=20, environ={}
     )
-    payload = {"identifier": "1", "name": "Milk"}
-    transport = make_sync_transport(json_response(200, payload), transport_config=capped)
+    transport = make_sync_transport(json_response(200, thing_payload()), transport_config=capped)
 
     transport.execute(costly_operation(20))
 
@@ -180,11 +159,8 @@ def test_call_within_the_per_request_budget_is_sent(
 def test_without_a_budget_any_cost_is_sent(
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
-    payload = {"identifier": "1", "name": "Milk"}
-
-    make_sync_transport(json_response(200, payload)).execute(costly_operation(10_000))
+    make_sync_transport(json_response(200, thing_payload())).execute(costly_operation(10_000))
 
     assert len(sent_requests) == 1
 
@@ -195,12 +171,9 @@ def test_without_a_budget_any_cost_is_sent(
 def test_successful_response_is_parsed_and_annotated(
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     handler = json_response(
-        200,
-        {"identifier": "1", "name": "Milk", "introduced_later": True},
-        headers={"X-Correlation-ID": "echoed-by-api"},
+        200, thing_payload(introduced_later=True), headers={"X-Correlation-ID": "echoed-by-api"}
     )
 
     with make_sync_transport(handler) as transport:
@@ -221,9 +194,8 @@ def test_successful_response_is_parsed_and_annotated(
 def test_correlation_id_falls_back_to_the_one_sent(
     make_sync_transport: Callable[..., SyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
-    transport = make_sync_transport(json_response(200, {"identifier": "1", "name": "Milk"}))
+    transport = make_sync_transport(json_response(200, thing_payload()))
 
     thing = transport.execute(thing_operation())
 
@@ -277,10 +249,9 @@ def test_invalid_json_is_an_unexpected_response(
 
 def test_payload_that_does_not_match_the_model_is_an_unexpected_response(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     operation: Operation[StrictThing] = Operation(
-        method="GET", path="/things/1", parse=parser_for(StrictThing)
+        method="GET", path="/things/1", parse=StrictThing.model_validate
     )
 
     with pytest.raises(UnexpectedResponseError, match="did not match") as excinfo:
@@ -293,7 +264,6 @@ def test_payload_that_does_not_match_the_model_is_an_unexpected_response(
 
 def test_error_status_raises_the_mapped_exception(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     handler = json_response(
         404,
@@ -311,23 +281,36 @@ def test_error_status_raises_the_mapped_exception(
 
 def test_product_error_overrides_are_applied(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     class ThingNotFoundError(NotFoundError):
         pass
 
-    product = ProductSettings(
-        distribution_name="cnovatech-example",
-        version="1.2.3",
-        env_prefix="EXAMPLE_",
-        default_base_url="https://api.example.test",
-        error_overrides={"thing_not_found": ThingNotFoundError},
+    product = dataclasses.replace(
+        EXAMPLE_PRODUCT, error_overrides={"thing_not_found": ThingNotFoundError}
     )
     custom = build_client_config(product, api_key="ex_test_key", environ={})
     handler = json_response(404, {"error": "thing_not_found", "message": "No such thing."})
 
     with pytest.raises(ThingNotFoundError):
         make_sync_transport(handler, transport_config=custom).execute(thing_operation())
+
+
+def test_operation_status_overrides_are_applied(
+    make_sync_transport: Callable[..., SyncTransport],
+) -> None:
+    class ThingNotFoundError(NotFoundError):
+        pass
+
+    operation: Operation[Thing] = Operation(
+        method="GET",
+        path="/things/1",
+        parse=Thing.model_validate,
+        status_overrides={404: ThingNotFoundError},
+    )
+    handler = json_response(404, {"error": "not_found", "message": "No such thing."})
+
+    with pytest.raises(ThingNotFoundError):
+        make_sync_transport(handler).execute(operation)
 
 
 @pytest.mark.parametrize(
@@ -340,7 +323,6 @@ def test_product_error_overrides_are_applied(
 )
 def test_error_families(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
     status_code: int,
     payload: dict[str, Any],
     headers: dict[str, str],
@@ -477,7 +459,6 @@ def test_transport_exposes_its_config(config: ClientConfig) -> None:
 async def test_async_transport_parses_a_successful_response(
     make_async_transport: Callable[..., AsyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     async with make_async_transport(json_response(200, {"status": "healthy"})) as transport:
         status = await transport.execute(status_operation())
@@ -490,7 +471,6 @@ async def test_async_transport_parses_a_successful_response(
 
 async def test_async_transport_raises_mapped_errors(
     make_async_transport: Callable[..., AsyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     transport = make_async_transport(json_response(404, {"error": "not_found", "message": "Nope."}))
 
@@ -522,13 +502,11 @@ async def test_async_transport_wraps_connection_failures(
 
 
 async def test_async_budget_guard_refuses_before_sending(
-    product: ProductSettings,
     make_async_transport: Callable[..., AsyncTransport],
     sent_requests: list[httpx.Request],
-    json_response: Callable[..., Any],
 ) -> None:
     capped = build_client_config(
-        product, api_key="ex_test_key", max_units_per_request=1, environ={}
+        EXAMPLE_PRODUCT, api_key="ex_test_key", max_units_per_request=1, environ={}
     )
 
     async with make_async_transport(json_response(200, {}), transport_config=capped) as transport:
@@ -547,5 +525,4 @@ async def test_async_close_leaves_an_injected_client_open(config: ClientConfig) 
     await transport.aclose()
 
     assert http_client.is_closed is False
-    assert transport.config is config
     await http_client.aclose()

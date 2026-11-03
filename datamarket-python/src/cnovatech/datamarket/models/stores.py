@@ -40,14 +40,9 @@ __all__ = [
 ]
 
 
-class Store(Record):
+class Store(StoreRef):
     """A monitored store."""
 
-    store_id: str
-    store_name: str
-    city: str | None = None
-    state: str | None = None
-    channel: str | None = None
     omnichannel: bool = False
     product_count: int = 0
     last_collected_date: datetime.date | None = None
@@ -108,14 +103,9 @@ class AsyncAssortmentPage(AsyncPage[AssortmentItem], StoreEnvelope):
     usage: Usage
 
 
-class Competitor(Record):
+class Competitor(StoreRef):
     """A competing store, by assortment overlap with the queried store."""
 
-    store_id: str
-    store_name: str
-    city: str | None = None
-    state: str | None = None
-    channel: str | None = None
     product_count: int = 0
     common_product_count: int = 0
     overlap_pct: float = 0
@@ -141,14 +131,9 @@ class CompetitorsResponse(TabularResponse):
     usage: Usage
 
 
-class CompetitivenessItem(Record):
+class CompetitivenessItem(StoreRef):
     """Price position of the queried store against one competitor."""
 
-    store_id: str
-    store_name: str
-    city: str | None = None
-    state: str | None = None
-    channel: str | None = None
     common_product_count: int = 0
     unavailable_count: int = 0
     below_count: int = 0

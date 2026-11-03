@@ -19,7 +19,7 @@ from cnovatech.datamarket.models.stores import (
     StoresPage,
 )
 from cnovatech.datamarket.resources import _operations as operations
-from cnovatech.datamarket.resources._base import AsyncResource, SyncResource
+from cnovatech.sdk_core.resource import AsyncResource, SyncResource
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -59,7 +59,7 @@ def select_store(name: str, candidates: Sequence[Store]) -> Store:
     exact = exact_matches(name, candidates)
     if len(exact) == 1:
         return exact[0]
-    if len(candidates) == 1 and not exact:
+    if len(candidates) == 1:
         return candidates[0]
     if not candidates:
         raise StoreNotFoundError(

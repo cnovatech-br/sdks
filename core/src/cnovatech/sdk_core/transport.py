@@ -82,12 +82,19 @@ def prepare_request(config: ClientConfig, operation: Operation[Any]) -> Prepared
         ConfigurationError: The operation needs an API key and none is configured.
         BudgetExceededError: The estimated cost is above ``max_units_per_request``.
     """
-    api_key = config.api_key
-    if operation.requires_auth and api_key is None:
-        raise ConfigurationError(
-            "No API key configured. Pass api_key= to the client or set the "
-            f"{config.product.env_prefix}{API_KEY_ENV_SUFFIX} environment variable."
-        )
+    correlation_id = str(uuid.uuid4())
+    headers = {
+        "Accept": JSON_MEDIA_TYPE,
+        "User-Agent": config.user_agent,
+        CORRELATION_ID_HEADER: correlation_id,
+    }
+    if operation.requires_auth:
+        if config.api_key is None:
+            raise ConfigurationError(
+                "No API key configured. Pass api_key= to the client or set the "
+                f"{config.product.env_prefix}{API_KEY_ENV_SUFFIX} environment variable."
+            )
+        headers[config.product.api_key_header] = config.api_key.get_secret_value()
     prefix = config.product.api_prefix if operation.under_api_prefix else ""
     path = f"{prefix}{operation.path}"
     budget = config.max_units_per_request
@@ -98,14 +105,6 @@ def prepare_request(config: ClientConfig, operation: Operation[Any]) -> Prepared
             estimated_cost=operation.estimated_cost,
             limit=budget,
         )
-    correlation_id = str(uuid.uuid4())
-    headers = {
-        "Accept": JSON_MEDIA_TYPE,
-        "User-Agent": config.user_agent,
-        CORRELATION_ID_HEADER: correlation_id,
-    }
-    if operation.requires_auth and api_key is not None:
-        headers[config.product.api_key_header] = api_key.get_secret_value()
     return PreparedRequest(
         method=operation.method,
         url=f"{config.base_url}{path}",

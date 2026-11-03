@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
+from .errors import parse_int
 from .models import APIResponse, Usage
 
 if TYPE_CHECKING:
@@ -90,21 +91,11 @@ class RateLimitState:
 
     def update_from_headers(self, headers: Mapping[str, str]) -> None:
         """Read the ``X-RateLimit-*`` headers of a response, if present."""
-        limit = _int_header(headers, RATE_LIMIT_LIMIT_HEADER)
-        remaining = _int_header(headers, RATE_LIMIT_REMAINING_HEADER)
+        limit = parse_int(headers.get(RATE_LIMIT_LIMIT_HEADER))
+        remaining = parse_int(headers.get(RATE_LIMIT_REMAINING_HEADER))
         if limit is None and remaining is None:
             return
         self.limit = limit
         self.remaining = remaining
-        self.reset_in_seconds = _int_header(headers, RATE_LIMIT_RESET_HEADER)
+        self.reset_in_seconds = parse_int(headers.get(RATE_LIMIT_RESET_HEADER))
         self.observed_at = datetime.now(timezone.utc)
-
-
-def _int_header(headers: Mapping[str, str], name: str) -> int | None:
-    value = headers.get(name)
-    if value is None:
-        return None
-    try:
-        return int(value.strip())
-    except ValueError:
-        return None

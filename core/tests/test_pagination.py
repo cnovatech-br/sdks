@@ -123,11 +123,8 @@ def test_max_units_refuses_before_the_page_that_would_cross_it() -> None:
     first = resource.fetch(1)
     delivered: list[int] = []
 
-    def consume() -> None:
-        delivered.extend(page.meta.page for page in first.iter_pages(max_units=3))
-
     with pytest.raises(BudgetExceededError) as excinfo:
-        consume()
+        delivered.extend(page.meta.page for page in first.iter_pages(max_units=3))
 
     assert delivered == [1, 2]
     assert excinfo.value.spent == 2

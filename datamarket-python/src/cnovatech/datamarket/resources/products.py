@@ -14,7 +14,7 @@ from cnovatech.datamarket.models.products import (
     ProductsByBrandPage,
 )
 from cnovatech.datamarket.resources import _operations as operations
-from cnovatech.datamarket.resources._base import AsyncResource, SyncResource
+from cnovatech.sdk_core.resource import AsyncResource, SyncResource
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

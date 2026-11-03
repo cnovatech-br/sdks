@@ -4,14 +4,16 @@ import pytest
 
 from cnovatech.sdk_core.errors import CnovatechError, InvalidRequestError
 from cnovatech.sdk_core.validation import (
+    stripped,
     validate_batch,
+    validate_digits,
     validate_identifier,
     validate_limit,
     validate_page,
     validate_path_segment,
-    validate_product_code,
-    validate_state,
 )
+
+LENGTHS = frozenset({8, 13})
 
 
 def test_invalid_request_error_is_a_value_error_and_an_sdk_error() -> None:
@@ -19,34 +21,22 @@ def test_invalid_request_error_is_a_value_error_and_an_sdk_error() -> None:
     assert issubclass(InvalidRequestError, CnovatechError)
 
 
-@pytest.mark.parametrize(
-    "code", ["78949000", "7894900011517", " 7894900011517 ", "12345678901234", "12345678901"]
-)
-def test_valid_product_codes(code: str) -> None:
-    assert validate_product_code(code) == code.strip()
+@pytest.mark.parametrize("code", ["78949000", "7894900011517", " 7894900011517 "])
+def test_valid_digit_strings(code: str) -> None:
+    assert validate_digits(code, lengths=LENGTHS, name="code") == code.strip()
 
 
 @pytest.mark.parametrize(
-    "code",
-    [
-        "",
-        "1234567",
-        "123456789",
-        "1234567890",
-        "123456789012345",
-        "7894900O11517",
-        "٧٨٩٤٩٠٠٠١١٥١٧",
-        "78949000-11517",
-    ],
+    "code", ["", "1234567", "123456789", "7894900O11517", "٧٨٩٤٩٠٠٠١١٥١٧", "78949000-11517"]
 )
-def test_invalid_product_codes(code: str) -> None:
-    with pytest.raises(InvalidRequestError, match="code must contain only digits"):
-        validate_product_code(code)
+def test_invalid_digit_strings(code: str) -> None:
+    with pytest.raises(InvalidRequestError, match=r"code must contain only digits.*8, 13"):
+        validate_digits(code, lengths=LENGTHS, name="code")
 
 
-def test_product_code_error_names_the_argument() -> None:
+def test_digit_errors_name_the_argument() -> None:
     with pytest.raises(InvalidRequestError, match="competitor_code"):
-        validate_product_code("x", name="competitor_code")
+        validate_digits("x", lengths=LENGTHS, name="competitor_code")
 
 
 def test_batch_is_stripped_and_bounded() -> None:
@@ -81,18 +71,6 @@ def test_invalid_identifiers(value: str) -> None:
         validate_identifier(value, name="store_id")
 
 
-def test_state_is_upper_cased_and_none_passes() -> None:
-    assert validate_state("sp") == "SP"
-    assert validate_state(" rj ") == "RJ"
-    assert validate_state(None) is None
-
-
-@pytest.mark.parametrize("value", ["", "S", "SPP", "S1", "ÇA"])
-def test_invalid_states(value: str) -> None:
-    with pytest.raises(InvalidRequestError, match="two-letter state code"):
-        validate_state(value)
-
-
 def test_path_segment_is_percent_encoded() -> None:
     assert validate_path_segment("Coca-Cola / Zero?", name="brand") == "Coca-Cola%20%2F%20Zero%3F"
     assert validate_path_segment("../x", name="brand") == "..%2Fx"
@@ -118,3 +96,8 @@ def test_valid_page_and_limit() -> None:
 def test_invalid_limits(limit: object) -> None:
     with pytest.raises(InvalidRequestError, match="limit must be an integer between 1 and 100"):
         validate_limit(limit, maximum=100)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(("value", "expected"), [(" a ", "a"), ("", ""), (None, ""), (3, "")])
+def test_stripped(value: object, expected: str) -> None:
+    assert stripped(value) == expected

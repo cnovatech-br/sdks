@@ -93,7 +93,6 @@ class APIConnectionError(CnovatechError):
 
     def __init__(self, message: str, *, retryable: bool) -> None:
         super().__init__(message)
-        self.message = message
         self.retryable = retryable
 
 
@@ -347,13 +346,18 @@ def error_from_response(
 
 def parse_retry_after(value: str | None) -> int | None:
     """Seconds from a ``Retry-After`` header, or ``None`` when absent or not a delay in seconds."""
+    seconds = parse_int(value)
+    return seconds if seconds is not None and seconds >= 0 else None
+
+
+def parse_int(value: str | None) -> int | None:
+    """An integer header value, or ``None`` when the header is absent or not a number."""
     if value is None:
         return None
     try:
-        seconds = int(value.strip())
+        return int(value.strip())
     except ValueError:
         return None
-    return seconds if seconds >= 0 else None
 
 
 def _error_code(body: Mapping[str, Any], status_code: int) -> str:

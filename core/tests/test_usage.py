@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import httpx
+from conftest import json_response
 
-from cnovatech.sdk_core.models import APIResponse, Usage, parser_for
+from cnovatech.sdk_core.models import APIResponse, Usage
 from cnovatech.sdk_core.operation import Operation
 from cnovatech.sdk_core.usage import RateLimitState, UsageTracker, record_usage
 
@@ -24,6 +25,10 @@ class Billed(APIResponse):
 
 class Free(APIResponse):
     name: str
+
+
+def billed_operation() -> Operation[Billed]:
+    return Operation(method="GET", path="/billed", parse=Billed.model_validate)
 
 
 def usage(cost: int, *, remaining: int | None = 500, limit: int | None = 1000) -> Usage:
@@ -126,7 +131,6 @@ def test_rate_limit_state_tolerates_malformed_values() -> None:
 
 def test_transport_feeds_usage_and_rate_limit(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     handler = json_response(
         200,
@@ -138,10 +142,9 @@ def test_transport_feeds_usage_and_rate_limit(
         },
     )
     transport = make_sync_transport(handler)
-    operation: Operation[Billed] = Operation(method="GET", path="/billed", parse=parser_for(Billed))
 
-    transport.execute(operation)
-    transport.execute(operation)
+    transport.execute(billed_operation())
+    transport.execute(billed_operation())
 
     assert transport.usage.spent == 4
     assert transport.usage.last is not None
@@ -152,14 +155,12 @@ def test_transport_feeds_usage_and_rate_limit(
 
 def test_two_transports_do_not_share_accounting(
     make_sync_transport: Callable[..., SyncTransport],
-    json_response: Callable[..., Any],
 ) -> None:
     handler = json_response(200, {"name": "a", "usage": {"query_cost": 5}})
     first = make_sync_transport(handler)
     second = make_sync_transport(handler)
-    operation: Operation[Billed] = Operation(method="GET", path="/billed", parse=parser_for(Billed))
 
-    first.execute(operation)
+    first.execute(billed_operation())
 
     assert first.usage.spent == 5
     assert second.usage.spent == 0

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import Field
 
@@ -114,8 +114,6 @@ class UsageMonth(Record):
 
 class UsageHistory(TabularResponse):
     """Consumption history: the last 30 days with usage and the last 12 months."""
-
-    rows_field: ClassVar[str] = "daily"
 
     daily: list[UsageDay] = Field(default_factory=list)
     monthly: list[UsageMonth] = Field(default_factory=list)

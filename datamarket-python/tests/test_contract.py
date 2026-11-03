@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+
+from conftest import FIXTURES_DIR
 
 from cnovatech.datamarket._config import API_PREFIX
 from cnovatech.datamarket.resources import _operations as operations
 
-OPENAPI_DOCUMENT = Path(__file__).parent / "fixtures" / "openapi.json"
+OPENAPI_DOCUMENT = FIXTURES_DIR / "openapi.json"
 OUT_OF_SCOPE_PREFIXES = ("/api/v1/user/account", "/api/v1/user/change-password")
 
 
@@ -28,10 +29,7 @@ def openapi_operations() -> set[tuple[str, str]]:
 
 
 def sdk_operations() -> set[tuple[str, str]]:
-    return {
-        (method, path if path == operations.HEALTH_PATH else f"{API_PREFIX}{path}")
-        for method, path in operations.ENDPOINTS
-    }
+    return {(endpoint.method, endpoint.full_path(API_PREFIX)) for endpoint in operations.ENDPOINTS}
 
 
 def test_every_live_operation_has_an_sdk_counterpart() -> None:
@@ -40,3 +38,15 @@ def test_every_live_operation_has_an_sdk_counterpart() -> None:
 
 def test_endpoint_count_matches_the_documented_scope() -> None:
     assert len(operations.ENDPOINTS) == 20
+
+
+def test_only_the_health_check_sits_outside_the_prefix() -> None:
+    outside = [endpoint for endpoint in operations.ENDPOINTS if not endpoint.under_api_prefix]
+
+    assert outside == [operations.HEALTH]
+    assert operations.HEALTH.requires_auth is False
+    assert all(
+        endpoint.requires_auth
+        for endpoint in operations.ENDPOINTS
+        if endpoint is not operations.HEALTH
+    )

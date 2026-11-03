@@ -110,7 +110,16 @@ def test_httpx_timeout_is_used_as_given(product: ProductSettings) -> None:
 
 @pytest.mark.parametrize(
     "timeout",
-    [0, -1, MAX_READ_TIMEOUT_SECONDS + 1, httpx.Timeout(None), httpx.Timeout(10.0, read=None)],
+    [
+        0,
+        -1,
+        MAX_READ_TIMEOUT_SECONDS + 1,
+        float("nan"),
+        float("inf"),
+        httpx.Timeout(None),
+        httpx.Timeout(10.0, read=None),
+        httpx.Timeout(float("nan")),
+    ],
 )
 def test_out_of_range_read_timeout_is_rejected(
     product: ProductSettings, timeout: float | httpx.Timeout
@@ -119,9 +128,10 @@ def test_out_of_range_read_timeout_is_rejected(
         build_client_config(product, timeout=timeout, environ={})
 
 
-def test_non_numeric_timeout_is_rejected(product: ProductSettings) -> None:
+@pytest.mark.parametrize("timeout", ["soon", True])
+def test_non_numeric_timeout_is_rejected(product: ProductSettings, timeout: object) -> None:
     with pytest.raises(ConfigurationError, match="timeout must be a number"):
-        build_client_config(product, timeout="soon", environ={})  # type: ignore[arg-type]
+        build_client_config(product, timeout=timeout, environ={})  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("max_retries", [-1, True])
@@ -196,22 +206,3 @@ def test_blank_environment_values_fall_back_to_defaults(product: ProductSettings
 
     assert config.api_key is None
     assert config.base_url == "https://api.example.test"
-
-
-@pytest.mark.parametrize("timeout", [float("nan"), float("inf"), httpx.Timeout(float("nan"))])
-def test_non_finite_timeout_is_rejected(
-    product: ProductSettings, timeout: float | httpx.Timeout
-) -> None:
-    with pytest.raises(ConfigurationError, match="read timeout"):
-        build_client_config(product, timeout=timeout, environ={})
-
-
-def test_boolean_timeout_is_rejected(product: ProductSettings) -> None:
-    with pytest.raises(ConfigurationError, match="timeout must be a number"):
-        build_client_config(product, timeout=True, environ={})
-
-
-def test_user_agent_is_computed_once(product: ProductSettings) -> None:
-    config = build_client_config(product, environ={})
-
-    assert config.user_agent is config.user_agent

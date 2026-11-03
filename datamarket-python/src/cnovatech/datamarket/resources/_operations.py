@@ -1,10 +1,10 @@
 """Operation definitions, one function per API endpoint.
 
-Everything an endpoint needs, from its path and parameters to its quota
-estimate, is declared here and nowhere else. Resources call these functions;
-transports execute the result. Paginated endpoints take the page model as
-their first argument so the synchronous and asynchronous resources share
-one definition.
+Everything an endpoint needs is declared here and nowhere else: where it
+lives (an :class:`Endpoint`), its parameters, its validation and its quota
+estimate. Resources call these functions; transports execute the result.
+Paginated endpoints take the page model as their first argument so the
+synchronous and asynchronous resources share one definition.
 """
 
 from __future__ import annotations
@@ -25,17 +25,20 @@ from cnovatech.datamarket.models.products import (
     Product,
 )
 from cnovatech.datamarket.models.stores import CompetitivenessResponse, CompetitorsResponse
-from cnovatech.sdk_core import pricing
-from cnovatech.sdk_core.models import parser_for
-from cnovatech.sdk_core.operation import Operation
+from cnovatech.datamarket.resources._pricing import (
+    QUERY_COST,
+    competitor_cost,
+    coverage_cost,
+    export_cost,
+)
+from cnovatech.datamarket.resources._validation import validate_ean, validate_state
+from cnovatech.sdk_core.operation import Endpoint, Operation
 from cnovatech.sdk_core.validation import (
     validate_batch,
     validate_identifier,
     validate_limit,
     validate_page,
     validate_path_segment,
-    validate_product_code,
-    validate_state,
 )
 
 if TYPE_CHECKING:
@@ -55,52 +58,50 @@ if TYPE_CHECKING:
 
 PageT = TypeVar("PageT", bound=BaseModel)
 
-CATALOG_PATH = "/market/products/catalog"
-DEPARTMENTS_PATH = "/market/products/departments"
-BRANDS_PATH = "/market/products/brands"
-PRODUCTS_BY_BRAND_PATH = "/market/products/by-brand"
-PRODUCT_PATH = "/market/products/ean/{ean}"
-PRICE_HISTORY_PATH = "/market/products/ean/{ean}/price-history"
-COVERAGE_PATH = "/market/products/coverage"
-STORES_PATH = "/market/stores"
-ASSORTMENT_PATH = "/market/stores/{store_id}/assortment"
-COMPETITIVENESS_PATH = "/market/stores/{store_id}/competitiveness"
-COMPETITORS_PATH = "/market/stores/{store_id}/competitors"
-COMPARISON_PATH = "/market/stores/{store_id}/competitors/{competitor_id}/products"
-MARKET_POSITION_PATH = "/market/stores/{store_id}/market-position"
-OPPORTUNITIES_PATH = "/market/stores/{store_id}/opportunities"
-STORES_BY_BRAND_PATH = "/market/brands/{brand}/stores"
-PROFILE_PATH = "/user/profile"
-USAGE_PATH = "/user/usage"
-LOGS_PATH = "/user/logs"
-API_KEYS_PATH = "/user/api-keys"
-HEALTH_PATH = "/health"
+CATALOG = Endpoint("GET", "/market/products/catalog")
+DEPARTMENTS = Endpoint("GET", "/market/products/departments")
+BRANDS = Endpoint("GET", "/market/products/brands")
+PRODUCTS_BY_BRAND = Endpoint("GET", "/market/products/by-brand")
+PRODUCT = Endpoint("GET", "/market/products/ean/{ean}")
+PRICE_HISTORY = Endpoint("GET", "/market/products/ean/{ean}/price-history")
+COVERAGE = Endpoint("POST", "/market/products/coverage")
+STORES = Endpoint("GET", "/market/stores")
+ASSORTMENT = Endpoint("GET", "/market/stores/{store_id}/assortment")
+COMPETITIVENESS = Endpoint("GET", "/market/stores/{store_id}/competitiveness")
+COMPETITORS = Endpoint("GET", "/market/stores/{store_id}/competitors")
+COMPARISON = Endpoint("GET", "/market/stores/{store_id}/competitors/{competitor_id}/products")
+MARKET_POSITION = Endpoint("GET", "/market/stores/{store_id}/market-position")
+OPPORTUNITIES = Endpoint("GET", "/market/stores/{store_id}/opportunities")
+STORES_BY_BRAND = Endpoint("GET", "/market/brands/{brand}/stores")
+PROFILE = Endpoint("GET", "/user/profile")
+USAGE = Endpoint("GET", "/user/usage")
+LOGS = Endpoint("GET", "/user/logs")
+API_KEYS = Endpoint("GET", "/user/api-keys")
+HEALTH = Endpoint("GET", "/health", under_api_prefix=False, requires_auth=False)
 
-ENDPOINTS: frozenset[tuple[str, str]] = frozenset(
-    {
-        ("GET", CATALOG_PATH),
-        ("GET", DEPARTMENTS_PATH),
-        ("GET", BRANDS_PATH),
-        ("GET", PRODUCTS_BY_BRAND_PATH),
-        ("GET", PRODUCT_PATH),
-        ("GET", PRICE_HISTORY_PATH),
-        ("POST", COVERAGE_PATH),
-        ("GET", STORES_PATH),
-        ("GET", ASSORTMENT_PATH),
-        ("GET", COMPETITIVENESS_PATH),
-        ("GET", COMPETITORS_PATH),
-        ("GET", COMPARISON_PATH),
-        ("GET", MARKET_POSITION_PATH),
-        ("GET", OPPORTUNITIES_PATH),
-        ("GET", STORES_BY_BRAND_PATH),
-        ("GET", PROFILE_PATH),
-        ("GET", USAGE_PATH),
-        ("GET", LOGS_PATH),
-        ("GET", API_KEYS_PATH),
-        ("GET", HEALTH_PATH),
-    }
+ENDPOINTS: tuple[Endpoint, ...] = (
+    CATALOG,
+    DEPARTMENTS,
+    BRANDS,
+    PRODUCTS_BY_BRAND,
+    PRODUCT,
+    PRICE_HISTORY,
+    COVERAGE,
+    STORES,
+    ASSORTMENT,
+    COMPETITIVENESS,
+    COMPETITORS,
+    COMPARISON,
+    MARKET_POSITION,
+    OPPORTUNITIES,
+    STORES_BY_BRAND,
+    PROFILE,
+    USAGE,
+    LOGS,
+    API_KEYS,
+    HEALTH,
 )
-"""Every (method, path) this module implements, for the contract test against the OpenAPI document."""
+"""Every endpoint this module implements; the contract test compares it with the OpenAPI document."""
 
 MAX_LIMIT_CATALOG = 100
 MAX_LIMIT_BRANDS = 100
@@ -136,10 +137,8 @@ def catalog(
     page: int,
 ) -> Operation[PageT]:
     """``GET /market/products/catalog``: one unit per page."""
-    return Operation(
-        method="GET",
-        path=CATALOG_PATH,
-        parse=parser_for(page_model),
+    return CATALOG.operation(
+        page_model.model_validate,
         params={
             "search": search,
             "brand": brand,
@@ -152,18 +151,13 @@ def catalog(
             "page": validate_page(page),
             "limit": validate_limit(limit, maximum=MAX_LIMIT_CATALOG),
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
     )
 
 
 def departments() -> Operation[DepartmentsResponse]:
     """``GET /market/products/departments``: one unit."""
-    return Operation(
-        method="GET",
-        path=DEPARTMENTS_PATH,
-        parse=parser_for(DepartmentsResponse),
-        estimated_cost=pricing.query_cost(),
-    )
+    return DEPARTMENTS.operation(DepartmentsResponse.model_validate, estimated_cost=QUERY_COST)
 
 
 def brands(
@@ -176,10 +170,8 @@ def brands(
     page: int,
 ) -> Operation[PageT]:
     """``GET /market/products/brands``: one unit per page."""
-    return Operation(
-        method="GET",
-        path=BRANDS_PATH,
-        parse=parser_for(page_model),
+    return BRANDS.operation(
+        page_model.model_validate,
         params={
             "search": search,
             "department": department,
@@ -187,7 +179,7 @@ def brands(
             "page": validate_page(page),
             "limit": validate_limit(limit, maximum=MAX_LIMIT_BRANDS),
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
     )
 
 
@@ -201,10 +193,8 @@ def products_by_brand(
     page: int,
 ) -> Operation[PageT]:
     """``GET /market/products/by-brand``: one unit per page."""
-    return Operation(
-        method="GET",
-        path=PRODUCTS_BY_BRAND_PATH,
-        parse=parser_for(page_model),
+    return PRODUCTS_BY_BRAND.operation(
+        page_model.model_validate,
         params={
             "brand": brand,
             "category": category,
@@ -212,7 +202,7 @@ def products_by_brand(
             "page": validate_page(page),
             "limit": validate_limit(limit, maximum=MAX_LIMIT_PRODUCTS_BY_BRAND),
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
     )
 
 
@@ -226,10 +216,8 @@ def product(
     sort_order: SortOrder,
 ) -> Operation[Product]:
     """``GET /market/products/ean/{ean}``: one unit."""
-    return Operation(
-        method="GET",
-        path=PRODUCT_PATH.format(ean=validate_product_code(ean, name="ean")),
-        parse=parser_for(Product),
+    return PRODUCT.operation(
+        Product.model_validate,
         params={
             "state": validate_state(state),
             "city": city,
@@ -237,7 +225,8 @@ def product(
             "sort_by": sort_by,
             "sort_order": sort_order,
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
+        ean=validate_ean(ean),
     )
 
 
@@ -250,29 +239,26 @@ def price_history(
     store_limit: int,
 ) -> Operation[PriceHistory]:
     """``GET /market/products/ean/{ean}/price-history``: one unit."""
-    return Operation(
-        method="GET",
-        path=PRICE_HISTORY_PATH.format(ean=validate_product_code(ean, name="ean")),
-        parse=parser_for(PriceHistory),
+    return PRICE_HISTORY.operation(
+        PriceHistory.model_validate,
         params={
             "days": days,
             "granularity": granularity,
             "state": validate_state(state),
             "store_limit": store_limit,
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
+        ean=validate_ean(ean),
     )
 
 
 def coverage(eans: Sequence[str]) -> Operation[CoverageResponse]:
     """``POST /market/products/coverage``: one unit per started block of 250 codes."""
     codes = validate_batch(eans, name="eans", maximum=MAX_CODES_PER_COVERAGE)
-    return Operation(
-        method="POST",
-        path=COVERAGE_PATH,
-        parse=parser_for(CoverageResponse),
+    return COVERAGE.operation(
+        CoverageResponse.model_validate,
         json_body={"eans": codes},
-        estimated_cost=pricing.batch_cost(len(codes)),
+        estimated_cost=coverage_cost(len(codes)),
     )
 
 
@@ -290,10 +276,8 @@ def stores(
     page: int,
 ) -> Operation[PageT]:
     """``GET /market/stores``: one unit per page."""
-    return Operation(
-        method="GET",
-        path=STORES_PATH,
-        parse=parser_for(page_model),
+    return STORES.operation(
+        page_model.model_validate,
         params={
             "search": search,
             "state": validate_state(state),
@@ -302,7 +286,7 @@ def stores(
             "page": validate_page(page),
             "limit": validate_limit(limit, maximum=MAX_LIMIT_STORES),
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
     )
 
 
@@ -311,13 +295,12 @@ def assortment(
 ) -> Operation[PageT]:
     """``GET /market/stores/{store_id}/assortment``: two units per started block of 250 rows."""
     rows = validate_limit(limit, maximum=MAX_LIMIT_ASSORTMENT)
-    return Operation(
-        method="GET",
-        path=ASSORTMENT_PATH.format(store_id=validate_identifier(store_id, name="store_id")),
-        parse=parser_for(page_model),
+    return ASSORTMENT.operation(
+        page_model.model_validate,
         params={"page": validate_page(page), "limit": rows},
-        estimated_cost=pricing.export_cost(rows),
+        estimated_cost=export_cost(rows),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
     )
 
 
@@ -326,13 +309,12 @@ def competitors(
 ) -> Operation[CompetitorsResponse]:
     """``GET /market/stores/{store_id}/competitors``: one unit per competitor returned."""
     items = validate_limit(limit, maximum=MAX_LIMIT_COMPETITORS)
-    return Operation(
-        method="GET",
-        path=COMPETITORS_PATH.format(store_id=validate_identifier(store_id, name="store_id")),
-        parse=parser_for(CompetitorsResponse),
+    return COMPETITORS.operation(
+        CompetitorsResponse.model_validate,
         params={"min_overlap_pct": min_overlap_pct, "limit": items},
-        estimated_cost=pricing.per_item_cost(items),
+        estimated_cost=competitor_cost(items),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
     )
 
 
@@ -346,18 +328,17 @@ def competitiveness(
 ) -> Operation[CompetitivenessResponse]:
     """``GET /market/stores/{store_id}/competitiveness``: one unit per competitor returned."""
     items = validate_limit(limit, maximum=MAX_LIMIT_COMPETITIVENESS)
-    return Operation(
-        method="GET",
-        path=COMPETITIVENESS_PATH.format(store_id=validate_identifier(store_id, name="store_id")),
-        parse=parser_for(CompetitivenessResponse),
+    return COMPETITIVENESS.operation(
+        CompetitivenessResponse.model_validate,
         params={
             "min_overlap_pct": min_overlap_pct,
             "limit": items,
             "market_scope": market_scope,
             "state": validate_state(state),
         },
-        estimated_cost=pricing.per_item_cost(items),
+        estimated_cost=competitor_cost(items),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
     )
 
 
@@ -375,13 +356,8 @@ def comparison(
 ) -> Operation[PageT]:
     """``GET /market/stores/{store_id}/competitors/{competitor_id}/products``: two units per started block of 250 rows."""
     rows = validate_limit(limit, maximum=MAX_LIMIT_COMPARISON)
-    return Operation(
-        method="GET",
-        path=COMPARISON_PATH.format(
-            store_id=validate_identifier(store_id, name="store_id"),
-            competitor_id=validate_identifier(competitor_id, name="competitor_id"),
-        ),
-        parse=parser_for(page_model),
+    return COMPARISON.operation(
+        page_model.model_validate,
         params={
             "price_position": price_position,
             "search": search,
@@ -390,8 +366,10 @@ def comparison(
             "page": validate_page(page),
             "limit": rows,
         },
-        estimated_cost=pricing.export_cost(rows),
+        estimated_cost=export_cost(rows),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
+        competitor_id=validate_identifier(competitor_id, name="competitor_id"),
     )
 
 
@@ -406,18 +384,17 @@ def market_position(
 ) -> Operation[PageT]:
     """``GET /market/stores/{store_id}/market-position``: two units per started block of 250 rows."""
     rows = validate_limit(limit, maximum=MAX_LIMIT_MARKET_POSITION)
-    return Operation(
-        method="GET",
-        path=MARKET_POSITION_PATH.format(store_id=validate_identifier(store_id, name="store_id")),
-        parse=parser_for(page_model),
+    return MARKET_POSITION.operation(
+        page_model.model_validate,
         params={
             "market_scope": market_scope,
             "state": validate_state(state),
             "page": validate_page(page),
             "limit": rows,
         },
-        estimated_cost=pricing.export_cost(rows),
+        estimated_cost=export_cost(rows),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
     )
 
 
@@ -435,10 +412,8 @@ def opportunities(
 ) -> Operation[PageT]:
     """``GET /market/stores/{store_id}/opportunities``: two units per started block of 250 rows."""
     rows = validate_limit(limit, maximum=MAX_LIMIT_OPPORTUNITIES)
-    return Operation(
-        method="GET",
-        path=OPPORTUNITIES_PATH.format(store_id=validate_identifier(store_id, name="store_id")),
-        parse=parser_for(page_model),
+    return OPPORTUNITIES.operation(
+        page_model.model_validate,
         params={
             "opportunity_type": opportunity_type,
             "min_diff_pct": min_diff_pct,
@@ -448,8 +423,9 @@ def opportunities(
             "page": validate_page(page),
             "limit": rows,
         },
-        estimated_cost=pricing.export_cost(rows),
+        estimated_cost=export_cost(rows),
         status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
     )
 
 
@@ -460,16 +436,15 @@ def stores_by_brand(
     brand: str, *, state: str | None, channel: Channel | None, min_product_count: int
 ) -> Operation[StoresByBrandResponse]:
     """``GET /market/brands/{brand}/stores``: one unit."""
-    return Operation(
-        method="GET",
-        path=STORES_BY_BRAND_PATH.format(brand=validate_path_segment(brand, name="brand")),
-        parse=parser_for(StoresByBrandResponse),
+    return STORES_BY_BRAND.operation(
+        StoresByBrandResponse.model_validate,
         params={
             "state": validate_state(state),
             "channel": channel,
             "min_product_count": min_product_count,
         },
-        estimated_cost=pricing.query_cost(),
+        estimated_cost=QUERY_COST,
+        brand=validate_path_segment(brand, name="brand"),
     )
 
 
@@ -478,12 +453,12 @@ def stores_by_brand(
 
 def profile() -> Operation[Profile]:
     """``GET /user/profile``: free."""
-    return Operation(method="GET", path=PROFILE_PATH, parse=parser_for(Profile))
+    return PROFILE.operation(Profile.model_validate)
 
 
 def usage_history() -> Operation[UsageHistory]:
     """``GET /user/usage``: free."""
-    return Operation(method="GET", path=USAGE_PATH, parse=parser_for(UsageHistory))
+    return USAGE.operation(UsageHistory.model_validate)
 
 
 def logs(
@@ -497,10 +472,8 @@ def logs(
     page: int,
 ) -> Operation[PageT]:
     """``GET /user/logs``: free."""
-    return Operation(
-        method="GET",
-        path=LOGS_PATH,
-        parse=parser_for(page_model),
+    return LOGS.operation(
+        page_model.model_validate,
         params={
             "status_filter": status,
             "search": search,
@@ -514,7 +487,7 @@ def logs(
 
 def api_keys() -> Operation[ApiKeys]:
     """``GET /user/api-keys``: free."""
-    return Operation(method="GET", path=API_KEYS_PATH, parse=parser_for(ApiKeys))
+    return API_KEYS.operation(ApiKeys.model_validate)
 
 
 # --- status -------------------------------------------------------------------
@@ -522,13 +495,7 @@ def api_keys() -> Operation[ApiKeys]:
 
 def health() -> Operation[Health]:
     """``GET /health``: outside the API prefix, without authentication, free."""
-    return Operation(
-        method="GET",
-        path=HEALTH_PATH,
-        parse=parser_for(Health),
-        requires_auth=False,
-        under_api_prefix=False,
-    )
+    return HEALTH.operation(Health.model_validate)
 
 
 def _iso_date(value: datetime.date | str | None) -> str | None:

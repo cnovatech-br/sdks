@@ -59,25 +59,56 @@ class _PageBase(TabularResponse, Generic[ItemT]):
         """Units expected to fetch every page after this one, at the estimated page cost."""
         return max(0, self.meta.pages - self.meta.page) * self._page_cost_estimate
 
-    def _check_budget(self, *, spent: int, max_units: int | None, items_yielded: int) -> None:
-        next_cost = self._page_cost_estimate
-        if max_units is not None and spent + next_cost > max_units:
-            raise BudgetExceededError(
-                f"Fetching page {self.meta.page + 1} is estimated at {next_cost} units; "
-                f"{spent} already spent in this iteration against max_units={max_units}. "
-                "Nothing more was sent.",
-                estimated_cost=next_cost,
-                limit=max_units,
-                spent=spent,
-                items_yielded=items_yielded,
-            )
-
     def _fetcher(self) -> Any:
         if self._fetch_page is None:
             raise RuntimeError(
                 "This page was not produced by a client and cannot fetch the one after it."
             )
         return self._fetch_page
+
+
+class _PageWalk:
+    """Bookkeeping of one walk over consecutive pages: pages fetched, units spent, items yielded.
+
+    Shared by the synchronous and asynchronous iterators, which differ only in
+    how they wait for the next page.
+    """
+
+    def __init__(
+        self, first: _PageBase[Any], *, max_pages: int | None, max_units: int | None
+    ) -> None:
+        self._max_pages = max_pages
+        self._max_units = max_units
+        self.fetched = 0
+        self.spent = 0
+        self.items_yielded = len(first.data)
+
+    def may_fetch(self) -> bool:
+        """Whether another page may be requested under ``max_pages``."""
+        return self._max_pages is None or self.fetched < self._max_pages
+
+    def check_budget(self, current: _PageBase[Any]) -> None:
+        """Refuse, before sending, the page after ``current`` if it would cross ``max_units``."""
+        next_cost = current.page_cost_estimate
+        if self._max_units is not None and self.spent + next_cost > self._max_units:
+            raise BudgetExceededError(
+                f"Fetching page {current.meta.page + 1} is estimated at {next_cost} units; "
+                f"{self.spent} already spent in this iteration against max_units={self._max_units}. "
+                "Nothing more was sent.",
+                estimated_cost=next_cost,
+                limit=self._max_units,
+                spent=self.spent,
+                items_yielded=self.items_yielded,
+            )
+
+    def accept(self, following: _PageBase[Any]) -> bool:
+        """Record a fetched page. ``False`` when it is empty, which ends the walk."""
+        if not following.data:
+            return False
+        self.fetched += 1
+        self.spent += following.usage.query_cost if following.usage is not None else 0
+        self.items_yielded += len(following.data)
+        return True
 
 
 class SyncPage(_PageBase[ItemT]):
@@ -107,21 +138,14 @@ class SyncPage(_PageBase[ItemT]):
         would cross it raises :class:`BudgetExceededError` before being
         requested, after everything already paid for was yielded.
         """
+        walk = _PageWalk(self, max_pages=max_pages, max_units=max_units)
         yield self
         current = self
-        fetched = 0
-        spent = 0
-        items_yielded = len(self.data)
-        while current.has_next:
-            if max_pages is not None and fetched >= max_pages:
-                return
-            current._check_budget(spent=spent, max_units=max_units, items_yielded=items_yielded)
+        while current.has_next and walk.may_fetch():
+            walk.check_budget(current)
             following = current.next_page()
-            if following is None or not following.data:
+            if following is None or not walk.accept(following):
                 return
-            fetched += 1
-            spent += following.usage.query_cost if following.usage is not None else 0
-            items_yielded += len(following.data)
             yield following
             current = following
 
@@ -154,21 +178,14 @@ class AsyncPage(_PageBase[ItemT]):
         self, *, max_pages: int | None = None, max_units: int | None = None
     ) -> AsyncIterator[Self]:
         """Yield this page, then each following page as it is fetched. See :meth:`SyncPage.iter_pages`."""
+        walk = _PageWalk(self, max_pages=max_pages, max_units=max_units)
         yield self
         current = self
-        fetched = 0
-        spent = 0
-        items_yielded = len(self.data)
-        while current.has_next:
-            if max_pages is not None and fetched >= max_pages:
-                return
-            current._check_budget(spent=spent, max_units=max_units, items_yielded=items_yielded)
+        while current.has_next and walk.may_fetch():
+            walk.check_budget(current)
             following = await current.next_page()
-            if following is None or not following.data:
+            if following is None or not walk.accept(following):
                 return
-            fetched += 1
-            spent += following.usage.query_cost if following.usage is not None else 0
-            items_yielded += len(following.data)
             yield following
             current = following
 

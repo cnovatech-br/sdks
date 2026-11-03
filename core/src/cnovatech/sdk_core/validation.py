@@ -3,30 +3,26 @@
 The API validates every request itself and answers 422 without billing, so
 the SDK checks only what makes a request malformed or unsafe to build: the
 values that end up in the path, the page bounds, and the size of a batch.
-Value ranges such as percentages are left to the API, whose answer carries
-the field and the rule that failed.
+Rules specific to one API, such as the accepted lengths of a product code,
+are declared by the product SDK on top of the shapes defined here.
 """
 
 from __future__ import annotations
 
 import uuid
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from urllib.parse import quote
 
 from .errors import InvalidRequestError
 
-PRODUCT_CODE_LENGTHS = frozenset({8, 11, 12, 13, 14})
 
-
-def validate_product_code(value: str, *, name: str = "code") -> str:
-    """A GTIN: ASCII digits only, 8 or 11 to 14 of them. Returns the value stripped."""
-    candidate = value.strip() if isinstance(value, str) else ""
-    if (
-        not (candidate.isascii() and candidate.isdigit())
-        or len(candidate) not in PRODUCT_CODE_LENGTHS
-    ):
+def validate_digits(value: str, *, lengths: Collection[int], name: str) -> str:
+    """A string of ASCII digits with one of the accepted lengths. Returns the value stripped."""
+    candidate = stripped(value)
+    if not (candidate.isascii() and candidate.isdigit()) or len(candidate) not in lengths:
+        accepted = ", ".join(str(length) for length in sorted(lengths))
         raise InvalidRequestError(
-            f"{name} must contain only digits, 8 or 11 to 14 of them; got {value!r}."
+            f"{name} must contain only digits, with one of these lengths: {accepted}; got {value!r}."
         )
     return candidate
 
@@ -44,37 +40,25 @@ def validate_batch(values: Sequence[str], *, name: str, maximum: int) -> list[st
         )
     cleaned: list[str] = []
     for position, value in enumerate(values):
-        if not isinstance(value, str) or not value.strip():
+        if not stripped(value):
             raise InvalidRequestError(f"{name}[{position}] must be a non-empty string.")
-        cleaned.append(value.strip())
+        cleaned.append(stripped(value))
     return cleaned
 
 
 def validate_identifier(value: str, *, name: str) -> str:
     """A UUID in any accepted spelling, returned in its canonical form."""
     try:
-        return str(uuid.UUID(value.strip() if isinstance(value, str) else ""))
+        return str(uuid.UUID(stripped(value)))
     except ValueError as exc:
         raise InvalidRequestError(
             f"{name} must be the identifier returned by the API (a UUID); got {value!r}."
         ) from exc
 
 
-def validate_state(value: str | None, *, name: str = "state") -> str | None:
-    """A two-letter state code, upper-cased; ``None`` passes through."""
-    if value is None:
-        return None
-    candidate = value.strip() if isinstance(value, str) else ""
-    if len(candidate) != 2 or not candidate.isascii() or not candidate.isalpha():
-        raise InvalidRequestError(
-            f"{name} must be a two-letter state code such as 'SP'; got {value!r}."
-        )
-    return candidate.upper()
-
-
 def validate_path_segment(value: str, *, name: str) -> str:
     """A non-empty value made safe for a URL path: every reserved character is percent-encoded."""
-    candidate = value.strip() if isinstance(value, str) else ""
+    candidate = stripped(value)
     if not candidate:
         raise InvalidRequestError(f"{name} must be a non-empty string.")
     return quote(candidate, safe="")
@@ -94,3 +78,8 @@ def validate_limit(limit: int, *, maximum: int) -> int:
             f"limit must be an integer between 1 and {maximum}; got {limit!r}."
         )
     return limit
+
+
+def stripped(value: object) -> str:
+    """The value without surrounding whitespace, or an empty string when it is not text."""
+    return value.strip() if isinstance(value, str) else ""

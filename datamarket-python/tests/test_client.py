@@ -1,60 +1,61 @@
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
 import pytest
 
 from cnovatech.datamarket import AsyncDataMarket, DataMarket, __version__, errors, models
 
+if TYPE_CHECKING:
+    from conftest import FakeAPI
 
-def test_health_is_parsed_and_sent_without_credentials(health_payload: dict[str, Any]) -> None:
-    requests: list[httpx.Request] = []
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        requests.append(request)
-        return httpx.Response(200, json=health_payload, headers={"X-Correlation-ID": "corr-123"})
+def test_health_is_parsed_and_sent_without_credentials(
+    api: FakeAPI, health_payload: dict[str, Any]
+) -> None:
+    api.respond("GET", "/health", health_payload, headers={"X-Correlation-ID": "corr-123"})
 
-    with DataMarket(api_key="dm_secret", transport=httpx.MockTransport(handler)) as client:
+    with api.client(api_key="dm_secret") as client:
         health = client.health()
 
     assert isinstance(health, models.Health)
     assert health.healthy is True
-    assert health.cache == "degraded"
-    assert health.version == "1.0.0"
+    assert health.version == health_payload["version"]
     assert health.request_info is not None
     assert health.request_info.correlation_id == "corr-123"
-
-    request = requests[0]
-    assert str(request.url) == "https://datamarket.cnovatech.com.br/health"
-    assert "X-API-Key" not in request.headers
-    assert request.headers["User-Agent"].startswith("cnovatech-datamarket/")
-    assert "dm_secret" not in request.headers["User-Agent"]
+    assert str(api.last_request.url) == "https://datamarket.cnovatech.com.br/health"
+    assert "X-API-Key" not in api.last_request.headers
+    assert api.last_request.headers["User-Agent"].startswith("cnovatech-datamarket/")
+    assert "dm_secret" not in api.last_request.headers["User-Agent"]
 
 
-def test_health_works_without_an_api_key(health_payload: dict[str, Any]) -> None:
-    transport = httpx.MockTransport(lambda _request: httpx.Response(200, json=health_payload))
+def test_health_works_without_an_api_key(api: FakeAPI, health_payload: dict[str, Any]) -> None:
+    api.respond("GET", "/health", health_payload)
 
-    with DataMarket(transport=transport) as client:
+    with api.client(api_key=None) as client:
         assert client.health().status == "healthy"
 
 
-def test_unhealthy_status_is_reported_not_raised(health_payload: dict[str, Any]) -> None:
-    payload = {**health_payload, "status": "unhealthy", "database": "disconnected"}
-    transport = httpx.MockTransport(lambda _request: httpx.Response(200, json=payload))
+def test_unhealthy_status_is_reported_not_raised(
+    api: FakeAPI, health_payload: dict[str, Any]
+) -> None:
+    api.respond(
+        "GET", "/health", {**health_payload, "status": "unhealthy", "database": "disconnected"}
+    )
 
-    with DataMarket(transport=transport) as client:
+    with api.client() as client:
         health = client.health()
 
     assert health.healthy is False
     assert health.database == "disconnected"
 
 
-async def test_async_health(health_payload: dict[str, Any]) -> None:
-    transport = httpx.MockTransport(lambda _request: httpx.Response(200, json=health_payload))
+async def test_async_health(api: FakeAPI, health_payload: dict[str, Any]) -> None:
+    api.respond("GET", "/health", health_payload)
 
-    async with AsyncDataMarket(transport=transport) as client:
+    async with api.async_client(api_key=None) as client:
         health = await client.health()
 
     assert health.healthy is True
@@ -63,20 +64,16 @@ async def test_async_health(health_payload: dict[str, Any]) -> None:
 
 
 def test_base_url_from_environment(
-    monkeypatch: pytest.MonkeyPatch, health_payload: dict[str, Any]
+    api: FakeAPI, monkeypatch: pytest.MonkeyPatch, health_payload: dict[str, Any]
 ) -> None:
     monkeypatch.setenv("DATAMARKET_BASE_URL", "http://localhost:8000/")
-    requests: list[httpx.Request] = []
+    api.respond("GET", "/health", health_payload)
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        requests.append(request)
-        return httpx.Response(200, json=health_payload)
-
-    with DataMarket(transport=httpx.MockTransport(handler)) as client:
+    with api.client(api_key=None) as client:
         assert client.base_url == "http://localhost:8000"
         client.health()
 
-    assert str(requests[0].url) == "http://localhost:8000/health"
+    assert str(api.last_request.url) == "http://localhost:8000/health"
 
 
 def test_invalid_base_url_is_a_configuration_error() -> None:
@@ -95,8 +92,8 @@ async def test_async_repr_masks_the_api_key() -> None:
     async with AsyncDataMarket(api_key="dm_1234567890abcdef") as client:
         text = repr(client)
 
-    assert (
-        text == "AsyncDataMarket(base_url='https://datamarket.cnovatech.com.br', api_key='dm_****')"
+    assert text == (
+        "AsyncDataMarket(base_url='https://datamarket.cnovatech.com.br', api_key='dm_****')"
     )
 
 

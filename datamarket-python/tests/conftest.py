@@ -1,4 +1,4 @@
-"""Fixtures for the Data Market SDK test suite."""
+"""Helpers and fixtures for the Data Market SDK test suite."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from cnovatech.datamarket import AsyncDataMarket, DataMarket
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 ENVIRONMENT_VARIABLES = ("DATAMARKET_API_KEY", "DATAMARKET_BASE_URL")
 TEST_API_KEY = "dm_test_key"
+STORES_PATH = "/api/v1/market/stores"
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -43,25 +44,41 @@ def _isolated_environment(request: pytest.FixtureRequest, monkeypatch: pytest.Mo
         monkeypatch.delenv(name, raising=False)
 
 
-def load_fixture(name: str) -> Any:
-    return json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
+def load_fixture(name: str) -> dict[str, Any]:
+    payload: dict[str, Any] = json.loads((FIXTURES_DIR / name).read_text(encoding="utf-8"))
+    return payload
+
+
+def stores_page(*names: str, page: int = 1, pages: int = 1) -> dict[str, Any]:
+    """A store listing page with the given names, for the lookup-by-name tests."""
+    return {
+        "data": [
+            {
+                "store_id": f"{page:04x}{index:04x}-0000-4000-8000-000000000000",
+                "store_name": name,
+                "state": "SP",
+            }
+            for index, name in enumerate(names)
+        ],
+        "meta": {"page": page, "limit": 100, "total": 100 * pages, "pages": pages},
+        "usage": {"query_cost": 1},
+    }
 
 
 @pytest.fixture
 def health_payload() -> dict[str, Any]:
-    payload: dict[str, Any] = load_fixture("healthCheck.json")
-    return payload
+    return load_fixture("healthCheck.json")
 
 
 class FakeAPI:
-    """Answers requests from fixture files and records what the client sent.
+    """Answers requests from fixtures and records what the client sent.
 
     A route matches on method, path and, when given, a subset of the query
     parameters, so one test can serve several pages of the same listing.
     """
 
     def __init__(self) -> None:
-        self._routes: list[tuple[str, str, dict[str, str], int, Any]] = []
+        self._routes: list[tuple[str, str, dict[str, str], httpx.Response]] = []
         self.requests: list[httpx.Request] = []
 
     def respond(
@@ -72,18 +89,20 @@ class FakeAPI:
         *,
         params: dict[str, str] | None = None,
         status_code: int = 200,
+        headers: dict[str, str] | None = None,
     ) -> None:
         payload = load_fixture(fixture) if isinstance(fixture, str) else fixture
-        self._routes.append((method, path, params or {}, status_code, payload))
+        response = httpx.Response(status_code, json=payload, headers=headers)
+        self._routes.append((method, path, params or {}, response))
 
     def handler(self, request: httpx.Request) -> httpx.Response:
         self.requests.append(request)
         query = dict(request.url.params)
-        for method, path, params, status_code, payload in self._routes:
+        for method, path, params, response in self._routes:
             if method != request.method or path != request.url.path:
                 continue
             if all(query.get(name) == value for name, value in params.items()):
-                return httpx.Response(status_code, json=payload)
+                return response
         return httpx.Response(
             404,
             json={
@@ -100,14 +119,14 @@ class FakeAPI:
     def last_params(self) -> dict[str, str]:
         return dict(self.last_request.url.params)
 
-    def client(self, **options: Any) -> DataMarket:
-        return DataMarket(
-            api_key=TEST_API_KEY, transport=httpx.MockTransport(self.handler), **options
-        )
+    def client(self, *, api_key: str | None = TEST_API_KEY, **options: Any) -> DataMarket:
+        return DataMarket(api_key=api_key, transport=httpx.MockTransport(self.handler), **options)
 
-    def async_client(self, **options: Any) -> AsyncDataMarket:
+    def async_client(
+        self, *, api_key: str | None = TEST_API_KEY, **options: Any
+    ) -> AsyncDataMarket:
         return AsyncDataMarket(
-            api_key=TEST_API_KEY, transport=httpx.MockTransport(self.handler), **options
+            api_key=api_key, transport=httpx.MockTransport(self.handler), **options
         )
 
 

@@ -7,12 +7,7 @@ from typing import TYPE_CHECKING, ClassVar, Literal
 
 from pydantic import Field
 
-from cnovatech.sdk_core.dataframe import (
-    column_union,
-    flatten,
-    flatten_envelope,
-    records_to_dataframe,
-)
+from cnovatech.sdk_core.dataframe import build_dataframe
 
 from .common import Record, TabularResponse, Usage
 
@@ -75,19 +70,5 @@ class PriceHistory(TabularResponse):
 
         Requires pandas, available through the SDK's ``pandas`` extra.
         """
-        if series == "market":
-            return super().to_dataframe(include_envelope=include_envelope)
-        payload = self.model_dump(mode="python")
-        payload.pop("market_series", None)
-        stores = payload.pop("store_series", None) or []
-        envelope = flatten_envelope(payload) if include_envelope else {}
-        records = [
-            {
-                **envelope,
-                **flatten({key: value for key, value in store.items() if key != "points"}),
-                **point,
-            }
-            for store in stores
-            for point in store.get("points", [])
-        ]
-        return records_to_dataframe(records, columns=column_union(records) or list(envelope))
+        rows_field = "market_series" if series == "market" else "store_series.points"
+        return build_dataframe(self, rows_field=rows_field, include_envelope=include_envelope)

@@ -1,18 +1,15 @@
 """Response models shared by every Cnovatech SDK.
 
-Product SDKs subclass :class:`APIResponse` once per endpoint and re-export the
-models defined here, so their users never import this package directly.
+Product SDKs subclass :class:`APIResponse` once per endpoint, :class:`Record`
+for the objects nested inside, and re-export the models defined here so their
+users never import this package directly.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,15 +33,22 @@ class RequestInfo:
     elapsed_seconds: float
 
 
-class APIResponse(BaseModel):
-    """Base class of every model built from an API response.
+class Record(BaseModel):
+    """Base of every model, including the objects nested inside a response.
 
-    Instances are immutable. Fields the API adds in the future are kept in
-    ``model_extra`` instead of failing validation, so a newer API never breaks
-    an older SDK.
+    Instances are immutable and accept aliases. Fields the API adds in the
+    future are kept in ``model_extra`` instead of failing validation, so a
+    newer API never breaks an older SDK.
     """
 
     model_config = ConfigDict(frozen=True, extra="allow", populate_by_name=True)
+
+
+class APIResponse(Record):
+    """Base class of every model built from a whole API response.
+
+    Adds the transport details of the request that produced the response.
+    """
 
     _request_info: RequestInfo | None = PrivateAttr(default=None)
 
@@ -62,14 +66,12 @@ class APIResponse(BaseModel):
         self._request_info = info
 
 
-class Usage(BaseModel):
+class Usage(Record):
     """Quota accounting returned with every billed response.
 
     ``used``, ``limit`` and ``remaining`` are ``None`` on plans without a
     monthly ceiling.
     """
-
-    model_config = ConfigDict(frozen=True, extra="allow")
 
     query_cost: int
     used: int | None = None
@@ -77,10 +79,8 @@ class Usage(BaseModel):
     remaining: int | None = None
 
 
-class PaginationMeta(BaseModel):
+class PaginationMeta(Record):
     """Position of a page within a paginated listing."""
-
-    model_config = ConfigDict(frozen=True, extra="allow")
 
     page: int
     limit: int
@@ -88,18 +88,8 @@ class PaginationMeta(BaseModel):
     pages: int
 
 
-class ListMeta(BaseModel):
+class ListMeta(Record):
     """Size of a listing capped by ``limit`` and not paginated."""
-
-    model_config = ConfigDict(frozen=True, extra="allow")
 
     limit: int
     total: int
-
-
-ModelT = TypeVar("ModelT", bound=BaseModel)
-
-
-def parser_for(model: type[ModelT]) -> Callable[[Any], ModelT]:
-    """Return a callable that validates a decoded JSON payload into ``model``."""
-    return model.model_validate

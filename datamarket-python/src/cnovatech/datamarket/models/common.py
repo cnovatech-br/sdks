@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
-
 from cnovatech.sdk_core.dataframe import TabularResponse
-from cnovatech.sdk_core.models import APIResponse, ListMeta, PaginationMeta, RequestInfo, Usage
+from cnovatech.sdk_core.models import (
+    APIResponse,
+    ListMeta,
+    PaginationMeta,
+    Record,
+    RequestInfo,
+    Usage,
+)
 from cnovatech.sdk_core.usage import RateLimitState
 
 __all__ = [
@@ -22,14 +27,8 @@ __all__ = [
 ]
 
 
-class Record(BaseModel):
-    """Base of every object nested inside a response: immutable, keeps unknown fields."""
-
-    model_config = ConfigDict(frozen=True, extra="allow", populate_by_name=True)
-
-
 class StoreRef(Record):
-    """A store named in a response envelope: the one queried, or the competitor compared."""
+    """A store's identity, as named in envelopes and extended by the store models."""
 
     store_id: str
     store_name: str

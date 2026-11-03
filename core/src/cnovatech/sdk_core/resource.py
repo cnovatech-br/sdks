@@ -1,16 +1,20 @@
-"""What every resource shares: a transport and the way to fetch paginated results."""
+"""What every resource shares: a transport and the way to fetch paginated results.
+
+A product SDK groups its endpoints into resources that subclass these two
+classes; each method builds an :class:`Operation` and hands it over.
+"""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from cnovatech.sdk_core.pagination import AsyncPage, SyncPage
+from .pagination import AsyncPage, SyncPage
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from cnovatech.sdk_core.operation import Operation
-    from cnovatech.sdk_core.transport import AsyncTransport, SyncTransport
+    from .operation import Operation
+    from .transport import AsyncTransport, SyncTransport
 
 ResultT = TypeVar("ResultT")
 SyncPageT = TypeVar("SyncPageT", bound=SyncPage[Any])

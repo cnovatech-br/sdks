@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pytest
-from conftest import load_fixture
+from conftest import STORES_PATH, load_fixture, stores_page
 
 from cnovatech.datamarket import errors, models
 from cnovatech.datamarket.resources.stores import select_store
@@ -12,38 +12,21 @@ from cnovatech.datamarket.resources.stores import select_store
 if TYPE_CHECKING:
     from conftest import FakeAPI
 
-STORES = "/api/v1/market/stores"
 ASSORTMENT_FIXTURE = load_fixture("getStoreAssortment.json")
 COMPARISON_FIXTURE = load_fixture("getCompetitorProducts.json")
 STORE_ID = ASSORTMENT_FIXTURE["store"]["store_id"]
 STORE_NAME = ASSORTMENT_FIXTURE["store"]["store_name"]
 COMPETITOR_ID = COMPARISON_FIXTURE["competitor"]["store_id"]
-STORE = f"{STORES}/{STORE_ID}"
+STORE = f"{STORES_PATH}/{STORE_ID}"
 
 
 def store(name: str, store_id: str = STORE_ID) -> models.Store:
     return models.Store(store_id=store_id, store_name=name, state="SP")
 
 
-def stores_page(*names: str) -> dict[str, Any]:
-    """A listing page with the given store names, for the lookup-by-name tests."""
-    return {
-        "data": [
-            {
-                "store_id": f"{index:08x}-0000-4000-8000-000000000000",
-                "store_name": name,
-                "state": "SP",
-            }
-            for index, name in enumerate(names)
-        ],
-        "meta": {"page": 1, "limit": 100, "total": len(names), "pages": 1 if names else 0},
-        "usage": {"query_cost": 1},
-    }
-
-
 def test_list_stores(api: FakeAPI) -> None:
     expected = load_fixture("listStores.json")
-    api.respond("GET", STORES, expected)
+    api.respond("GET", STORES_PATH, expected)
 
     with api.client() as client:
         page = client.stores.list(search="max", state="pr", city="Quedas do Iguacu", limit=5)
@@ -64,7 +47,9 @@ def test_list_stores(api: FakeAPI) -> None:
 
 
 def test_find_prefers_the_exact_name(api: FakeAPI) -> None:
-    api.respond("GET", STORES, stores_page("Supermercado Modelo", "Supermercado Modelo Express"))
+    api.respond(
+        "GET", STORES_PATH, stores_page("Supermercado Modelo", "Supermercado Modelo Express")
+    )
 
     with api.client() as client:
         found = client.stores.find("supermercado modelo", state="SP")
@@ -80,7 +65,9 @@ def test_find_prefers_the_exact_name(api: FakeAPI) -> None:
 
 
 def test_find_is_ambiguous_without_an_exact_match(api: FakeAPI) -> None:
-    api.respond("GET", STORES, stores_page("Supermercado Modelo", "Supermercado Modelo Express"))
+    api.respond(
+        "GET", STORES_PATH, stores_page("Supermercado Modelo", "Supermercado Modelo Express")
+    )
 
     with api.client() as client, pytest.raises(errors.AmbiguousStoreError) as excinfo:
         client.stores.find("Modelo")
@@ -94,7 +81,7 @@ def test_find_is_ambiguous_without_an_exact_match(api: FakeAPI) -> None:
 
 
 def test_find_without_results(api: FakeAPI) -> None:
-    api.respond("GET", STORES, stores_page())
+    api.respond("GET", STORES_PATH, stores_page())
 
     with api.client() as client, pytest.raises(errors.StoreNotFoundError) as excinfo:
         client.stores.find("Loja Inexistente")
@@ -294,7 +281,7 @@ def test_opportunity_type_is_omitted_when_not_given(api: FakeAPI) -> None:
 
 
 async def test_async_stores(api: FakeAPI) -> None:
-    api.respond("GET", STORES, stores_page(STORE_NAME))
+    api.respond("GET", STORES_PATH, stores_page(STORE_NAME))
     api.respond("GET", f"{STORE}/market-position", load_fixture("getStoreMarketPosition.json"))
 
     async with api.async_client() as client:

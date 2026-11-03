@@ -4,13 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from cnovatech.sdk_core.config import (
-    DEFAULT_MAX_RETRIES,
-    DEFAULT_READ_TIMEOUT_SECONDS,
-    ClientConfig,
-    build_client_config,
-)
-from cnovatech.sdk_core.transport import AsyncTransport, SyncTransport
+from cnovatech.sdk_core.client import BaseAsyncClient, BaseSyncClient
+from cnovatech.sdk_core.config import DEFAULT_MAX_RETRIES, DEFAULT_READ_TIMEOUT_SECONDS
 
 from ._config import PRODUCT_SETTINGS
 from .resources import (
@@ -26,12 +21,7 @@ from .resources import (
 )
 
 if TYPE_CHECKING:
-    from types import TracebackType
-
     import httpx
-    from typing_extensions import Self
-
-    from cnovatech.sdk_core.usage import RateLimitState, UsageTracker
 
     from .models import Health
 
@@ -58,24 +48,7 @@ _CONSTRUCTOR_DOC = """
 """
 
 
-def _build_config(
-    api_key: str | None,
-    base_url: str | None,
-    timeout: float | httpx.Timeout,
-    max_retries: int,
-    max_units_per_request: int | None,
-) -> ClientConfig:
-    return build_client_config(
-        PRODUCT_SETTINGS,
-        api_key=api_key,
-        base_url=base_url,
-        timeout=timeout,
-        max_retries=max_retries,
-        max_units_per_request=max_units_per_request,
-    )
-
-
-class DataMarket:
+class DataMarket(BaseSyncClient):
     """Client for the Data Market API using blocking I/O.
 
     Attributes:
@@ -98,27 +71,20 @@ class DataMarket:
         http_client: httpx.Client | None = None,
         transport: httpx.BaseTransport | None = None,
     ) -> None:
-        self._config = _build_config(api_key, base_url, timeout, max_retries, max_units_per_request)
-        self._transport = SyncTransport(self._config, http_client=http_client, transport=transport)
+        super().__init__(
+            PRODUCT_SETTINGS,
+            api_key,
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            max_units_per_request=max_units_per_request,
+            http_client=http_client,
+            transport=transport,
+        )
         self.products = Products(self._transport)
         self.stores = Stores(self._transport)
         self.brands = Brands(self._transport)
         self.account = Account(self._transport)
-
-    @property
-    def base_url(self) -> str:
-        """Origin the client talks to."""
-        return self._config.base_url
-
-    @property
-    def usage(self) -> UsageTracker:
-        """Quota spent through this client: ``spent``, ``calls`` and the ``last`` usage block."""
-        return self._transport.usage
-
-    @property
-    def rate_limit(self) -> RateLimitState:
-        """The per-minute rate limit as last reported by the API."""
-        return self._transport.rate_limit
 
     def health(self) -> Health:
         """Check that the API, its database and its cache are up.
@@ -127,29 +93,8 @@ class DataMarket:
         """
         return self._transport.execute(operations.health())
 
-    def close(self) -> None:
-        """Release the connection pool. Clients supplied through ``http_client`` are left open."""
-        self._transport.close()
 
-    def __enter__(self) -> Self:
-        return self
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        self.close()
-
-    def __repr__(self) -> str:
-        return (
-            f"{type(self).__name__}(base_url={self._config.base_url!r}, "
-            f"api_key={self._config.masked_api_key!r})"
-        )
-
-
-class AsyncDataMarket:
+class AsyncDataMarket(BaseAsyncClient):
     """Client for the Data Market API using asyncio.
 
     Attributes:
@@ -172,27 +117,20 @@ class AsyncDataMarket:
         http_client: httpx.AsyncClient | None = None,
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
-        self._config = _build_config(api_key, base_url, timeout, max_retries, max_units_per_request)
-        self._transport = AsyncTransport(self._config, http_client=http_client, transport=transport)
+        super().__init__(
+            PRODUCT_SETTINGS,
+            api_key,
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            max_units_per_request=max_units_per_request,
+            http_client=http_client,
+            transport=transport,
+        )
         self.products = AsyncProducts(self._transport)
         self.stores = AsyncStores(self._transport)
         self.brands = AsyncBrands(self._transport)
         self.account = AsyncAccount(self._transport)
-
-    @property
-    def base_url(self) -> str:
-        """Origin the client talks to."""
-        return self._config.base_url
-
-    @property
-    def usage(self) -> UsageTracker:
-        """Quota spent through this client: ``spent``, ``calls`` and the ``last`` usage block."""
-        return self._transport.usage
-
-    @property
-    def rate_limit(self) -> RateLimitState:
-        """The per-minute rate limit as last reported by the API."""
-        return self._transport.rate_limit
 
     async def health(self) -> Health:
         """Check that the API, its database and its cache are up.
@@ -200,24 +138,3 @@ class AsyncDataMarket:
         No authentication and no quota cost.
         """
         return await self._transport.execute(operations.health())
-
-    async def aclose(self) -> None:
-        """Release the connection pool. Clients supplied through ``http_client`` are left open."""
-        await self._transport.aclose()
-
-    async def __aenter__(self) -> Self:
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        await self.aclose()
-
-    def __repr__(self) -> str:
-        return (
-            f"{type(self).__name__}(base_url={self._config.base_url!r}, "
-            f"api_key={self._config.masked_api_key!r})"
-        )

@@ -12,7 +12,10 @@ project uses [Semantic Versioning](https://semver.org/).
   (HTTPS required outside loopback), timeouts (read timeout capped at the
   server's 300 s) and retry count. Explicit arguments win over environment
   variables, which win over product defaults.
-- `Operation`: a transport-independent description of one API call.
+- `Operation`: a transport-independent description of one API call, and
+  `Endpoint`: where a call lives, declared once per endpoint.
+- `BaseSyncClient` / `BaseAsyncClient` and `SyncResource` / `AsyncResource`:
+  the client and resource plumbing every product SDK shares.
 - `SyncTransport` and `AsyncTransport` over httpx, sharing request preparation
   and response interpretation. Correlation ID per request, kept across
   retries and reported on errors even when the API does not echo it;
@@ -29,4 +32,8 @@ project uses [Semantic Versioning](https://semver.org/).
   subclasses chosen by HTTP status and, for 429, by error code.
   `APIConnectionError.retryable` says whether a repeat could bill twice.
 - `APIResponse` base model (immutable, keeps unknown fields) with
-  `request_info`, plus `Usage`.
+  `request_info`, `Record` for nested objects, plus `Usage`, `PaginationMeta`
+  and `ListMeta`.
+- `SyncPage` / `AsyncPage` with `iter_pages` and `iter_all` capped by
+  `max_pages` or `max_units`, and `TabularResponse.to_dataframe()` with
+  nested rows and pandas imported on first use.

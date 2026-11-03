@@ -12,12 +12,15 @@ if TYPE_CHECKING:
     import pandas
 
 ENVELOPE_FIELDS_SKIPPED = frozenset({"meta"})
+NESTED_ROWS_SEPARATOR = "."
 
 
 class TabularResponse(APIResponse):
     """A response whose main content is a list of rows.
 
-    Subclasses name the list in ``rows_field`` when it is not ``data``.
+    Subclasses name the list in ``rows_field`` when it is not ``data``. A
+    dotted name such as ``"groups.members"`` points at a list nested in each
+    item of another list; the parent's own fields are repeated on each row.
     """
 
     rows_field: ClassVar[str] = "data"
@@ -39,11 +42,24 @@ class TabularResponse(APIResponse):
 def build_dataframe(
     response: APIResponse, *, rows_field: str, include_envelope: bool
 ) -> pandas.DataFrame:
-    """Build the DataFrame of ``response`` from the list in ``rows_field``."""
-    payload = response.model_dump(mode="python")
-    rows = payload.pop(rows_field, None) or []
+    """Build the DataFrame of ``response`` from the list in ``rows_field``.
+
+    Only the named list is serialised; sibling lists are left out of the dump
+    since the envelope never includes them.
+    """
+    parent_field, _, child_field = rows_field.partition(NESTED_ROWS_SEPARATOR)
+    payload = response.model_dump(mode="python", exclude=_other_lists(response, parent_field))
+    parents = [row for row in payload.pop(parent_field, None) or [] if isinstance(row, dict)]
     envelope = flatten_envelope(payload) if include_envelope else {}
-    records = [{**envelope, **flatten(row)} for row in rows if isinstance(row, dict)]
+    if child_field:
+        records = [
+            {**envelope, **flatten(_without(parent, child_field)), **flatten(child)}
+            for parent in parents
+            for child in parent.get(child_field) or []
+            if isinstance(child, dict)
+        ]
+    else:
+        records = [{**envelope, **flatten(row)} for row in parents]
     return records_to_dataframe(records, columns=column_union(records) or list(envelope))
 
 
@@ -104,3 +120,15 @@ def flatten_envelope(payload: Mapping[str, Any]) -> dict[str, Any]:
         else:
             flat[key] = value
     return flat
+
+
+def _other_lists(response: APIResponse, keep: str) -> set[str]:
+    return {
+        name
+        for name in type(response).model_fields
+        if name != keep and isinstance(getattr(response, name, None), list)
+    }
+
+
+def _without(mapping: Mapping[str, Any], key: str) -> dict[str, Any]:
+    return {name: value for name, value in mapping.items() if name != key}
