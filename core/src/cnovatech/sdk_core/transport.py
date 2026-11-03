@@ -29,6 +29,7 @@ from .errors import (
 )
 from .models import APIResponse, RequestInfo
 from .retry import RetryDecision, RetryPolicy
+from .usage import RateLimitState, UsageTracker, record_usage
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -136,6 +137,7 @@ def interpret_response(
         raise error_from_response(
             response,
             overrides=config.product.error_overrides,
+            status_overrides=operation.status_overrides,
             fallback_correlation_id=prepared.correlation_id,
         )
     payload = _decode_json(response, correlation_id=correlation_id)
@@ -281,6 +283,8 @@ class SyncTransport:
             if http_client is not None
             else httpx.Client(timeout=config.timeout, transport=transport, follow_redirects=False)
         )
+        self.usage = UsageTracker()
+        self.rate_limit = RateLimitState()
 
     @property
     def config(self) -> ClientConfig:
@@ -301,11 +305,12 @@ class SyncTransport:
                 if decision is None:
                     raise
             else:
+                self.rate_limit.update_from_headers(response.headers)
                 decision = self._policy.after_response(response, attempt)
                 if decision is None:
                     elapsed = time.perf_counter() - started
                     _log_exchange(prepared, response, elapsed, attempt)
-                    return interpret_response(
+                    result = interpret_response(
                         self._config,
                         operation,
                         response,
@@ -313,6 +318,8 @@ class SyncTransport:
                         attempts=attempt,
                         elapsed_seconds=elapsed,
                     )
+                    record_usage(self.usage, result)
+                    return result
             _log_retry(prepared, decision, attempt, self._policy.max_attempts)
             self._sleep(decision.delay_seconds)
 
@@ -375,6 +382,8 @@ class AsyncTransport:
                 timeout=config.timeout, transport=transport, follow_redirects=False
             )
         )
+        self.usage = UsageTracker()
+        self.rate_limit = RateLimitState()
 
     @property
     def config(self) -> ClientConfig:
@@ -395,11 +404,12 @@ class AsyncTransport:
                 if decision is None:
                     raise
             else:
+                self.rate_limit.update_from_headers(response.headers)
                 decision = self._policy.after_response(response, attempt)
                 if decision is None:
                     elapsed = time.perf_counter() - started
                     _log_exchange(prepared, response, elapsed, attempt)
-                    return interpret_response(
+                    result = interpret_response(
                         self._config,
                         operation,
                         response,
@@ -407,6 +417,8 @@ class AsyncTransport:
                         attempts=attempt,
                         elapsed_seconds=elapsed,
                     )
+                    record_usage(self.usage, result)
+                    return result
             _log_retry(prepared, decision, attempt, self._policy.max_attempts)
             await self._sleep(decision.delay_seconds)
 

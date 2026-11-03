@@ -50,6 +50,10 @@ class ConfigurationError(CnovatechError, ValueError):
     """The client was configured with a missing or invalid value. Nothing was sent."""
 
 
+class InvalidRequestError(CnovatechError, ValueError):
+    """An argument failed the SDK's local validation. Nothing was sent."""
+
+
 class BudgetExceededError(CnovatechError):
     """A call or an iteration would cost more quota than the configured ceiling.
 
@@ -286,14 +290,19 @@ def error_class_for(
     status_code: int,
     code: str,
     overrides: Mapping[str, type[APIStatusError]] | None = None,
+    status_overrides: Mapping[int, type[APIStatusError]] | None = None,
 ) -> type[APIStatusError]:
     """Choose the exception class for a status and error code.
 
     ``overrides`` maps error codes to product-specific classes and wins over
-    the generic choice by status.
+    everything else. ``status_overrides`` maps HTTP statuses to classes for
+    one operation, such as a 404 on a route that names an entity, and wins
+    over the generic choice by status.
     """
     if overrides and code in overrides:
         return overrides[code]
+    if status_overrides and status_code in status_overrides:
+        return status_overrides[status_code]
     if status_code == 429:
         return RateLimitError if code == RATE_LIMIT_CODE else QuotaExceededError
     if status_code >= 500:
@@ -311,6 +320,7 @@ def error_from_response(
     response: httpx.Response,
     *,
     overrides: Mapping[str, type[APIStatusError]] | None = None,
+    status_overrides: Mapping[int, type[APIStatusError]] | None = None,
     fallback_correlation_id: str | None = None,
 ) -> APIStatusError:
     """Build the exception that describes an error response.
@@ -323,7 +333,7 @@ def error_from_response(
     status_code = response.status_code
     code = _text(body.get("error")) or _DEFAULT_CODES.get(status_code, "error")
     message = _text(body.get("message")) or response.reason_phrase or f"HTTP {status_code}"
-    error_class = error_class_for(status_code, code, overrides)
+    error_class = error_class_for(status_code, code, overrides, status_overrides)
     return error_class(
         status_code=status_code,
         code=code,

@@ -1,0 +1,10 @@
+{
+  "daily": [
+    { "date": "2026-11-02", "used": 26, "call_count": 19 },
+    { "date": "2026-11-01", "used": 12, "call_count": 9 }
+  ],
+  "monthly": [
+    { "month": "2026-11", "used": 38, "call_count": 28 },
+    { "month": "2026-10", "used": 240, "call_count": 190 }
+  ]
+}

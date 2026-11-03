@@ -1,0 +1,7 @@
+{
+  "error": "ean_not_found",
+  "message": "O EAN 0000000000000 não está na base. Esta consulta não consome cota.",
+  "what_to_do": "Para saber de uma vez quanto da sua lista está coberto, envie os códigos em POST /api/v1/market/products/coverage. Para achar o EAN pela descrição, use /market/products/catalog?search=.",
+  "ean": "0000000000000",
+  "timestamp": "2026-11-02T18:09:40+00:00"
+}

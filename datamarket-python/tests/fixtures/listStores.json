@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+      "store_name": "Supermercado Modelo",
+      "city": "São Paulo",
+      "state": "SP",
+      "channel": "e-commerce",
+      "omnichannel": false,
+      "product_count": 12480,
+      "last_collected_date": "2026-11-02"
+    },
+    {
+      "store_id": "c2e4a6b8-1d3f-4a5c-9e7b-0f2d4c6a8e1b",
+      "store_name": "Supermercado Modelo Express",
+      "city": "São Paulo",
+      "state": "SP",
+      "channel": "e-commerce",
+      "omnichannel": true,
+      "product_count": 3210,
+      "last_collected_date": "2026-11-01"
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
+  "usage": { "query_cost": 1, "used": 8, "limit": 1000, "remaining": 992 }
+}

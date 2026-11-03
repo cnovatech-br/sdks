@@ -2,8 +2,10 @@
 PACKAGES := core datamarket-python
 # Words that must not appear under core/src: the core knows no product.
 PRODUCT_TERMS := ean|eans|market|pharma|datamarket|assortment|competitor|retailer
+# Credentials for the targets that reach the real API live in .env (ignored by git).
+ENV_FILE := $(if $(wildcard .env),--env-file $(abspath .env),)
 
-.PHONY: help install lint format boundary typecheck test cov check live build clean
+.PHONY: help install lint format boundary typecheck test cov check live capture build clean
 
 help:  ## List the targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -42,7 +44,10 @@ cov:  ## Test suite with coverage; fails below each package's threshold
 check: lint boundary typecheck cov  ## Everything CI runs
 
 live:  ## Smoke test against the real API; free endpoints only
-	cd datamarket-python && uv run pytest tests/test_live.py --live
+	cd datamarket-python && uv run $(ENV_FILE) pytest tests/test_live.py --live
+
+capture:  ## Call every endpoint once through the SDK and refresh the fixtures (about 21 units)
+	uv run $(ENV_FILE) python scripts/capture_fixtures.py
 
 build:  ## Build sdist and wheel of every package into dist/
 	uv build --package cnovatech-sdk-core

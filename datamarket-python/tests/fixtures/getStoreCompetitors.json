@@ -1,0 +1,42 @@
+{
+  "store": {
+    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+    "store_name": "Supermercado Modelo",
+    "city": "São Paulo",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "summary": { "product_count": 12480 },
+  "data": [
+    {
+      "store_id": "7a1d3c5e-9b2f-4e6a-8c0d-1f3b5a7c9e2b",
+      "store_name": "Mercado Vizinho",
+      "city": "Campinas",
+      "state": "SP",
+      "channel": "e-commerce",
+      "product_count": 9800,
+      "common_product_count": 7800,
+      "overlap_pct": 62.5,
+      "avg_price": 11.2,
+      "median_price": 8.9,
+      "min_price": 0.99,
+      "max_price": 899.0
+    },
+    {
+      "store_id": "c2e4a6b8-1d3f-4a5c-9e7b-0f2d4c6a8e1b",
+      "store_name": "Supermercado Modelo Express",
+      "city": "São Paulo",
+      "state": "SP",
+      "channel": "e-commerce",
+      "product_count": 3210,
+      "common_product_count": 3000,
+      "overlap_pct": 24.04,
+      "avg_price": 10.4,
+      "median_price": 8.2,
+      "min_price": 1.49,
+      "max_price": 450.0
+    }
+  ],
+  "meta": { "limit": 5, "total": 2 },
+  "usage": { "query_cost": 2, "used": 12, "limit": 1000, "remaining": 988 }
+}

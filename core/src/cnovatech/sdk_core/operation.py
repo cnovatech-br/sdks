@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
 
+    from .errors import APIStatusError
+
 ResultT = TypeVar("ResultT")
 
 
@@ -31,6 +33,8 @@ class Operation(Generic[ResultT]):
             before it is sent. Zero for free endpoints.
         requires_auth: Whether the API key must be sent.
         under_api_prefix: Whether ``path`` sits under the product's API prefix.
+        status_overrides: Exception classes to raise for specific HTTP statuses
+            of this call, such as a 404 on a route that names an entity.
     """
 
     method: Literal["GET", "POST"]
@@ -41,3 +45,4 @@ class Operation(Generic[ResultT]):
     estimated_cost: int = 0
     requires_auth: bool = True
     under_api_prefix: bool = True
+    status_overrides: Mapping[int, type[APIStatusError]] = field(default_factory=dict)

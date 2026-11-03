@@ -5,15 +5,16 @@ Typical use::
     from cnovatech.datamarket import DataMarket
 
     with DataMarket() as client:  # reads DATAMARKET_API_KEY
-        print(client.health().status)
+        product = client.products.get("7894900011517", state="SP")
+        print(product.market.median_price, product.usage.remaining)
 
 ``AsyncDataMarket`` offers the same surface with coroutines.
 """
 
 from __future__ import annotations
 
-from . import errors, models
+from . import errors, models, types
 from ._client import AsyncDataMarket, DataMarket
 from ._version import __version__
 
-__all__ = ["AsyncDataMarket", "DataMarket", "__version__", "errors", "models"]
+__all__ = ["AsyncDataMarket", "DataMarket", "__version__", "errors", "models", "types"]

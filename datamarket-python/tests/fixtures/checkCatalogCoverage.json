@@ -1,0 +1,54 @@
+{
+  "summary": {
+    "checked_count": 3,
+    "covered_count": 2,
+    "missing_count": 1,
+    "invalid_count": 1,
+    "coverage_pct": 66.67
+  },
+  "data": [
+    {
+      "ean": "7894900011517",
+      "queried_as": "7894900011517",
+      "found": true,
+      "product_name": "Refrigerante Coca-Cola 2L",
+      "brand": "COCA-COLA",
+      "category": "Refrigerantes",
+      "department": "Bebidas",
+      "store_count": 183,
+      "state_count": 19,
+      "min_price": 7.49,
+      "max_price": 12.99,
+      "median_price": 9.49
+    },
+    {
+      "ean": "7891991000826",
+      "queried_as": "7891991000826",
+      "found": true,
+      "product_name": "Cerveja Skol 350ml",
+      "brand": "SKOL",
+      "category": "Cervejas",
+      "department": "Bebidas",
+      "store_count": 150,
+      "state_count": 17,
+      "min_price": 2.79,
+      "max_price": 4.49,
+      "median_price": 3.29
+    },
+    {
+      "ean": "0000000000000",
+      "queried_as": "0000000000000",
+      "found": false,
+      "product_name": null,
+      "brand": null,
+      "category": null,
+      "department": null,
+      "store_count": null,
+      "state_count": null,
+      "min_price": null,
+      "max_price": null,
+      "median_price": null
+    }
+  ],
+  "usage": { "query_cost": 1, "used": 7, "limit": 1000, "remaining": 993 }
+}

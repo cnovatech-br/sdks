@@ -1,0 +1,6 @@
+{
+  "error": "filter_required",
+  "message": "A partir da página 21 é necessário informar ao menos um filtro (search, brand, category, department, state, channel ou faixa de preço).",
+  "what_to_do": "Restrinja a consulta por marca, categoria, departamento ou estado. Se você precisa da base completa, fale com a gente: existe um formato próprio para isso.",
+  "timestamp": "2026-11-02T18:12:00+00:00"
+}

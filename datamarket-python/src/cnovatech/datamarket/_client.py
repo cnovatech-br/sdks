@@ -13,13 +13,25 @@ from cnovatech.sdk_core.config import (
 from cnovatech.sdk_core.transport import AsyncTransport, SyncTransport
 
 from ._config import PRODUCT_SETTINGS
-from .resources import _operations as operations
+from .resources import (
+    Account,
+    AsyncAccount,
+    AsyncBrands,
+    AsyncProducts,
+    AsyncStores,
+    Brands,
+    Products,
+    Stores,
+    _operations as operations,
+)
 
 if TYPE_CHECKING:
     from types import TracebackType
 
     import httpx
     from typing_extensions import Self
+
+    from cnovatech.sdk_core.usage import RateLimitState, UsageTracker
 
     from .models import Health
 
@@ -32,8 +44,9 @@ _CONSTRUCTOR_DOC = """
         timeout: Read timeout in seconds, or an ``httpx.Timeout`` to set every
             phase. The default of 150 s covers the first lookup of an uncached
             product, which can take about 90 s.
-        max_retries: Extra attempts for failures that cannot have been billed.
-            Read timeouts are never retried.
+        max_retries: Extra attempts for failures that cannot have been billed:
+            connection errors, 502/503/504 and the per-minute 429. Read
+            timeouts and quota errors are never retried.
         max_units_per_request: Refuse, before sending, any call estimated to
             cost more than this many quota units. Off by default.
         http_client: Your own httpx client, for proxies, certificates or a
@@ -63,7 +76,14 @@ def _build_config(
 
 
 class DataMarket:
-    """Client for the Data Market API using blocking I/O."""
+    """Client for the Data Market API using blocking I/O.
+
+    Attributes:
+        products: Catalogue, departments, brands, lookup by EAN, price history and coverage.
+        stores: Listing, lookup by name, assortment, competitors and price analyses.
+        brands: Where a brand is sold.
+        account: Profile, quota history, request log and API keys.
+    """
 
     __doc__ = (__doc__ or "") + _CONSTRUCTOR_DOC
 
@@ -80,11 +100,25 @@ class DataMarket:
     ) -> None:
         self._config = _build_config(api_key, base_url, timeout, max_retries, max_units_per_request)
         self._transport = SyncTransport(self._config, http_client=http_client, transport=transport)
+        self.products = Products(self._transport)
+        self.stores = Stores(self._transport)
+        self.brands = Brands(self._transport)
+        self.account = Account(self._transport)
 
     @property
     def base_url(self) -> str:
         """Origin the client talks to."""
         return self._config.base_url
+
+    @property
+    def usage(self) -> UsageTracker:
+        """Quota spent through this client: ``spent``, ``calls`` and the ``last`` usage block."""
+        return self._transport.usage
+
+    @property
+    def rate_limit(self) -> RateLimitState:
+        """The per-minute rate limit as last reported by the API."""
+        return self._transport.rate_limit
 
     def health(self) -> Health:
         """Check that the API, its database and its cache are up.
@@ -116,7 +150,14 @@ class DataMarket:
 
 
 class AsyncDataMarket:
-    """Client for the Data Market API using asyncio."""
+    """Client for the Data Market API using asyncio.
+
+    Attributes:
+        products: Catalogue, departments, brands, lookup by EAN, price history and coverage.
+        stores: Listing, lookup by name, assortment, competitors and price analyses.
+        brands: Where a brand is sold.
+        account: Profile, quota history, request log and API keys.
+    """
 
     __doc__ = (__doc__ or "") + _CONSTRUCTOR_DOC
 
@@ -133,11 +174,25 @@ class AsyncDataMarket:
     ) -> None:
         self._config = _build_config(api_key, base_url, timeout, max_retries, max_units_per_request)
         self._transport = AsyncTransport(self._config, http_client=http_client, transport=transport)
+        self.products = AsyncProducts(self._transport)
+        self.stores = AsyncStores(self._transport)
+        self.brands = AsyncBrands(self._transport)
+        self.account = AsyncAccount(self._transport)
 
     @property
     def base_url(self) -> str:
         """Origin the client talks to."""
         return self._config.base_url
+
+    @property
+    def usage(self) -> UsageTracker:
+        """Quota spent through this client: ``spent``, ``calls`` and the ``last`` usage block."""
+        return self._transport.usage
+
+    @property
+    def rate_limit(self) -> RateLimitState:
+        """The per-minute rate limit as last reported by the API."""
+        return self._transport.rate_limit
 
     async def health(self) -> Health:
         """Check that the API, its database and its cache are up.

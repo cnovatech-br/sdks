@@ -1,0 +1,55 @@
+{
+  "store": {
+    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+    "store_name": "Supermercado Modelo",
+    "city": "São Paulo",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "competitor": {
+    "store_id": "7a1d3c5e-9b2f-4e6a-8c0d-1f3b5a7c9e2b",
+    "store_name": "Mercado Vizinho",
+    "city": "Campinas",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "summary": {
+    "common_product_count": 7800,
+    "below_count": 3100,
+    "aligned_count": 2500,
+    "above_count": 1780,
+    "unavailable_count": 420
+  },
+  "data": [
+    {
+      "ean": "7894900011517",
+      "product_name": "Refrigerante Coca-Cola 2L",
+      "brand": "COCA-COLA",
+      "department": "Bebidas",
+      "category": "Refrigerantes",
+      "image_url": null,
+      "price": 8.99,
+      "available": true,
+      "competitor_price": 9.49,
+      "competitor_available": true,
+      "price_diff_pct": -5.27,
+      "price_position": "below"
+    },
+    {
+      "ean": "7891991000826",
+      "product_name": "Cerveja Skol 350ml",
+      "brand": "SKOL",
+      "department": "Bebidas",
+      "category": "Cervejas",
+      "image_url": null,
+      "price": 3.19,
+      "available": false,
+      "competitor_price": 3.29,
+      "competitor_available": true,
+      "price_diff_pct": null,
+      "price_position": "unavailable"
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
+  "usage": { "query_cost": 2, "used": 15, "limit": 1000, "remaining": 985 }
+}

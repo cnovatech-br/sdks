@@ -58,7 +58,7 @@ include = ["src", "tests", "README.md", "CHANGELOG.md", "LICENSE", "pyproject.to
 [tool.mypy]
 python_version = "3.10"
 files = ["src", "tests"]
-mypy_path = "src:../core/src"
+mypy_path = "src:../core/src:tests"
 strict = true
 warn_unreachable = true
 namespace_packages = true

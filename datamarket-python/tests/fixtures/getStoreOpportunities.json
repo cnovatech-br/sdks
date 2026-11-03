@@ -1,0 +1,40 @@
+{
+  "store": {
+    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+    "store_name": "Supermercado Modelo",
+    "city": "São Paulo",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "summary": {
+    "product_count": 11900,
+    "increase_count": 1200,
+    "decrease_count": 900,
+    "comfortable_count": 9800,
+    "avg_abs_price_diff_pct": 8.4
+  },
+  "data": [
+    {
+      "ean": "7891991000826",
+      "product_name": "Cerveja Skol 350ml",
+      "brand": "SKOL",
+      "category": "Cervejas",
+      "department": "Bebidas",
+      "image_url": null,
+      "price": 3.99,
+      "price_diff": 0.7,
+      "price_diff_pct": 21.28,
+      "price_rank": 140,
+      "opportunity_type": "decrease",
+      "market": {
+        "store_count": 149,
+        "min_price": 2.79,
+        "max_price": 4.49,
+        "avg_price": 3.31,
+        "median_price": 3.29
+      }
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 1, "pages": 1 },
+  "usage": { "query_cost": 2, "used": 25, "limit": 1000, "remaining": 975 }
+}

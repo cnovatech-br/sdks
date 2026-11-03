@@ -23,6 +23,17 @@ workspace, so `cnovatech-datamarket` always uses the `core` checkout next to it.
 
 Run `make format` before committing.
 
+Two targets reach the real API and need a key. Put it in `.env` at the
+workspace root, which git ignores:
+
+```
+DATAMARKET_API_KEY=dm_...
+```
+
+`make live` runs the smoke tests (free endpoints only) and `make capture`
+calls every endpoint once through the SDK and refreshes the test fixtures
+(about 21 quota units).
+
 ## Layout
 
 ```

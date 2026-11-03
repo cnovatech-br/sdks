@@ -1,0 +1,57 @@
+{
+  "store": {
+    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+    "store_name": "Supermercado Modelo",
+    "city": "São Paulo",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "data": [
+    {
+      "ean": "7894900011517",
+      "product_name": "Refrigerante Coca-Cola 2L",
+      "brand": "COCA-COLA",
+      "department": "Bebidas",
+      "category": "Refrigerantes",
+      "image_url": null,
+      "price": 8.99,
+      "list_price": 9.99,
+      "discount_pct": 10.01,
+      "wholesale_price": 8.49,
+      "wholesale_min_qty": 6,
+      "installment_count": null,
+      "installment_value": null,
+      "installment_total": null,
+      "installment_has_interest": null,
+      "available": true,
+      "stock_qty": null,
+      "sale_unit": "UN",
+      "sale_qty": 1,
+      "collected_date": "2026-11-02"
+    },
+    {
+      "ean": "7891991000826",
+      "product_name": "Cerveja Skol 350ml",
+      "brand": "SKOL",
+      "department": "Bebidas",
+      "category": "Cervejas",
+      "image_url": null,
+      "price": 3.19,
+      "list_price": null,
+      "discount_pct": null,
+      "wholesale_price": null,
+      "wholesale_min_qty": null,
+      "installment_count": null,
+      "installment_value": null,
+      "installment_total": null,
+      "installment_has_interest": null,
+      "available": false,
+      "stock_qty": 0,
+      "sale_unit": "UN",
+      "sale_qty": 1,
+      "collected_date": "2026-11-02"
+    }
+  ],
+  "meta": { "page": 1, "limit": 100, "total": 2, "pages": 1 },
+  "usage": { "query_cost": 2, "used": 10, "limit": 1000, "remaining": 990 }
+}

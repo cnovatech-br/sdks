@@ -77,6 +77,26 @@ class Usage(BaseModel):
     remaining: int | None = None
 
 
+class PaginationMeta(BaseModel):
+    """Position of a page within a paginated listing."""
+
+    model_config = ConfigDict(frozen=True, extra="allow")
+
+    page: int
+    limit: int
+    total: int
+    pages: int
+
+
+class ListMeta(BaseModel):
+    """Size of a listing capped by ``limit`` and not paginated."""
+
+    model_config = ConfigDict(frozen=True, extra="allow")
+
+    limit: int
+    total: int
+
+
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 

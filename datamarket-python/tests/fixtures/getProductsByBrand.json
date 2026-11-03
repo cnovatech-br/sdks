@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "ean": "7894900011517",
+      "product_name": "Refrigerante Coca-Cola 2L",
+      "brand": "COCA-COLA",
+      "category": "Refrigerantes",
+      "department": "Bebidas",
+      "image_url": null,
+      "store_count": 183,
+      "availability_pct": 91.3,
+      "min_price": 7.49,
+      "max_price": 12.99,
+      "avg_price": 9.62,
+      "median_price": 9.49,
+      "price_range": 5.5,
+      "price_cv_pct": 11.2
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 1, "pages": 1 },
+  "usage": { "query_cost": 1, "used": 4, "limit": 1000, "remaining": 996 }
+}

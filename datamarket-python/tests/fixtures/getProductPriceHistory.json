@@ -1,0 +1,26 @@
+{
+  "ean": "7894900011517",
+  "granularity": "daily",
+  "period_days": 30,
+  "currency": "BRL",
+  "market_series": [
+    { "date": "2026-10-31", "median_price": 9.49, "min_price": 7.49, "max_price": 12.99, "store_count": 180 },
+    { "date": "2026-11-01", "median_price": 9.59, "min_price": 7.49, "max_price": 12.99, "store_count": 181 }
+  ],
+  "store_count": 183,
+  "has_more": true,
+  "store_series": [
+    {
+      "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+      "store_name": "Supermercado Modelo",
+      "city": "São Paulo",
+      "state": "SP",
+      "last_collected_at": "2026-11-02T06:12:44-03:00",
+      "points": [
+        { "date": "2026-10-31", "price": 8.99 },
+        { "date": "2026-11-01", "price": 8.99 }
+      ]
+    }
+  ],
+  "usage": { "query_cost": 1, "used": 6, "limit": 1000, "remaining": 994 }
+}

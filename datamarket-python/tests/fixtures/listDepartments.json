@@ -1,0 +1,19 @@
+{
+  "summary": { "department_count": 2, "category_count": 3 },
+  "data": [
+    {
+      "department": "Bebidas",
+      "product_count": 1240,
+      "categories": [
+        { "category": "Refrigerantes", "product_count": 310 },
+        { "category": "Cervejas", "product_count": 420 }
+      ]
+    },
+    {
+      "department": "Mercearia",
+      "product_count": 5120,
+      "categories": [{ "category": "Azeites", "product_count": 96 }]
+    }
+  ],
+  "usage": { "query_cost": 1, "used": 2, "limit": 1000, "remaining": 998 }
+}

@@ -1,0 +1,33 @@
+{
+  "summary": {
+    "request_count": 19,
+    "success_pct": 94,
+    "median_response_time_ms": 412,
+    "error_count": 1
+  },
+  "data": [
+    {
+      "id": 9001,
+      "endpoint": "/api/v1/market/products/ean/7894900011517",
+      "method": "GET",
+      "status_code": 200,
+      "response_time_ms": 388,
+      "ip_address": "203.0.113.10",
+      "created_at": "2026-11-02T18:10:03+00:00",
+      "query_params": { "state": "SP" },
+      "api_key_prefix": "dm_12ab"
+    },
+    {
+      "id": 9000,
+      "endpoint": "/api/v1/market/products/ean/0000000000000",
+      "method": "GET",
+      "status_code": 404,
+      "response_time_ms": 51,
+      "ip_address": "203.0.113.10",
+      "created_at": "2026-11-02T18:09:40+00:00",
+      "query_params": null,
+      "api_key_prefix": "dm_12ab"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 2, "pages": 1 }
+}

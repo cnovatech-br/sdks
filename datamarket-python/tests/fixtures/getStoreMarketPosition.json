@@ -1,0 +1,36 @@
+{
+  "store": {
+    "store_id": "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63",
+    "store_name": "Supermercado Modelo",
+    "city": "São Paulo",
+    "state": "SP",
+    "channel": "e-commerce"
+  },
+  "summary": { "product_count": 12480, "comparable_count": 11900, "unavailable_count": 580 },
+  "data": [
+    {
+      "ean": "7894900011517",
+      "product_name": "Refrigerante Coca-Cola 2L",
+      "brand": "COCA-COLA",
+      "department": "Bebidas",
+      "category": "Refrigerantes",
+      "image_url": null,
+      "price": 8.99,
+      "list_price": 9.99,
+      "available": true,
+      "price_position": "below",
+      "price_diff_pct": -5.27,
+      "market": {
+        "store_count": 182,
+        "min_price": 7.49,
+        "max_price": 12.99,
+        "avg_price": 9.62,
+        "median_price": 9.49,
+        "mode_price": 9.49,
+        "availability_pct": 91.3
+      }
+    }
+  ],
+  "meta": { "page": 1, "limit": 1000, "total": 1, "pages": 1 },
+  "usage": { "query_cost": 8, "used": 23, "limit": 1000, "remaining": 977 }
+}

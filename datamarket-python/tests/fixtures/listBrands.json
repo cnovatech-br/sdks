@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "brand": "COCA-COLA",
+      "product_count": 42,
+      "department_count": 1,
+      "category_count": 3,
+      "departments": ["Bebidas"],
+      "categories": ["Refrigerantes", "Sucos", "Águas"]
+    },
+    {
+      "brand": "GALLO",
+      "product_count": 18,
+      "department_count": 1,
+      "category_count": 1,
+      "departments": ["Mercearia"],
+      "categories": ["Azeites"]
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 2, "pages": 1 },
+  "usage": { "query_cost": 1, "used": 3, "limit": 1000, "remaining": 997 }
+}

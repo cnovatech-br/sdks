@@ -6,10 +6,14 @@ import json
 from pathlib import Path
 from typing import Any
 
+import httpx
 import pytest
+
+from cnovatech.datamarket import AsyncDataMarket, DataMarket
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 ENVIRONMENT_VARIABLES = ("DATAMARKET_API_KEY", "DATAMARKET_BASE_URL")
+TEST_API_KEY = "dm_test_key"
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -47,3 +51,66 @@ def load_fixture(name: str) -> Any:
 def health_payload() -> dict[str, Any]:
     payload: dict[str, Any] = load_fixture("healthCheck.json")
     return payload
+
+
+class FakeAPI:
+    """Answers requests from fixture files and records what the client sent.
+
+    A route matches on method, path and, when given, a subset of the query
+    parameters, so one test can serve several pages of the same listing.
+    """
+
+    def __init__(self) -> None:
+        self._routes: list[tuple[str, str, dict[str, str], int, Any]] = []
+        self.requests: list[httpx.Request] = []
+
+    def respond(
+        self,
+        method: str,
+        path: str,
+        fixture: str | dict[str, Any],
+        *,
+        params: dict[str, str] | None = None,
+        status_code: int = 200,
+    ) -> None:
+        payload = load_fixture(fixture) if isinstance(fixture, str) else fixture
+        self._routes.append((method, path, params or {}, status_code, payload))
+
+    def handler(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        query = dict(request.url.params)
+        for method, path, params, status_code, payload in self._routes:
+            if method != request.method or path != request.url.path:
+                continue
+            if all(query.get(name) == value for name, value in params.items()):
+                return httpx.Response(status_code, json=payload)
+        return httpx.Response(
+            404,
+            json={
+                "error": "not_found",
+                "message": f"The fake API has no route for {request.method} {request.url.path}.",
+            },
+        )
+
+    @property
+    def last_request(self) -> httpx.Request:
+        return self.requests[-1]
+
+    @property
+    def last_params(self) -> dict[str, str]:
+        return dict(self.last_request.url.params)
+
+    def client(self, **options: Any) -> DataMarket:
+        return DataMarket(
+            api_key=TEST_API_KEY, transport=httpx.MockTransport(self.handler), **options
+        )
+
+    def async_client(self, **options: Any) -> AsyncDataMarket:
+        return AsyncDataMarket(
+            api_key=TEST_API_KEY, transport=httpx.MockTransport(self.handler), **options
+        )
+
+
+@pytest.fixture
+def api() -> FakeAPI:
+    return FakeAPI()

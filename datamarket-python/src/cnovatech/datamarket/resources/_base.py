@@ -1,0 +1,72 @@
+"""What every resource shares: a transport and the way to fetch paginated results."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, TypeVar
+
+from cnovatech.sdk_core.pagination import AsyncPage, SyncPage
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from cnovatech.sdk_core.operation import Operation
+    from cnovatech.sdk_core.transport import AsyncTransport, SyncTransport
+
+ResultT = TypeVar("ResultT")
+SyncPageT = TypeVar("SyncPageT", bound=SyncPage[Any])
+AsyncPageT = TypeVar("AsyncPageT", bound=AsyncPage[Any])
+
+
+class SyncResource:
+    """A group of endpoints served through a blocking transport."""
+
+    def __init__(self, transport: SyncTransport) -> None:
+        self._transport = transport
+
+    def _execute(self, operation: Operation[ResultT]) -> ResultT:
+        return self._transport.execute(operation)
+
+    def _execute_paginated(
+        self,
+        build: Callable[..., Operation[SyncPageT]],
+        *,
+        page: int,
+        page_cost_estimate: int,
+    ) -> SyncPageT:
+        """Fetch ``page`` and give it the means to fetch the pages after it.
+
+        ``build`` receives ``page=`` and returns the operation for that page.
+        """
+
+        def fetch(page_number: int) -> SyncPageT:
+            result = self._transport.execute(build(page=page_number))
+            result.attach_pagination(fetch, page_cost_estimate=page_cost_estimate)
+            return result
+
+        return fetch(page)
+
+
+class AsyncResource:
+    """A group of endpoints served through an asynchronous transport."""
+
+    def __init__(self, transport: AsyncTransport) -> None:
+        self._transport = transport
+
+    async def _execute(self, operation: Operation[ResultT]) -> ResultT:
+        return await self._transport.execute(operation)
+
+    async def _execute_paginated(
+        self,
+        build: Callable[..., Operation[AsyncPageT]],
+        *,
+        page: int,
+        page_cost_estimate: int,
+    ) -> AsyncPageT:
+        """Fetch ``page`` and give it the means to fetch the pages after it."""
+
+        async def fetch(page_number: int) -> AsyncPageT:
+            result = await self._transport.execute(build(page=page_number))
+            result.attach_pagination(fetch, page_cost_estimate=page_cost_estimate)
+            return result
+
+        return await fetch(page)
