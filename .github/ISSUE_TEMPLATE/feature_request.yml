@@ -1,0 +1,31 @@
+name: Feature request
+description: Something the SDK should do, or do differently.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you are trying to do
+      description: The task, not the solution. What does the SDK make hard or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: How you would like it to work, with an example of the code you would write.
+      render: python
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: How you solve it today, if at all.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - The SDK (a method, a model, a behaviour)
+        - The API itself (a new endpoint or field; the SDK can only expose what the API offers)
+    validations:
+      required: true

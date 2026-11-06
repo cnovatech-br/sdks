@@ -17,6 +17,8 @@ dev = [
     "mypy>=1.14",
     "pandas>=2.0",
     "pandas-stubs>=2.0",
+    # `Self` for the type checker; imported under TYPE_CHECKING only.
+    "typing-extensions>=4.12",
 ]
 
 [tool.ruff]

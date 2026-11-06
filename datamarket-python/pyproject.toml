@@ -21,6 +21,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Office/Business",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
@@ -44,7 +46,7 @@ Changelog = "https://github.com/cnovatech/sdks/blob/main/datamarket-python/CHANG
 cnovatech-sdk-core = { workspace = true }
 
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.25,<2"]
 build-backend = "hatchling.build"
 
 # `src/cnovatech/` has no __init__.py on purpose: it is a PEP 420 namespace

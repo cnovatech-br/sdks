@@ -1,0 +1,57 @@
+name: Bug report
+description: Something in the SDK behaves differently from what its documentation says.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste an API key.** Keys start with `dm_`; if one appears in a log or
+        traceback you attach, replace it with `dm_****` and revoke it in the dashboard.
+  - type: input
+    id: sdk-version
+    attributes:
+      label: SDK version
+      description: "`python -c \"import cnovatech.datamarket as m; print(m.__version__)\"`"
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      placeholder: 3.13.1
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Ubuntu 24.04, macOS 15, Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal code that reproduces the problem
+      description: The smallest script that shows it, with the key read from the environment.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened instead
+    validations:
+      required: true
+  - type: input
+    id: correlation-id
+    attributes:
+      label: Correlation ID
+      description: Every SDK error message ends with `[correlation_id=...]`. It lets support find the request.
+      placeholder: 7f3c2a1e-...
+  - type: textarea
+    id: output
+    attributes:
+      label: Error message or log output
+      description: With the `cnovatech` logger at DEBUG if possible. Remove any key before posting.
+      render: text

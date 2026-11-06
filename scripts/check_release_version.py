@@ -1,50 +1,67 @@
-"""Verify that every workspace package declares the version named by a release tag.
+"""Verify that a release tag matches every workspace package.
+
+Each package must declare the tagged version in ``pyproject.toml`` and have a
+``## [version]`` section in its ``CHANGELOG.md``.
 
 Usage::
 
     python scripts/check_release_version.py v0.1.0
 
-Exits with status 1 and lists the mismatches when any package disagrees.
+Exits with status 1 and lists the problems when any package disagrees.
 Requires Python 3.11 or newer for ``tomllib``.
 """
 
 from __future__ import annotations
 
+import re
 import sys
 import tomllib
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-PACKAGE_MANIFESTS = (
-    WORKSPACE_ROOT / "core" / "pyproject.toml",
-    WORKSPACE_ROOT / "datamarket-python" / "pyproject.toml",
+PACKAGE_DIRECTORIES = (
+    WORKSPACE_ROOT / "core",
+    WORKSPACE_ROOT / "datamarket-python",
 )
 
 
-def declared_version(manifest: Path) -> str:
-    """Read ``project.version`` from a ``pyproject.toml``."""
-    with manifest.open("rb") as handle:
+def declared_version(package: Path) -> str:
+    """Read ``project.version`` from the package's ``pyproject.toml``."""
+    with (package / "pyproject.toml").open("rb") as handle:
         version: str = tomllib.load(handle)["project"]["version"]
     return version
 
 
+def has_changelog_section(package: Path, version: str) -> bool:
+    """Whether the package's ``CHANGELOG.md`` has a ``## [version]`` heading."""
+    heading = re.compile(rf"^## \[{re.escape(version)}\]", re.MULTILINE)
+    return heading.search((package / "CHANGELOG.md").read_text(encoding="utf-8")) is not None
+
+
+def problems(expected: str) -> list[str]:
+    """Every package that does not declare or document ``expected``."""
+    found: list[str] = []
+    for package in PACKAGE_DIRECTORIES:
+        name = package.relative_to(WORKSPACE_ROOT)
+        if (version := declared_version(package)) != expected:
+            found.append(f"{name}/pyproject.toml declares {version}")
+        if not has_changelog_section(package, expected):
+            found.append(f"{name}/CHANGELOG.md has no '## [{expected}]' section")
+    return found
+
+
 def main(argv: list[str]) -> int:
-    """Compare the tag in ``argv[1]`` with every package version."""
+    """Compare the tag in ``argv[1]`` with every package."""
     if len(argv) != 2:
         print(__doc__)
         return 2
     expected = argv[1].removeprefix("v")
-    mismatches = [
-        f"{manifest.relative_to(WORKSPACE_ROOT)}: {version}"
-        for manifest in PACKAGE_MANIFESTS
-        if (version := declared_version(manifest)) != expected
-    ]
-    if mismatches:
+    if found := problems(expected):
         print(f"Tag {argv[1]} expects version {expected}, but:")
-        for mismatch in mismatches:
-            print(f"  {mismatch}")
+        for problem in found:
+            print(f"  {problem}")
         return 1
-    print(f"Every package declares {expected}.")
+    print(f"Every package declares and documents {expected}.")
     return 0
 
 

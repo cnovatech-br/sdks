@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/cnovatech/sdks/blob/main/SECURITY.md
+    about: Do not open an issue. Follow the security policy to report it privately.
+  - name: Questions about the API, plans or your account
+    url: mailto:suporte@cnovatech.com.br
+    about: The issue tracker is for the SDK. Account and billing questions go to support.

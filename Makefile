@@ -5,7 +5,7 @@ PRODUCT_TERMS := ean|eans|market|pharma|datamarket|assortment|competitor|retaile
 # Credentials for the targets that reach the real API live in .env (ignored by git).
 ENV_FILE := $(if $(wildcard .env),--env-file $(abspath .env),)
 
-PYTHON_VERSIONS := 3.10 3.11 3.12 3.13
+PYTHON_VERSIONS := 3.10 3.11 3.12 3.13 3.14 3.15
 
 .PHONY: help install lint format boundary typecheck test cov check matrix live capture build clean
 
@@ -64,6 +64,7 @@ build:  ## Build sdist and wheel of every package into dist/
 	uv build --package cnovatech-sdk-core
 	uv build --package cnovatech-datamarket
 
-clean:  ## Remove build output and tool caches
-	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov
+clean:  ## Remove build output, tool caches and the matrix environments
+	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov .venv-*
+	rm -f $(addsuffix /.coverage,$(PACKAGES))
 	find . -path ./.venv -prune -o \( -name __pycache__ -o -name .pytest_cache -o -name .mypy_cache \) -type d -print -prune | xargs rm -rf
