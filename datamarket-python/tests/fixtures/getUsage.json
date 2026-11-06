@@ -1,56 +1,31 @@
 {
   "daily": [
     {
-      "date": "2026-11-02",
-      "used": 40,
-      "call_count": 40
-    },
-    {
       "date": "2026-10-29",
-      "used": 73,
-      "call_count": 53
+      "used": 6,
+      "call_count": 4
     },
     {
-      "date": "2026-10-28",
-      "used": 20,
-      "call_count": 19
-    },
-    {
-      "date": "2026-10-27",
+      "date": "2026-08-14",
       "used": 4,
-      "call_count": 2
+      "call_count": 4
     },
     {
-      "date": "2026-10-26",
-      "used": 2,
-      "call_count": 2
+      "date": "2026-08-13",
+      "used": 14,
+      "call_count": 11
     }
   ],
   "monthly": [
     {
-      "month": "2026-11",
-      "used": 40,
-      "call_count": 40
-    },
-    {
       "month": "2026-10",
-      "used": 112,
-      "call_count": 89
-    },
-    {
-      "month": "2026-09",
-      "used": 1882,
-      "call_count": 1000
+      "used": 6,
+      "call_count": 4
     },
     {
       "month": "2026-08",
-      "used": 73,
-      "call_count": 73
-    },
-    {
-      "month": "2026-07",
-      "used": 40,
-      "call_count": 40
+      "used": 18,
+      "call_count": 15
     }
   ]
 }

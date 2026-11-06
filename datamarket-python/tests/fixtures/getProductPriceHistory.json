@@ -5,42 +5,42 @@
   "currency": "BRL",
   "market_series": [
     {
-      "date": "2026-10-27",
-      "median_price": 11.49,
-      "min_price": 9.29,
-      "max_price": 13.99,
-      "store_count": 163
-    },
-    {
-      "date": "2026-10-28",
-      "median_price": 11.49,
-      "min_price": 9.29,
-      "max_price": 13.99,
-      "store_count": 165
-    },
-    {
-      "date": "2026-10-29",
-      "median_price": 11.49,
-      "min_price": 9.29,
-      "max_price": 13.99,
-      "store_count": 156
-    },
-    {
-      "date": "2026-10-30",
-      "median_price": 11.49,
-      "min_price": 8.98,
-      "max_price": 13.99,
-      "store_count": 156
-    },
-    {
       "date": "2026-10-31",
       "median_price": 11.49,
       "min_price": 9.29,
       "max_price": 13.99,
       "store_count": 159
+    },
+    {
+      "date": "2026-11-01",
+      "median_price": 11.49,
+      "min_price": 8.98,
+      "max_price": 13.99,
+      "store_count": 165
+    },
+    {
+      "date": "2026-11-02",
+      "median_price": 11.49,
+      "min_price": 8.98,
+      "max_price": 13.99,
+      "store_count": 169
+    },
+    {
+      "date": "2026-11-03",
+      "median_price": 11.49,
+      "min_price": 9.88,
+      "max_price": 13.99,
+      "store_count": 169
+    },
+    {
+      "date": "2026-11-04",
+      "median_price": 11.49,
+      "min_price": 9.79,
+      "max_price": 13.79,
+      "store_count": 168
     }
   ],
-  "store_count": 149,
+  "store_count": 150,
   "has_more": true,
   "store_series": [
     {
@@ -48,36 +48,36 @@
       "store_name": "Alvorada Max",
       "city": "Quedas do Iguacu",
       "state": "PR",
-      "last_collected_at": "2026-10-28T05:03:33-03:00",
+      "last_collected_at": "2026-11-03T23:54:57-03:00",
       "points": [
         {
-          "date": "2026-10-28",
+          "date": "2026-11-03",
           "price": 11.49
         }
       ]
     },
     {
-      "store_id": "ddda1794-3075-4f44-a649-60167bd7e524",
-      "store_name": "Armazem Alianca",
-      "city": "Paragominas",
-      "state": "PA",
-      "last_collected_at": "2026-10-28T04:59:56-03:00",
-      "points": [
-        {
-          "date": "2026-10-28",
-          "price": 11.49
-        }
-      ]
-    },
-    {
-      "store_id": "d00f01d6-c513-47c4-a280-3e0fa21a4b1c",
-      "store_name": "Badotti",
-      "city": "Xanxere",
+      "store_id": "db74d0a3-f8e1-41a3-a5b9-381f62b0eddb",
+      "store_name": "Angeloni",
+      "city": "Porto Belo",
       "state": "SC",
-      "last_collected_at": "2026-10-28T05:09:26-03:00",
+      "last_collected_at": "2026-11-03T12:27:40-03:00",
       "points": [
         {
-          "date": "2026-10-28",
+          "date": "2026-11-03",
+          "price": 11.99
+        }
+      ]
+    },
+    {
+      "store_id": "57b7c98e-f957-4a02-87fe-e48ebdc55ec9",
+      "store_name": "Supermercados Amigao",
+      "city": "Maringa",
+      "state": "PR",
+      "last_collected_at": "2026-11-03T12:06:47-03:00",
+      "points": [
+        {
+          "date": "2026-11-03",
           "price": 11.99
         }
       ]
@@ -85,8 +85,8 @@
   ],
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 11,
+    "limit": 50,
+    "remaining": 39
   }
 }

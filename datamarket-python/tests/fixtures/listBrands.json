@@ -2,11 +2,12 @@
   "data": [
     {
       "brand": "HAVAIANAS",
-      "product_count": 1712,
-      "department_count": 3,
+      "product_count": 1825,
+      "department_count": 4,
       "category_count": 3,
       "departments": [
         "BAZAR E UTILIDADES",
+        "BEBIDAS",
         "CALCADOS",
         "LIMPEZA"
       ],
@@ -18,11 +19,12 @@
     },
     {
       "brand": "TRAMONTINA",
-      "product_count": 1252,
-      "department_count": 3,
+      "product_count": 1288,
+      "department_count": 4,
       "category_count": 16,
       "departments": [
         "BAZAR E UTILIDADES",
+        "CARNES, AVES E PEIXES",
         "ELETRO",
         "LIMPEZA"
       ],
@@ -36,29 +38,29 @@
     },
     {
       "brand": "PLASUTIL",
-      "product_count": 1109,
-      "department_count": 5,
-      "category_count": 16,
+      "product_count": 1187,
+      "department_count": 6,
+      "category_count": 18,
       "departments": [
         "BABY E INFANTIL",
         "BAZAR E UTILIDADES",
         "HIGIENE E BELEZA",
         "LIMPEZA",
-        "PET SHOP"
+        "MERCEARIA"
       ],
       "categories": [
         "ACESSORIOS PARA PETS",
         "ALIMENTACAO INFANTIL",
-        "DECORACAO",
-        "DIVERSOS",
-        "EMBALAGENS E DESCARTAVEIS"
+        "ALIMENTOS PARA PETS",
+        "CAMA, MESA E BANHO",
+        "DECORACAO"
       ]
     },
     {
       "brand": "QUALITA",
-      "product_count": 1037,
+      "product_count": 1138,
       "department_count": 12,
-      "category_count": 56,
+      "category_count": 57,
       "departments": [
         "BABY E INFANTIL",
         "BAZAR E UTILIDADES",
@@ -76,7 +78,7 @@
     },
     {
       "brand": "NESTLE",
-      "product_count": 726,
+      "product_count": 758,
       "department_count": 8,
       "category_count": 23,
       "departments": [
@@ -98,13 +100,13 @@
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 19144,
-    "pages": 3829
+    "total": 20635,
+    "pages": 4127
   },
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 8,
+    "limit": 50,
+    "remaining": 42
   }
 }

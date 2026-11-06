@@ -7,8 +7,8 @@
     "channel": "e-commerce"
   },
   "summary": {
-    "product_count": 5546,
-    "competitiveness_score": 43.08
+    "product_count": 5557,
+    "competitiveness_score": 41.57
   },
   "data": [
     {
@@ -18,15 +18,15 @@
       "state": "PR",
       "channel": "e-commerce",
       "common_product_count": 2583,
-      "unavailable_count": 836,
-      "below_count": 724,
-      "aligned_count": 459,
-      "above_count": 564,
-      "below_pct": 41.44,
-      "aligned_pct": 26.27,
-      "above_pct": 32.28,
+      "unavailable_count": 801,
+      "below_count": 742,
+      "aligned_count": 462,
+      "above_count": 578,
+      "below_pct": 41.64,
+      "aligned_pct": 25.93,
+      "above_pct": 32.44,
       "median_price_diff_pct": 0.0,
-      "competitiveness_score": 54.58
+      "competitiveness_score": 54.6
     },
     {
       "store_id": "6340b619-4048-451a-bd8b-73cf1dd82060",
@@ -35,15 +35,15 @@
       "state": "SP",
       "channel": "e-commerce",
       "common_product_count": 2654,
-      "unavailable_count": 887,
-      "below_count": 374,
-      "aligned_count": 368,
-      "above_count": 1025,
-      "below_pct": 21.17,
-      "aligned_pct": 20.83,
-      "above_pct": 58.01,
-      "median_price_diff_pct": 8.34,
-      "competitiveness_score": 31.58
+      "unavailable_count": 932,
+      "below_count": 328,
+      "aligned_count": 327,
+      "above_count": 1067,
+      "below_pct": 19.05,
+      "aligned_pct": 18.99,
+      "above_pct": 61.96,
+      "median_price_diff_pct": 11.12,
+      "competitiveness_score": 28.54
     }
   ],
   "meta": {
@@ -52,8 +52,8 @@
   },
   "usage": {
     "query_cost": 2,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 21,
+    "limit": 50,
+    "remaining": 29
   }
 }

@@ -7,11 +7,11 @@
     "channel": "e-commerce"
   },
   "summary": {
-    "product_count": 3799,
+    "product_count": 3819,
     "increase_count": 499,
-    "decrease_count": 449,
-    "comfortable_count": 2851,
-    "avg_abs_price_diff_pct": 10.75
+    "decrease_count": 452,
+    "comfortable_count": 2868,
+    "avg_abs_price_diff_pct": 10.7
   },
   "data": [
     {
@@ -35,26 +35,6 @@
       }
     },
     {
-      "ean": "7897013586231",
-      "product_name": "LAMPADA BULBO ELGIN LED 9W BIV 6500K",
-      "brand": "ELGIN",
-      "category": "PILHAS E ELETRO",
-      "department": "BAZAR E UTILIDADES",
-      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/969468/g.jpg?v=639047107160600000",
-      "price": 9.99,
-      "price_diff": 4.76,
-      "price_diff_pct": 90.83,
-      "price_rank": 23,
-      "opportunity_type": "decrease",
-      "market": {
-        "store_count": 24,
-        "min_price": 1.98,
-        "max_price": 12.99,
-        "avg_price": 5.72,
-        "median_price": 5.24
-      }
-    },
-    {
       "ean": "7622202256714",
       "product_name": "LACTA CHOCOLATE LAKA 336G C-12",
       "brand": "LACTA",
@@ -69,9 +49,29 @@
       "market": {
         "store_count": 3,
         "min_price": 4.49,
-        "max_price": 40.07,
-        "avg_price": 26.89,
+        "max_price": 46.35,
+        "avg_price": 28.98,
         "median_price": 36.11
+      }
+    },
+    {
+      "ean": "7897013586231",
+      "product_name": "LAMPADA BULBO ELGIN LED 9W BIV 6500K",
+      "brand": "ELGIN",
+      "category": "PILHAS E ELETRO",
+      "department": "BAZAR E UTILIDADES",
+      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/969468/g.jpg?v=639047107160600000",
+      "price": 9.99,
+      "price_diff": 4.51,
+      "price_diff_pct": 82.3,
+      "price_rank": 22,
+      "opportunity_type": "decrease",
+      "market": {
+        "store_count": 23,
+        "min_price": 1.98,
+        "max_price": 12.99,
+        "avg_price": 5.89,
+        "median_price": 5.48
       }
     },
     {
@@ -95,36 +95,36 @@
       }
     },
     {
-      "ean": "7896419713852",
-      "product_name": "STEAK DE FRANGO EMPANADO LAR 100G",
-      "brand": "LAR",
-      "category": "CARNES CONGELADAS",
-      "department": "CONGELADOS",
-      "image_url": "https://muffatosupermercados.vteximg.com.br/arquivos/ids/248309/7896419713852.jpg?v=636862848563400000",
-      "price": 2.89,
-      "price_diff": 1.19,
-      "price_diff_pct": 70.0,
-      "price_rank": 35,
+      "ean": "7891150027848",
+      "product_name": "KETCHUP HELLMANNS TRADICIONAL 380G",
+      "brand": "HELLMANNS",
+      "category": "MOLHOS E CONDIMENTOS",
+      "department": "MERCEARIA",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/419295/KetchupHellmannsTradicional380g1.jpg?v=638941549403100000",
+      "price": 23.99,
+      "price_diff": 10.0,
+      "price_diff_pct": 71.48,
+      "price_rank": 171,
       "opportunity_type": "decrease",
       "market": {
-        "store_count": 35,
-        "min_price": 0.99,
-        "max_price": 2.99,
-        "avg_price": 1.83,
-        "median_price": 1.7
+        "store_count": 171,
+        "min_price": 8.98,
+        "max_price": 24.94,
+        "avg_price": 14.77,
+        "median_price": 13.99
       }
     }
   ],
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 3799,
-    "pages": 760
+    "total": 3819,
+    "pages": 764
   },
   "usage": {
     "query_cost": 2,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 27,
+    "limit": 50,
+    "remaining": 23
   }
 }

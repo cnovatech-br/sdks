@@ -24,10 +24,10 @@
       "installment_total": null,
       "installment_has_interest": null,
       "available": true,
-      "stock_qty": 30,
+      "stock_qty": 28,
       "sale_unit": "UN",
       "sale_qty": 4.0,
-      "collected_date": "2026-10-28"
+      "collected_date": "2026-11-04"
     },
     {
       "ean": "7891010031633",
@@ -49,7 +49,7 @@
       "stock_qty": 33,
       "sale_unit": "UN",
       "sale_qty": 5.0,
-      "collected_date": "2026-10-28"
+      "collected_date": "2026-11-03"
     },
     {
       "ean": "7896007551705",
@@ -71,7 +71,7 @@
       "stock_qty": 6,
       "sale_unit": "UN",
       "sale_qty": 1.0,
-      "collected_date": "2026-10-28"
+      "collected_date": "2026-11-03"
     },
     {
       "ean": "7891010694593",
@@ -80,7 +80,29 @@
       "department": "HIGIENE E BELEZA",
       "category": "HIGIENE INTIMA",
       "image_url": "https://edge.osuper.com.br/SHtZNOKBfS2BL8gzZy1QwvJM63w=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://osuper-ecommerce-alvorada.s3.sa-east-1.amazonaws.com/f58fe936-abs.jpg",
-      "price": 12.99,
+      "price": 13.99,
+      "list_price": null,
+      "discount_pct": null,
+      "wholesale_price": null,
+      "wholesale_min_qty": null,
+      "installment_count": null,
+      "installment_value": null,
+      "installment_total": null,
+      "installment_has_interest": null,
+      "available": true,
+      "stock_qty": 12,
+      "sale_unit": "UN",
+      "sale_qty": 1.0,
+      "collected_date": "2026-11-03"
+    },
+    {
+      "ean": "7896104992494",
+      "product_name": "ABSORVENTE COM ABAS COBERTURA SUAVE PROTECAO TOTAL MILI COM 32UN",
+      "brand": "MILI",
+      "department": "HIGIENE E BELEZA",
+      "category": "HIGIENE INTIMA",
+      "image_url": "https://edge.osuper.com.br/ouDkeGXw-7ZWEFyhafivgBgKEuw=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://osuper-ecommerce-alvorada.s3.sa-east-1.amazonaws.com/3a5ff3fe-absorvente-mili-32.jpg",
+      "price": 15.99,
       "list_price": null,
       "discount_pct": null,
       "wholesale_price": null,
@@ -92,42 +114,20 @@
       "available": true,
       "stock_qty": 7,
       "sale_unit": "UN",
-      "sale_qty": 1.0,
-      "collected_date": "2026-10-28"
-    },
-    {
-      "ean": "7896104992494",
-      "product_name": "ABSORVENTE COM ABAS COBERTURA SUAVE PROTECAO TOTAL MILI COM 32UN",
-      "brand": "MILI",
-      "department": "HIGIENE E BELEZA",
-      "category": "HIGIENE INTIMA",
-      "image_url": "https://edge.osuper.com.br/ouDkeGXw-7ZWEFyhafivgBgKEuw=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://osuper-ecommerce-alvorada.s3.sa-east-1.amazonaws.com/3a5ff3fe-absorvente-mili-32.jpg",
-      "price": 16.69,
-      "list_price": null,
-      "discount_pct": null,
-      "wholesale_price": null,
-      "wholesale_min_qty": null,
-      "installment_count": null,
-      "installment_value": null,
-      "installment_total": null,
-      "installment_has_interest": null,
-      "available": true,
-      "stock_qty": 2,
-      "sale_unit": "UN",
       "sale_qty": 6.0,
-      "collected_date": "2026-10-28"
+      "collected_date": "2026-11-04"
     }
   ],
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 5546,
-    "pages": 1110
+    "total": 5557,
+    "pages": 1112
   },
   "usage": {
     "query_cost": 2,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 17,
+    "limit": 50,
+    "remaining": 33
   }
 }

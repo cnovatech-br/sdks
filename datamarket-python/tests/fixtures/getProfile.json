@@ -2,48 +2,48 @@
   "id": "a3b1c2d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
   "email": "analyst@example.test",
   "name": "Analyst Example",
-  "profile": "admin",
+  "profile": "starter",
   "company_name": "Example Retail Ltda",
   "company_document": "12.345.678/0001-90",
   "phone": null,
   "is_verified": true,
-  "created_at": "2026-01-23T20:12:32.256286Z",
-  "last_login_at": "2026-11-02T22:14:56.653133Z",
+  "created_at": "2026-01-25T04:10:23.791608Z",
+  "last_login_at": "2026-10-29T02:48:37.176836Z",
   "subscription": {
-    "status": "active",
+    "status": "trialing",
     "plan": {
-      "code": "admin",
-      "name": "Administrador",
+      "code": "free",
+      "name": "Free",
       "features": {
         "api_access": true,
-        "priority_support": true,
-        "dedicated_account_manager": true,
-        "sla_guaranteed": true,
-        "custom_integrations": true
+        "sla_guaranteed": false,
+        "priority_support": false,
+        "custom_integrations": false,
+        "dedicated_account_manager": false
       },
       "limits": {
-        "requests_per_month": 999999999,
-        "requests_per_minute": 999999,
-        "max_results_per_request": 100,
-        "max_api_keys": 1
+        "max_api_keys": 1,
+        "requests_per_month": 50,
+        "requests_per_minute": 60,
+        "max_results_per_request": 100
       }
     },
-    "billing_cycle": null,
-    "current_period_end": null,
+    "billing_cycle": "monthly",
+    "current_period_end": "2026-11-12T02:54:20.044896Z",
     "cancel_at_period_end": false
   },
   "trial": {
-    "is_trial": false,
-    "started_at": null,
-    "ends_at": null,
-    "days_remaining": 0,
+    "is_trial": true,
+    "started_at": "2026-10-29T02:54:20.044896Z",
+    "ends_at": "2026-11-12T02:54:20.044896Z",
+    "days_remaining": 5,
     "expired": false
   },
   "usage": {
-    "used": null,
-    "limit": null,
-    "remaining": null,
-    "plan_limit": null,
+    "used": 6,
+    "limit": 50,
+    "remaining": 44,
+    "plan_limit": 50,
     "bonus": 0,
     "can_early_renew": false,
     "early_renewal_count": 0,

@@ -23,8 +23,8 @@ workspace, so `cnovatech-datamarket` always uses the `core` checkout next to it.
 
 Run `make format` before committing.
 
-Two targets reach the real API and need a key. Put it in `.env` at the
-workspace root, which git ignores:
+Two targets reach the real API and need a key. Copy `.env.example` to `.env`
+at the workspace root, which git ignores, and put the key there:
 
 ```
 DATAMARKET_API_KEY=dm_...
@@ -32,7 +32,13 @@ DATAMARKET_API_KEY=dm_...
 
 `make live` runs the smoke tests (free endpoints only) and `make capture`
 calls every endpoint once through the SDK and refreshes the test fixtures
-(about 21 quota units).
+(about 21 quota units). Use a key of an ordinary account, not an
+administrative one, so that quota and rate-limit information behaves as it
+does for users. Any script runs the same way:
+
+```bash
+uv run --env-file .env python script.py
+```
 
 ## Layout
 

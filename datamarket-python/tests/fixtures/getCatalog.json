@@ -21,11 +21,11 @@
       ],
       "min_price": 8.98,
       "max_price": 22.99,
-      "avg_price": 11.8,
-      "median_price": 11.69,
+      "avg_price": 11.79,
+      "median_price": 11.54,
       "price_range": 14.01,
       "price_range_pct": 156.01,
-      "availability_pct": 96.3
+      "availability_pct": 96.8
     },
     {
       "ean": "7894900709926",
@@ -47,8 +47,8 @@
       ],
       "min_price": 9.99,
       "max_price": 13.9,
-      "avg_price": 11.69,
-      "median_price": 11.38,
+      "avg_price": 11.47,
+      "median_price": 11.28,
       "price_range": 3.91,
       "price_range_pct": 39.14,
       "availability_pct": 100.0
@@ -60,7 +60,7 @@
       "category": "REFRIGERANTES",
       "department": "BEBIDAS",
       "image_url": "https://www.sondadelivery.com.br/Arquivos/ProdutosSku/85316/7894900027013.jpg",
-      "store_count": 51,
+      "store_count": 52,
       "state_count": 11,
       "states": [
         "AL",
@@ -73,12 +73,12 @@
         "e-commerce"
       ],
       "min_price": 7.29,
-      "max_price": 17.9,
-      "avg_price": 12.05,
+      "max_price": 18.94,
+      "avg_price": 12.01,
       "median_price": 11.99,
-      "price_range": 10.61,
-      "price_range_pct": 145.54,
-      "availability_pct": 92.2
+      "price_range": 11.65,
+      "price_range_pct": 159.81,
+      "availability_pct": 92.3
     },
     {
       "ean": "7894900701517",
@@ -87,7 +87,7 @@
       "category": "REFRIGERANTES",
       "department": "BEBIDAS",
       "image_url": "https://bretas.vteximg.com.br/arquivos/ids/183445/6571bea7558925a4e8897d22.jpg?v=638375499951770000",
-      "store_count": 215,
+      "store_count": 216,
       "state_count": 23,
       "states": [
         "AL",
@@ -100,12 +100,12 @@
         "e-commerce"
       ],
       "min_price": 8.98,
-      "max_price": 17.9,
-      "avg_price": 11.88,
-      "median_price": 11.8,
-      "price_range": 8.92,
-      "price_range_pct": 99.33,
-      "availability_pct": 97.7
+      "max_price": 18.94,
+      "avg_price": 11.84,
+      "median_price": 11.83,
+      "price_range": 9.96,
+      "price_range_pct": 110.91,
+      "availability_pct": 97.2
     },
     {
       "ean": "7894900014211",
@@ -114,7 +114,7 @@
       "category": "REFRIGERANTES",
       "department": "BEBIDAS",
       "image_url": "https://bretas.vteximg.com.br/arquivos/ids/189350/6571c38c558925a4e889941c.jpg?v=638375512480100000",
-      "store_count": 53,
+      "store_count": 54,
       "state_count": 8,
       "states": [
         "MG",
@@ -128,11 +128,11 @@
       ],
       "min_price": 5.98,
       "max_price": 10.99,
-      "avg_price": 8.19,
+      "avg_price": 8.2,
       "median_price": 7.99,
       "price_range": 5.01,
       "price_range_pct": 83.78,
-      "availability_pct": 88.7
+      "availability_pct": 83.3
     }
   ],
   "meta": {
@@ -143,8 +143,8 @@
   },
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 9,
+    "limit": 50,
+    "remaining": 41
   }
 }

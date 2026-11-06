@@ -15,10 +15,10 @@
   },
   "summary": {
     "common_product_count": 2654,
-    "below_count": 374,
-    "aligned_count": 368,
-    "above_count": 1025,
-    "unavailable_count": 887
+    "below_count": 328,
+    "aligned_count": 327,
+    "above_count": 1067,
+    "unavailable_count": 932
   },
   "data": [
     {
@@ -64,31 +64,31 @@
       "price_position": "above"
     },
     {
-      "ean": "7891150022003",
-      "product_name": "SAPONACEO CREMOSO MULTIUSO CIF LIMAO SQUEEZE 250ML",
-      "brand": "CIF",
+      "ean": "7896090100101",
+      "product_name": "LA DE ACO ASSOLAN 8UN 45G - MAXIMO BRILHO/ MINIMO ESFORCO",
+      "brand": "YPE",
       "department": "LIMPEZA",
       "category": "PRODUTOS DE LIMPEZA",
-      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/197262/6571ca5c558925a4e889b33c.jpg?v=638375529916430000",
-      "price": 15.99,
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/396236/LaDeAcoAssolan8Un45GMaximoBr1.jpg?v=638706423088400000",
+      "price": 2.99,
       "available": true,
-      "competitor_price": 7.99,
+      "competitor_price": 1.49,
       "competitor_available": true,
-      "price_diff_pct": 100.13,
+      "price_diff_pct": 100.67,
       "price_position": "above"
     },
     {
-      "ean": "7891150034341",
-      "product_name": "SOPONACEO CREMOSO MULTIUSO LARANJA CIF 250ML",
-      "brand": "CIF",
-      "department": "LIMPEZA",
-      "category": "PRODUTOS DE LIMPEZA",
-      "image_url": "https://www.sondadelivery.com.br/Arquivos/ProdutosSku/1439405/7891150034341-(2).jpg",
-      "price": 15.99,
+      "ean": "7891150027848",
+      "product_name": "KETCHUP HELLMANNS TRADICIONAL 380G",
+      "brand": "HELLMANNS",
+      "department": "MERCEARIA",
+      "category": "MOLHOS E CONDIMENTOS",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/419295/KetchupHellmannsTradicional380g1.jpg?v=638941549403100000",
+      "price": 23.99,
       "available": true,
-      "competitor_price": 7.99,
+      "competitor_price": 11.99,
       "competitor_available": true,
-      "price_diff_pct": 100.13,
+      "price_diff_pct": 100.08,
       "price_position": "above"
     }
   ],
@@ -100,8 +100,8 @@
   },
   "usage": {
     "query_cost": 2,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 23,
+    "limit": 50,
+    "remaining": 27
   }
 }

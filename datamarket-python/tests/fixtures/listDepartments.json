@@ -6,135 +6,135 @@
   "data": [
     {
       "department": "MERCEARIA",
-      "product_count": 63838,
+      "product_count": 66870,
       "categories": [
         {
           "category": "MOLHOS E CONDIMENTOS",
-          "product_count": 13098
+          "product_count": 13798
         },
         {
           "category": "BISCOITOS E COOKIES",
-          "product_count": 7518
+          "product_count": 7774
         },
         {
           "category": "SNACKS E SALGADINHOS",
-          "product_count": 5822
+          "product_count": 6099
         },
         {
           "category": "GRAOS E CEREAIS",
-          "product_count": 5025
+          "product_count": 5220
         },
         {
           "category": "DOCES E SOBREMESAS",
-          "product_count": 4954
+          "product_count": 5179
         }
       ]
     },
     {
       "department": "BAZAR E UTILIDADES",
-      "product_count": 33278,
+      "product_count": 34588,
       "categories": [
         {
           "category": "UTENSILIOS DE COZINHA",
-          "product_count": 7348
+          "product_count": 7614
         },
         {
           "category": "DECORACAO",
-          "product_count": 3632
+          "product_count": 3698
         },
         {
           "category": "LOUCAS E COPOS",
-          "product_count": 3234
+          "product_count": 3421
         },
         {
           "category": "EMBALAGENS E DESCARTAVEIS",
-          "product_count": 2780
+          "product_count": 2867
         },
         {
           "category": "PAPELARIA E ESCRITORIO",
-          "product_count": 2744
+          "product_count": 2826
         }
       ]
     },
     {
       "department": "BEBIDAS",
-      "product_count": 25498,
+      "product_count": 26558,
       "categories": [
         {
           "category": "VINHOS",
-          "product_count": 10151
+          "product_count": 10727
         },
         {
           "category": "DESTILADOS",
-          "product_count": 3122
+          "product_count": 3230
         },
         {
           "category": "SUCOS",
-          "product_count": 2954
+          "product_count": 3042
         },
         {
           "category": "REFRIGERANTES",
-          "product_count": 2819
+          "product_count": 2878
         },
         {
           "category": "CERVEJAS",
-          "product_count": 2255
+          "product_count": 2311
         }
       ]
     },
     {
       "department": "HIGIENE E BELEZA",
-      "product_count": 23992,
+      "product_count": 24577,
       "categories": [
         {
           "category": "CABELOS",
-          "product_count": 8391
+          "product_count": 8646
         },
         {
           "category": "CUIDADOS PESSOAIS",
-          "product_count": 2872
+          "product_count": 2918
         },
         {
           "category": "SABONETES",
-          "product_count": 2261
+          "product_count": 2312
         },
         {
           "category": "HIGIENE BUCAL",
-          "product_count": 2070
+          "product_count": 2125
         },
         {
           "category": "CUIDADOS COM A PELE",
-          "product_count": 2046
+          "product_count": 2080
         }
       ]
     },
     {
       "department": "LIMPEZA",
-      "product_count": 13713,
+      "product_count": 14082,
       "categories": [
         {
           "category": "PRODUTOS DE LIMPEZA",
-          "product_count": 10259
+          "product_count": 10474
         },
         {
           "category": "UTENSILIOS DE LIMPEZA",
-          "product_count": 2889
+          "product_count": 2999
         },
         {
           "category": "INSETICIDAS E REPELENTES",
-          "product_count": 423
+          "product_count": 433
         },
         {
           "category": "DIVERSOS",
-          "product_count": 142
+          "product_count": 176
         }
       ]
     }
   ],
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 7,
+    "limit": 50,
+    "remaining": 43
   }
 }

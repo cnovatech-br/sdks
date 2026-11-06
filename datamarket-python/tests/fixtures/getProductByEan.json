@@ -20,11 +20,11 @@
     ],
     "min_price": 8.98,
     "max_price": 22.99,
-    "avg_price": 11.8,
-    "median_price": 11.69,
+    "avg_price": 11.79,
+    "median_price": 11.54,
     "price_range": 14.01,
     "price_range_pct": 156.01,
-    "availability_pct": 96.3
+    "availability_pct": 96.8
   },
   "offers": [
     {
@@ -49,25 +49,46 @@
       "collected_at": "2026-10-29T06:28:00-03:00"
     },
     {
-      "store_id": "cb815681-0593-49be-9c26-3c2f222e2354",
-      "store_name": "DVille",
-      "city": "Tabajaras",
-      "state": "MG",
+      "store_id": "54d473ec-98cc-40c1-a516-84619396bf49",
+      "store_name": "Mega Mercado",
+      "city": "Costa Rica",
+      "state": "MS",
       "channel": "e-commerce",
       "price": 9.29,
-      "list_price": 10.19,
-      "discount_pct": 8.8,
+      "list_price": 12.79,
+      "discount_pct": 27.4,
       "wholesale_price": null,
       "wholesale_min_qty": null,
       "installment_count": null,
       "installment_value": null,
       "available": true,
       "stock_qty": null,
-      "seller_name": "DVILLE",
+      "seller_name": "MEGA MERCADO",
       "seller_type": "1P",
-      "product_url": "https://www.dville.net.br/produtos/detalhe/19962/refrigerante-cocacola-tradicional-menos-acucar-garrafa-2l",
-      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/e4c325e8-ddf3-422b-836e-0ad7313ec9c7.jpg",
-      "collected_at": "2026-10-20T09:03:00-03:00"
+      "product_url": "https://www.megaemcasa.atacadistamega.com.br/produtos/detalhe/4080/refrigerante-coca-cola-pet-2l-original",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/8415283a-b6e8-4893-b1a4-9944befd66fc.jpg",
+      "collected_at": "2026-11-06T11:10:42-03:00"
+    },
+    {
+      "store_id": "7bba9f8a-fb4a-4089-907e-5820b3ab7d81",
+      "store_name": "Master Supermercados",
+      "city": "Erechim",
+      "state": "RS",
+      "channel": "e-commerce",
+      "price": 9.79,
+      "list_price": 11.9,
+      "discount_pct": 17.7,
+      "wholesale_price": null,
+      "wholesale_min_qty": null,
+      "installment_count": null,
+      "installment_value": null,
+      "available": true,
+      "stock_qty": null,
+      "seller_name": "MASTER SUPERMERCADOS",
+      "seller_type": "1P",
+      "product_url": "https://www.lojaonline.mastersupermercados.com.br/produtos/detalhe/6320/refrigerante-coca-cola-pet-2l-orig",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/8415283a-b6e8-4893-b1a4-9944befd66fc.jpg",
+      "collected_at": "2026-11-04T19:51:03-03:00"
     },
     {
       "store_id": "fc40e8c7-472b-4eaf-a80d-156fea33c958",
@@ -88,28 +109,7 @@
       "seller_type": "1P",
       "product_url": "https://www.comper.com.br/refrigerante-coca-cola-2-litros/p",
       "image_url": "https://comper.vteximg.com.br/arquivos/ids/214508/2301822.jpg?v=637946944672970000",
-      "collected_at": "2026-10-27T07:00:46-03:00"
-    },
-    {
-      "store_id": "1eb6b20d-67db-419d-a87f-4a225f2d8c21",
-      "store_name": "Grepar",
-      "city": "Bento Goncalves",
-      "state": "RS",
-      "channel": "e-commerce",
-      "price": 9.88,
-      "list_price": 11.98,
-      "discount_pct": 17.5,
-      "wholesale_price": null,
-      "wholesale_min_qty": null,
-      "installment_count": null,
-      "installment_value": null,
-      "available": true,
-      "stock_qty": 1977,
-      "seller_name": "GREPAR",
-      "seller_type": "1P",
-      "product_url": "https://www.grepar.com.br/produtos/2866575/coca-cola-pet-2l",
-      "image_url": "https://edge.osuper.com.br/9uy7GynpTPT3DNu21Y1tdO-Ky4U=/fit-in/453x453/filters:fill(FFFFFF):background_color(white)/https://produtos-osuper.s3.sa-east-1.amazonaws.com/4698.jpg",
-      "collected_at": "2026-10-28T11:20:34-03:00"
+      "collected_at": "2026-11-04T01:55:26-03:00"
     },
     {
       "store_id": "51c033f9-6984-4063-92bf-c2520839a07b",
@@ -135,8 +135,8 @@
   ],
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 10,
+    "limit": 50,
+    "remaining": 40
   }
 }

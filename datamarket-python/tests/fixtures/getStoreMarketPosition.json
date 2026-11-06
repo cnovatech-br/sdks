@@ -7,9 +7,9 @@
     "channel": "e-commerce"
   },
   "summary": {
-    "product_count": 5546,
-    "comparable_count": 4283,
-    "unavailable_count": 1043
+    "product_count": 5557,
+    "comparable_count": 4302,
+    "unavailable_count": 1035
   },
   "data": [
     {
@@ -47,13 +47,13 @@
       "price_position": "much_above",
       "price_diff_pct": 12.52,
       "market": {
-        "store_count": 114,
+        "store_count": 115,
         "min_price": 4.79,
         "max_price": 11.99,
-        "avg_price": 8.2,
+        "avg_price": 8.21,
         "median_price": 7.99,
         "mode_price": 7.99,
-        "availability_pct": 88.6
+        "availability_pct": 87.0
       }
     },
     {
@@ -85,19 +85,19 @@
       "department": "HIGIENE E BELEZA",
       "category": "HIGIENE INTIMA",
       "image_url": "https://bretas.vteximg.com.br/arquivos/ids/188511/6571c2d3558925a4e88990ca.jpg?v=638375510662830000",
-      "price": 12.99,
+      "price": 13.99,
       "list_price": null,
       "available": true,
-      "price_position": "above",
-      "price_diff_pct": 8.34,
+      "price_position": "much_above",
+      "price_diff_pct": 16.68,
       "market": {
         "store_count": 112,
-        "min_price": 6.99,
+        "min_price": 5.99,
         "max_price": 17.99,
-        "avg_price": 12.38,
+        "avg_price": 12.36,
         "median_price": 11.99,
         "mode_price": 11.99,
-        "availability_pct": 80.4
+        "availability_pct": 81.3
       }
     },
     {
@@ -107,32 +107,32 @@
       "department": "HIGIENE E BELEZA",
       "category": "HIGIENE INTIMA",
       "image_url": "https://bretas.vteximg.com.br/arquivos/ids/217548/6633d6dd254681ffec67086a.jpg?v=638502701827700000",
-      "price": 16.69,
+      "price": 15.99,
       "list_price": null,
       "available": true,
       "price_position": "aligned",
-      "price_diff_pct": 4.84,
+      "price_diff_pct": 0.03,
       "market": {
-        "store_count": 56,
-        "min_price": 9.99,
+        "store_count": 57,
+        "min_price": 10.99,
         "max_price": 20.59,
-        "avg_price": 15.75,
-        "median_price": 15.92,
+        "avg_price": 15.98,
+        "median_price": 15.99,
         "mode_price": 15.99,
-        "availability_pct": 89.3
+        "availability_pct": 87.7
       }
     }
   ],
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 5546,
-    "pages": 1110
+    "total": 5557,
+    "pages": 1112
   },
   "usage": {
     "query_cost": 2,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 25,
+    "limit": 50,
+    "remaining": 25
   }
 }

@@ -1,11 +1,11 @@
 {
   "brand": "COCA-COLA",
   "summary": {
-    "store_count": 256,
+    "store_count": 257,
     "state_count": 23,
-    "offer_count": 5000,
-    "avg_price": 8.51,
-    "avg_availability_pct": 84.31
+    "offer_count": 5066,
+    "avg_price": 8.55,
+    "avg_availability_pct": 83.76
   },
   "data": [
     {
@@ -17,32 +17,14 @@
       "product_count": 36,
       "category_count": 1,
       "department_count": 1,
-      "avg_price": 12.01,
+      "avg_price": 12.02,
       "min_price": 2.09,
       "max_price": 74.94,
-      "price_cv_pct": 110.58,
+      "price_cv_pct": 110.25,
       "availability_pct": 97.22,
       "available_count": 35,
       "unavailable_count": 1,
-      "last_collected_date": "2026-10-26"
-    },
-    {
-      "store_id": "000fb4e0-6dff-4753-b72e-5076b4fe557d",
-      "store_name": "Super Central Online",
-      "city": "Botucatu",
-      "state": "SP",
-      "channel": "e-commerce",
-      "product_count": 33,
-      "category_count": 1,
-      "department_count": 1,
-      "avg_price": 9.97,
-      "min_price": 2.19,
-      "max_price": 64.9,
-      "price_cv_pct": 121.4,
-      "availability_pct": 72.73,
-      "available_count": 24,
-      "unavailable_count": 9,
-      "last_collected_date": "2026-10-28"
+      "last_collected_date": "2026-11-03"
     },
     {
       "store_id": "af15468f-273f-44b8-973b-7c77bd8ace27",
@@ -53,14 +35,32 @@
       "product_count": 33,
       "category_count": 2,
       "department_count": 2,
-      "avg_price": 8.94,
+      "avg_price": 9.03,
       "min_price": 1.98,
       "max_price": 27.69,
-      "price_cv_pct": 77.43,
+      "price_cv_pct": 76.59,
+      "availability_pct": 75.76,
+      "available_count": 25,
+      "unavailable_count": 8,
+      "last_collected_date": "2026-11-04"
+    },
+    {
+      "store_id": "000fb4e0-6dff-4753-b72e-5076b4fe557d",
+      "store_name": "Super Central Online",
+      "city": "Botucatu",
+      "state": "SP",
+      "channel": "e-commerce",
+      "product_count": 33,
+      "category_count": 1,
+      "department_count": 1,
+      "avg_price": 10.12,
+      "min_price": 1.99,
+      "max_price": 64.9,
+      "price_cv_pct": 119.3,
       "availability_pct": 72.73,
       "available_count": 24,
       "unavailable_count": 9,
-      "last_collected_date": "2026-10-27"
+      "last_collected_date": "2026-11-05"
     },
     {
       "store_id": "769cef51-567e-4492-b961-d2ea7278f2a1",
@@ -78,7 +78,7 @@
       "availability_pct": 87.5,
       "available_count": 28,
       "unavailable_count": 4,
-      "last_collected_date": "2026-10-16"
+      "last_collected_date": "2026-11-02"
     },
     {
       "store_id": "1bc8f621-b77f-44c5-81d3-f0b33c609196",
@@ -101,8 +101,8 @@
   ],
   "usage": {
     "query_cost": 1,
-    "used": null,
-    "limit": null,
-    "remaining": null
+    "used": 14,
+    "limit": 50,
+    "remaining": 36
   }
 }
