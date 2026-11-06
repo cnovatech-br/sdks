@@ -5,7 +5,9 @@ PRODUCT_TERMS := ean|eans|market|pharma|datamarket|assortment|competitor|retaile
 # Credentials for the targets that reach the real API live in .env (ignored by git).
 ENV_FILE := $(if $(wildcard .env),--env-file $(abspath .env),)
 
-.PHONY: help install lint format boundary typecheck test cov check live capture build clean
+PYTHON_VERSIONS := 3.10 3.11 3.12 3.13
+
+.PHONY: help install lint format boundary typecheck test cov check matrix live capture build clean
 
 help:  ## List the targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -42,6 +44,15 @@ cov:  ## Test suite with coverage; fails below each package's threshold
 	done
 
 check: lint boundary typecheck cov  ## Everything CI runs
+
+matrix:  ## Offline test suite on every supported Python, each in its own environment
+	@for version in $(PYTHON_VERSIONS); do \
+		echo "== Python $$version"; \
+		env -u VIRTUAL_ENV UV_PROJECT_ENVIRONMENT=$(CURDIR)/.venv-$$version uv sync --all-packages --python $$version -q || exit 1; \
+		for package in $(PACKAGES); do \
+			(cd $$package && env -u VIRTUAL_ENV UV_PROJECT_ENVIRONMENT=$(CURDIR)/.venv-$$version uv run --python $$version pytest -q) || exit 1; \
+		done; \
+	done
 
 live:  ## Smoke test against the real API; free endpoints only
 	cd datamarket-python && uv run $(ENV_FILE) pytest tests/test_live.py --live

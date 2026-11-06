@@ -25,7 +25,10 @@ def test_profile_is_free_and_typed(api: FakeAPI) -> None:
     assert profile.subscription.plan.limits == expected["subscription"]["plan"]["limits"]
     assert profile.trial.is_trial == expected["trial"]["is_trial"]
     assert profile.usage.remaining == expected["usage"]["remaining"]
-    assert profile.created_at == datetime.datetime.fromisoformat(expected["created_at"])
+    # Python 3.10's fromisoformat does not accept the "Z" suffix the API sends.
+    assert profile.created_at == datetime.datetime.fromisoformat(
+        expected["created_at"].replace("Z", "+00:00")
+    )
     assert client.usage.spent == 0
     assert client.usage.calls == 0
 
