@@ -30,4 +30,5 @@ make live        # smoke test against the real API; free endpoints only
 ```
 
 Contribution guidelines, layout and the release process are in
-[CONTRIBUTING.md](CONTRIBUTING.md).
+[CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see
+[SECURITY.md](SECURITY.md).

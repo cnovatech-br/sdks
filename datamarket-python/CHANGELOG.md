@@ -34,3 +34,4 @@ project uses [Semantic Versioning](https://semver.org/).
 - `cnovatech.datamarket.models`, one module per resource, and
   `cnovatech.datamarket.types` with the input enumerations.
 - `__version__`, read from the installed package metadata.
+- Guides under `docs/`: quota and costs, pagination, errors and recipes.

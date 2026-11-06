@@ -151,13 +151,21 @@ frame = assortment.to_dataframe()  # one row per item; usage and meta as columns
 | `max_units_per_request` | | no limit |
 | `http_client` | | your own `httpx.Client`, for proxies, certificates or a shared pool |
 
+## Guides
+
+- [Quota and costs](docs/quota-and-costs.md): the tariff, what each response reports, estimates and caps.
+- [Pagination](docs/pagination.md): pages, walks, `max_pages` and `max_units`.
+- [Errors](docs/errors.md): the hierarchy, what is retried, how to handle each case.
+- [Recipes](docs/recipes.md): coverage of a list, competitors, exports to pandas, when to use `get` and when to export.
+
 ## Logging
 
 The SDK logs through the standard `logging` module under the `cnovatech`
 namespace and installs no handler of its own. At DEBUG it records each request's
 method, path, status and duration; retries are logged at INFO, and a WARNING is
 emitted when the remaining quota drops below 10%. Keys, headers and bodies are
-never logged.
+never logged. The `httpx` logger, if the application enables it at INFO, prints
+the full URL with its query string; the key is sent as a header and is not in it.
 
 ```python
 import logging
