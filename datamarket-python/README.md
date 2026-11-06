@@ -11,7 +11,8 @@ across 240+ online supermarkets in 23 Brazilian states.
 
 > **Status: pre-release.** Every read endpoint of the API is implemented,
 > validated against production and tested offline against recorded responses.
-> The first release to PyPI is next. See [CHANGELOG.md](CHANGELOG.md).
+> The first release to PyPI is next. See the
+> [changelog](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/CHANGELOG.md).
 
 ## Installation
 
@@ -153,10 +154,10 @@ frame = assortment.to_dataframe()  # one row per item; usage and meta as columns
 
 ## Guides
 
-- [Quota and costs](docs/quota-and-costs.md): the tariff, what each response reports, estimates and caps.
-- [Pagination](docs/pagination.md): pages, walks, `max_pages` and `max_units`.
-- [Errors](docs/errors.md): the hierarchy, what is retried, how to handle each case.
-- [Recipes](docs/recipes.md): coverage of a list, competitors, exports to pandas, when to use `get` and when to export.
+- [Quota and costs](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/docs/quota-and-costs.md): the tariff, what each response reports, estimates and caps.
+- [Pagination](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/docs/pagination.md): pages, walks, `max_pages` and `max_units`.
+- [Errors](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/docs/errors.md): the hierarchy, what is retried, how to handle each case.
+- [Recipes](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/docs/recipes.md): coverage of a list, competitors, exports to pandas, when to use `get` and when to export.
 
 ## Logging
 
@@ -192,7 +193,7 @@ Each method's docstring states its cost. The API reference is at
 
 ## Support
 
-- Issues and feature requests: <https://github.com/cnovatech/sdks/issues>
+- Issues and feature requests: <https://github.com/cnovatech-br/sdks/issues>
 - Email: <suporte@cnovatech.com.br>
 
 ## License

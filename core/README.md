@@ -4,9 +4,10 @@ Shared foundation of the Cnovatech Python SDKs: configuration, HTTP transport
 (sync and async), error hierarchy, pagination and quota accounting.
 
 This package is not meant to be installed on its own. Product SDKs such as
-[`cnovatech-datamarket`](../datamarket-python/) depend on it and re-export
-everything their users need. If you are integrating with a Cnovatech API,
-install the product SDK.
+[`cnovatech-datamarket`](https://pypi.org/project/cnovatech-datamarket/)
+depend on it and re-export everything their users need. If you are
+integrating with a Cnovatech API, install the product SDK. Source and issues:
+<https://github.com/cnovatech-br/sdks>.
 
 ## Boundary
 

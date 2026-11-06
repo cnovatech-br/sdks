@@ -32,8 +32,8 @@ pandas = ["pandas>=2.0"]
 
 [project.urls]
 Homepage = "https://cnovatech.com.br"
-Repository = "https://github.com/cnovatech/sdks"
-Changelog = "https://github.com/cnovatech/sdks/blob/main/core/CHANGELOG.md"
+Repository = "https://github.com/cnovatech-br/sdks"
+Changelog = "https://github.com/cnovatech-br/sdks/blob/main/core/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.25,<2"]

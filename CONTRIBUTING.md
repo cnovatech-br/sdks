@@ -128,7 +128,7 @@ version in a comment.
 
 Publishing uses [trusted publishing](https://docs.pypi.org/trusted-publishers/):
 no token is stored in the repository. Each package needs a pending publisher
-registered on TestPyPI (and later PyPI) with owner `cnovatech`, repository
+registered on TestPyPI (and later PyPI) with owner `cnovatech-br`, repository
 `sdks`, workflow `release.yml` and environment `testpypi`.
 
 Installing a pre-release from TestPyPI, which does not mirror every dependency:

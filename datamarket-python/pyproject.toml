@@ -39,8 +39,8 @@ pandas = ["cnovatech-sdk-core[pandas]"]
 [project.urls]
 Homepage = "https://datamarket.cnovatech.com.br"
 Documentation = "https://datamarket.cnovatech.com.br/redoc"
-Repository = "https://github.com/cnovatech/sdks"
-Changelog = "https://github.com/cnovatech/sdks/blob/main/datamarket-python/CHANGELOG.md"
+Repository = "https://github.com/cnovatech-br/sdks"
+Changelog = "https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/CHANGELOG.md"
 
 [tool.uv.sources]
 cnovatech-sdk-core = { workspace = true }
