@@ -17,7 +17,7 @@ its subclasses for a specific situation::
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from cnovatech.sdk_core.errors import (
     APIConnectionError,
@@ -85,7 +85,10 @@ class EANNotFoundError(NotFoundError):
 
 
 class StoreNotFoundError(NotFoundError):
-    """404 on a ``/stores/{store_id}`` route, or ``stores.find()`` without a match."""
+    """404 on a ``/stores/{store_id}`` route, or ``stores.find()`` without a match.
+
+    On ``stores.compare()`` the unknown identifier may be the ``competitor_id``.
+    """
 
 
 class FilterRequiredError(BadRequestError):
@@ -109,3 +112,6 @@ class AmbiguousStoreError(DataMarketError):
         )
         self.name = name
         self.candidates = list(candidates)
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        return type(self), (self.name, self.candidates), self.__dict__

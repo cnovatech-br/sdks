@@ -52,6 +52,15 @@ def test_gateway_errors_are_repeated(status_code: int) -> None:
     assert decision.delay_seconds == 0.5
 
 
+def test_gateway_errors_wait_for_retry_after_when_given() -> None:
+    response = httpx.Response(503, headers={"Retry-After": "2"})
+
+    decision = predictable_policy(2).after_response(response, attempt=1)
+
+    assert decision is not None
+    assert decision.delay_seconds == 2.0
+
+
 @pytest.mark.parametrize("status_code", [400, 401, 404, 422, 500, 504])
 def test_other_statuses_are_not_repeated(status_code: int) -> None:
     # 504 included: the gateway gave up, but the application may still be billing the request.
@@ -272,3 +281,27 @@ async def test_async_transport_gives_up_after_max_retries(
             await transport.execute(thing_operation())
 
     assert len(sent_requests) == 3
+
+
+async def test_async_transport_honours_retry_after_on_the_per_minute_limit(
+    make_async_transport: Callable[..., AsyncTransport],
+    sleeps: list[float],
+) -> None:
+    async with make_async_transport(sequence(rate_limited("3"), ok())) as transport:
+        thing = await transport.execute(thing_operation())
+
+    assert thing.request_info is not None
+    assert thing.request_info.attempts == 2
+    assert sleeps == [3.0]
+
+
+async def test_async_transport_does_not_repeat_quota_errors(
+    make_async_transport: Callable[..., AsyncTransport],
+    sent_requests: list[httpx.Request],
+) -> None:
+    handler = json_response(429, {"error": "monthly_limit_exceeded"})
+    async with make_async_transport(handler) as transport:
+        with pytest.raises(QuotaExceededError):
+            await transport.execute(thing_operation())
+
+    assert len(sent_requests) == 1

@@ -52,6 +52,19 @@ def test_tracker_starts_empty() -> None:
     assert repr(UsageTracker()) == "UsageTracker(spent=0, calls=0, remaining=None)"
 
 
+def test_observe_keeps_the_balance_without_counting_a_call() -> None:
+    tracker = UsageTracker()
+    tracker.record(usage(1, remaining=999))
+
+    tracker.observe(usage(8, remaining=5))
+    tracker.observe(None)
+
+    assert tracker.last is not None
+    assert tracker.last.remaining == 5
+    assert tracker.spent == 1
+    assert tracker.calls == 1
+
+
 def test_low_quota_is_warned_once_per_crossing(caplog: pytest.LogCaptureFixture) -> None:
     tracker = UsageTracker()
 

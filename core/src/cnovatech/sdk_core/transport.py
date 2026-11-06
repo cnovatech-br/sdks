@@ -11,7 +11,7 @@ import asyncio
 import logging
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import httpx
@@ -21,6 +21,7 @@ from .config import API_KEY_ENV_SUFFIX, ClientConfig
 from .errors import (
     CORRELATION_ID_HEADER,
     APIConnectionError,
+    APIStatusError,
     APITimeoutError,
     BudgetExceededError,
     ConfigurationError,
@@ -45,6 +46,7 @@ ResultT = TypeVar("ResultT")
 
 JSON_MEDIA_TYPE = "application/json"
 CONTENT_TYPE_HEADER = "Content-Type"
+LOCATION_HEADER = "Location"
 
 # Failures that happen before the request reaches the API. Repeating them
 # cannot bill twice. Anything else, such as a connection dropped while the
@@ -61,13 +63,17 @@ _SAFE_TO_REPEAT_TRANSPORT_ERRORS = (
 
 @dataclass(frozen=True, slots=True)
 class PreparedRequest:
-    """Everything the HTTP layer needs to send one operation."""
+    """Everything the HTTP layer needs to send one operation.
+
+    ``headers`` carries the API key, so it is left out of ``repr`` and does
+    not show up in debuggers or test reports that print local variables.
+    """
 
     method: str
     url: str
     path: str
     params: dict[str, Any]
-    headers: dict[str, str]
+    headers: dict[str, str] = field(repr=False)
     json_body: Any
     correlation_id: str
 
@@ -139,6 +145,15 @@ def interpret_response(
             status_overrides=operation.status_overrides,
             fallback_correlation_id=prepared.correlation_id,
         )
+    if httpx.codes.is_redirect(response.status_code):
+        location = response.headers.get(LOCATION_HEADER, "an unknown location")
+        raise UnexpectedResponseError(
+            f"{prepared.method} {prepared.path} was redirected to {location} "
+            f"(HTTP {response.status_code}). The SDK does not follow redirects; check base_url.",
+            status_code=response.status_code,
+            content_type=response.headers.get(CONTENT_TYPE_HEADER),
+            correlation_id=correlation_id,
+        )
     payload = _decode_json(response, correlation_id=correlation_id)
     try:
         result = operation.parse(payload)
@@ -165,25 +180,51 @@ def interpret_response(
 
 
 def translate_transport_error(
-    config: ClientConfig, prepared: PreparedRequest, exc: httpx.TransportError
+    config: ClientConfig, prepared: PreparedRequest, exc: httpx.RequestError
 ) -> APIConnectionError:
-    """Map an httpx transport failure to the SDK's exception, deciding whether it may be repeated."""
+    """Map an httpx request failure to the SDK's exception, deciding whether it may be repeated.
+
+    Transport failures are classified by when they happen: before the request
+    is sent (safe to repeat), while waiting for the answer (a timeout) or while
+    the response is in flight. Failures that are not transport failures, such
+    as a response body that cannot be decoded, mean a response did arrive and
+    the request may have been billed.
+    """
+    correlation_id = prepared.correlation_id
+    cause = type(exc).__name__
     if isinstance(exc, httpx.ReadTimeout):
         return APITimeoutError(
             f"The API did not answer {prepared.method} {prepared.path} within "
             f"{config.read_timeout_seconds:g} seconds. The request may still have been processed "
-            "and billed, so the SDK does not retry it; check your usage before sending it again."
+            "and billed, so the SDK does not retry it; check your usage before sending it again.",
+            correlation_id=correlation_id,
+        )
+    if isinstance(exc, httpx.LocalProtocolError):
+        return APIConnectionError(
+            f"{prepared.method} {prepared.path} could not be sent: the request is not a valid "
+            f"HTTP message ({cause}). Nothing was sent; check the configured values.",
+            retryable=False,
+            correlation_id=correlation_id,
         )
     if isinstance(exc, _SAFE_TO_REPEAT_TRANSPORT_ERRORS):
         return APIConnectionError(
-            f"Could not reach {config.hostname} ({type(exc).__name__}). The request was not sent.",
+            f"Could not reach {config.hostname} ({cause}). The request was not sent.",
             retryable=True,
+            correlation_id=correlation_id,
+        )
+    if isinstance(exc, httpx.TransportError):
+        return APIConnectionError(
+            f"The connection to {config.hostname} failed while {prepared.method} {prepared.path} "
+            f"was in flight ({cause}). The request may have been processed and billed, "
+            "so the SDK does not retry it.",
+            retryable=False,
+            correlation_id=correlation_id,
         )
     return APIConnectionError(
-        f"The connection to {config.hostname} failed while {prepared.method} {prepared.path} "
-        f"was in flight ({type(exc).__name__}). The request may have been processed and billed, "
-        "so the SDK does not retry it.",
+        f"The response to {prepared.method} {prepared.path} could not be read ({cause}). "
+        "The request may have been processed and billed, so the SDK does not retry it.",
         retryable=False,
+        correlation_id=correlation_id,
     )
 
 
@@ -255,7 +296,9 @@ class SyncTransport:
     Args:
         config: Validated client settings.
         http_client: A client supplied by the user, for proxies, certificates or
-            a shared pool. It is not closed by the transport.
+            a shared pool. It is not closed by the transport. The configured
+            timeout applies to every request, and redirects are never followed,
+            whatever the client's own settings.
         transport: An httpx transport for the client the transport creates
             itself. Mutually exclusive with ``http_client``.
         retry_policy: Replaces the policy built from ``config.max_retries``.
@@ -309,18 +352,35 @@ class SyncTransport:
                 if decision is None:
                     elapsed = time.perf_counter() - started
                     _log_exchange(prepared, response, elapsed, attempt)
-                    result = interpret_response(
-                        self._config,
-                        operation,
-                        response,
-                        prepared=prepared,
-                        attempts=attempt,
-                        elapsed_seconds=elapsed,
+                    return self._interpret(
+                        operation, response, prepared=prepared, attempts=attempt, elapsed=elapsed
                     )
-                    record_usage(self.usage, result)
-                    return result
             _log_retry(prepared, decision, attempt, self._policy.max_attempts)
             self._sleep(decision.delay_seconds)
+
+    def _interpret(
+        self,
+        operation: Operation[ResultT],
+        response: httpx.Response,
+        *,
+        prepared: PreparedRequest,
+        attempts: int,
+        elapsed: float,
+    ) -> ResultT:
+        try:
+            result = interpret_response(
+                self._config,
+                operation,
+                response,
+                prepared=prepared,
+                attempts=attempts,
+                elapsed_seconds=elapsed,
+            )
+        except APIStatusError as exc:
+            self.usage.observe(exc.usage)
+            raise
+        record_usage(self.usage, result)
+        return result
 
     def _send(self, prepared: PreparedRequest) -> httpx.Response:
         try:
@@ -331,8 +391,9 @@ class SyncTransport:
                 headers=prepared.headers,
                 json=prepared.json_body,
                 timeout=self._config.timeout,
+                follow_redirects=False,
             )
-        except httpx.TransportError as exc:
+        except httpx.RequestError as exc:
             raise translate_transport_error(self._config, prepared, exc) from exc
 
     def close(self) -> None:
@@ -408,18 +469,35 @@ class AsyncTransport:
                 if decision is None:
                     elapsed = time.perf_counter() - started
                     _log_exchange(prepared, response, elapsed, attempt)
-                    result = interpret_response(
-                        self._config,
-                        operation,
-                        response,
-                        prepared=prepared,
-                        attempts=attempt,
-                        elapsed_seconds=elapsed,
+                    return self._interpret(
+                        operation, response, prepared=prepared, attempts=attempt, elapsed=elapsed
                     )
-                    record_usage(self.usage, result)
-                    return result
             _log_retry(prepared, decision, attempt, self._policy.max_attempts)
             await self._sleep(decision.delay_seconds)
+
+    def _interpret(
+        self,
+        operation: Operation[ResultT],
+        response: httpx.Response,
+        *,
+        prepared: PreparedRequest,
+        attempts: int,
+        elapsed: float,
+    ) -> ResultT:
+        try:
+            result = interpret_response(
+                self._config,
+                operation,
+                response,
+                prepared=prepared,
+                attempts=attempts,
+                elapsed_seconds=elapsed,
+            )
+        except APIStatusError as exc:
+            self.usage.observe(exc.usage)
+            raise
+        record_usage(self.usage, result)
+        return result
 
     async def _send(self, prepared: PreparedRequest) -> httpx.Response:
         try:
@@ -430,8 +508,9 @@ class AsyncTransport:
                 headers=prepared.headers,
                 json=prepared.json_body,
                 timeout=self._config.timeout,
+                follow_redirects=False,
             )
-        except httpx.TransportError as exc:
+        except httpx.RequestError as exc:
             raise translate_transport_error(self._config, prepared, exc) from exc
 
     async def aclose(self) -> None:

@@ -145,7 +145,7 @@ def build_client_config(
     )
     return ClientConfig(
         product=product,
-        api_key=SecretStr(api_key_value) if api_key_value is not None else None,
+        api_key=_validate_api_key(api_key_value) if api_key_value is not None else None,
         base_url=validate_base_url(base_url_value),
         timeout=build_timeout(timeout),
         max_retries=_validate_max_retries(max_retries),
@@ -186,17 +186,13 @@ def build_timeout(timeout: float | httpx.Timeout) -> httpx.Timeout:
     if isinstance(timeout, httpx.Timeout):
         resolved = timeout
     else:
-        if isinstance(timeout, bool):
-            raise ConfigurationError("timeout must be a number of seconds or an httpx.Timeout.")
-        try:
-            read_seconds = float(timeout)
-        except (TypeError, ValueError) as exc:
+        if not _is_number(timeout):
             raise ConfigurationError(
                 f"timeout must be a number of seconds or an httpx.Timeout, got {timeout!r}."
-            ) from exc
+            )
         resolved = httpx.Timeout(
             connect=DEFAULT_CONNECT_TIMEOUT_SECONDS,
-            read=read_seconds,
+            read=float(timeout),
             write=DEFAULT_WRITE_TIMEOUT_SECONDS,
             pool=DEFAULT_POOL_TIMEOUT_SECONDS,
         )
@@ -222,8 +218,19 @@ def _first_present(*candidates: str | None) -> str | None:
     return None
 
 
+def _validate_api_key(api_key: str) -> SecretStr:
+    """Refuse a key that cannot travel in an HTTP header. The key itself is never in the message."""
+    if not (api_key.isascii() and api_key.isprintable()) or " " in api_key:
+        raise ConfigurationError(
+            "The API key contains characters that cannot be sent in an HTTP header: only "
+            "printable ASCII without spaces is accepted. Check for invisible characters or "
+            "line breaks copied along with the key."
+        )
+    return SecretStr(api_key)
+
+
 def _validate_max_retries(max_retries: int) -> int:
-    if isinstance(max_retries, bool) or max_retries < 0:
+    if not _is_integer(max_retries) or max_retries < 0:
         raise ConfigurationError(
             f"max_retries must be an integer of at least 0, got {max_retries!r}."
         )
@@ -233,8 +240,18 @@ def _validate_max_retries(max_retries: int) -> int:
 def _validate_max_units_per_request(max_units: int | None) -> int | None:
     if max_units is None:
         return None
-    if isinstance(max_units, bool) or max_units < 1:
+    if not _is_integer(max_units) or max_units < 1:
         raise ConfigurationError(
             f"max_units_per_request must be an integer of at least 1 or None, got {max_units!r}."
         )
     return max_units
+
+
+def _is_integer(value: object) -> bool:
+    """An ``int`` that is not a ``bool``; ``True`` would otherwise pass as 1."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_number(value: object) -> bool:
+    """An ``int`` or ``float`` that is not a ``bool``; numeric strings do not count."""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)

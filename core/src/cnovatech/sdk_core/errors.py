@@ -54,6 +54,17 @@ class InvalidRequestError(CnovatechError, ValueError):
     """An argument failed the SDK's local validation. Nothing was sent."""
 
 
+def _rebuild(cls: type[CnovatechError], kwargs: dict[str, Any]) -> CnovatechError:
+    """Rebuild an exception from its constructor arguments.
+
+    Exceptions whose constructors take keyword-only arguments cannot be
+    rebuilt by the default ``__reduce__``, which passes ``args`` positionally.
+    They name this function instead, so they survive pickling across process
+    pools and in error reporters.
+    """
+    return cls(**kwargs)
+
+
 class BudgetExceededError(CnovatechError):
     """A call or an iteration would cost more quota than the configured ceiling.
 
@@ -81,6 +92,16 @@ class BudgetExceededError(CnovatechError):
         self.spent = spent
         self.items_yielded = items_yielded
 
+    def __reduce__(self) -> tuple[Any, ...]:
+        kwargs = {
+            "message": self.args[0],
+            "estimated_cost": self.estimated_cost,
+            "limit": self.limit,
+            "spent": self.spent,
+            "items_yielded": self.items_yielded,
+        }
+        return _rebuild, (type(self), kwargs), self.__dict__
+
 
 class APIConnectionError(CnovatechError):
     """No usable response was received: DNS, TCP, TLS or a similar transport failure.
@@ -89,11 +110,29 @@ class APIConnectionError(CnovatechError):
         retryable: Whether the request can be repeated without risk of a second
             charge, which is the case only when it never reached the API. The
             SDK retries on its own only when this is true.
+        correlation_id: Identifier the SDK sent with the request. Quote it in
+            support requests, for example to ask whether a timed-out call was
+            billed.
     """
 
-    def __init__(self, message: str, *, retryable: bool) -> None:
+    def __init__(self, message: str, *, retryable: bool, correlation_id: str | None = None) -> None:
         super().__init__(message)
         self.retryable = retryable
+        self.correlation_id = correlation_id
+
+    def __str__(self) -> str:
+        message = super().__str__()
+        if self.correlation_id:
+            return f"{message} [correlation_id={self.correlation_id}]"
+        return message
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        kwargs = {
+            "message": self.args[0],
+            "retryable": self.retryable,
+            "correlation_id": self.correlation_id,
+        }
+        return _rebuild, (type(self), kwargs), self.__dict__
 
 
 class APITimeoutError(APIConnectionError):
@@ -103,8 +142,12 @@ class APITimeoutError(APIConnectionError):
     the request, and a repeat could be charged again.
     """
 
-    def __init__(self, message: str) -> None:
-        super().__init__(message, retryable=False)
+    def __init__(self, message: str, *, correlation_id: str | None = None) -> None:
+        super().__init__(message, retryable=False, correlation_id=correlation_id)
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        kwargs = {"message": self.args[0], "correlation_id": self.correlation_id}
+        return _rebuild, (type(self), kwargs), self.__dict__
 
 
 class UnexpectedResponseError(CnovatechError):
@@ -128,6 +171,15 @@ class UnexpectedResponseError(CnovatechError):
         self.status_code = status_code
         self.content_type = content_type
         self.correlation_id = correlation_id
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        kwargs = {
+            "message": self.args[0],
+            "status_code": self.status_code,
+            "content_type": self.content_type,
+            "correlation_id": self.correlation_id,
+        }
+        return _rebuild, (type(self), kwargs), self.__dict__
 
 
 @dataclass(frozen=True, slots=True)
@@ -183,6 +235,19 @@ class APIStatusError(CnovatechError):
         if self.correlation_id:
             text = f"{text} [correlation_id={self.correlation_id}]"
         return text
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        kwargs = {
+            "status_code": self.status_code,
+            "code": self.code,
+            "message": self.message,
+            "body": dict(self.body),
+            "correlation_id": self.correlation_id,
+            "hint": self.hint,
+            "usage": self.usage,
+            "retry_after": self.retry_after,
+        }
+        return _rebuild, (type(self), kwargs), self.__dict__
 
     def _body_text(self, key: str) -> str | None:
         value = self.body.get(key)

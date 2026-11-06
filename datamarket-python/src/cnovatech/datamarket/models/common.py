@@ -38,13 +38,17 @@ class StoreRef(Record):
 
 
 class Health(APIResponse):
-    """Result of ``GET /health``: the API, its database and its cache."""
+    """Result of ``GET /health``: the API, its database and its cache.
+
+    Only ``status`` is required: the endpoint has no published schema, and a
+    monitoring probe must not fail because a detail was added or removed.
+    """
 
     status: str
-    database: str
-    cache: str
-    timestamp: str
-    version: str
+    database: str | None = None
+    cache: str | None = None
+    timestamp: str | None = None
+    version: str | None = None
 
     @property
     def healthy(self) -> bool:

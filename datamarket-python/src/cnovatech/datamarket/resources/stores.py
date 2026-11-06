@@ -5,7 +5,11 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 
-from cnovatech.datamarket.errors import AmbiguousStoreError, StoreNotFoundError
+from cnovatech.datamarket.errors import (
+    AmbiguousStoreError,
+    InvalidRequestError,
+    StoreNotFoundError,
+)
 from cnovatech.datamarket.models.stores import (
     AssortmentPage,
     AsyncAssortmentPage,
@@ -20,6 +24,7 @@ from cnovatech.datamarket.models.stores import (
 )
 from cnovatech.datamarket.resources import _operations as operations
 from cnovatech.sdk_core.resource import AsyncResource, SyncResource
+from cnovatech.sdk_core.validation import stripped
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -41,6 +46,14 @@ if TYPE_CHECKING:
 FIND_PAGE_SIZE = 100
 # Pages a lookup by name may read before giving up on an exact match.
 FIND_MAX_PAGES = 5
+
+
+def searched_name(name: str) -> str:
+    """The name to search for, stripped. A blank name would match every store and is refused."""
+    wanted = stripped(name)
+    if not wanted:
+        raise InvalidRequestError("name must be a non-empty string.")
+    return wanted
 
 
 def exact_matches(name: str, stores: Sequence[Store]) -> list[Store]:
@@ -114,15 +127,17 @@ class Stores(SyncResource):
         reads up to five pages of 100 results until it finds an exact match.
         Raises :class:`StoreNotFoundError` when nothing matches and
         :class:`AmbiguousStoreError`, with the candidates, when several stores
-        match and none exactly. ``state`` and ``city`` narrow the search.
+        match and none exactly. ``state`` and ``city`` narrow the search. A
+        blank name raises :class:`InvalidRequestError` before anything is sent.
         """
-        first = self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
+        wanted = searched_name(name)
+        first = self.list(search=wanted, state=state, city=city, limit=FIND_PAGE_SIZE)
         candidates: list[Store] = []
         for page in first.iter_pages(max_pages=FIND_MAX_PAGES - 1):
             candidates.extend(page.data)
-            if exact_matches(name, page.data):
+            if exact_matches(wanted, page.data):
                 break
-        return select_store(name, candidates)
+        return select_store(wanted, candidates)
 
     def assortment(self, store_id: str, *, page: int = 1, limit: int = 100) -> AssortmentPage:
         """The products a store sells, with price and conditions at the last collection.
@@ -202,7 +217,8 @@ class Stores(SyncResource):
         """Product by product against one competitor.
 
         Cost: 2 units per started block of 250 rows, per page (``limit`` up to
-        100 costs 2).
+        100 costs 2). An unknown ``store_id`` or ``competitor_id`` raises
+        :class:`StoreNotFoundError`.
 
         Args:
             store_id: Identifier of the store.
@@ -334,13 +350,14 @@ class AsyncStores(AsyncResource):
 
     async def find(self, name: str, *, state: str | None = None, city: str | None = None) -> Store:
         """One store by name. See :meth:`Stores.find`."""
-        first = await self.list(search=name, state=state, city=city, limit=FIND_PAGE_SIZE)
+        wanted = searched_name(name)
+        first = await self.list(search=wanted, state=state, city=city, limit=FIND_PAGE_SIZE)
         candidates: list[Store] = []
         async for page in first.iter_pages(max_pages=FIND_MAX_PAGES - 1):
             candidates.extend(page.data)
-            if exact_matches(name, page.data):
+            if exact_matches(wanted, page.data):
                 break
-        return select_store(name, candidates)
+        return select_store(wanted, candidates)
 
     async def assortment(
         self, store_id: str, *, page: int = 1, limit: int = 100

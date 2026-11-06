@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle
 from typing import Any
 
 import pytest
@@ -181,6 +182,22 @@ def test_detached_page_cannot_paginate() -> None:
 
     with pytest.raises(RuntimeError, match="not produced by a client"):
         page.next_page()
+
+
+def test_pages_survive_pickling_without_their_fetcher() -> None:
+    """joblib, multiprocessing and disk caches pickle what a resource returned."""
+    resource = three_pages()
+    page = resource.fetch(1)
+
+    restored = pickle.loads(pickle.dumps(page))  # noqa: S301 - our own bytes
+
+    assert restored.data == page.data
+    assert restored.owner == "me"
+    assert restored.meta == page.meta
+    assert restored.page_cost_estimate == 2
+    assert page.next_page() is not None, "the original keeps its fetcher"
+    with pytest.raises(RuntimeError, match="restored from a pickle"):
+        restored.next_page()
 
 
 def test_to_dataframe_repeats_the_envelope_on_every_row() -> None:

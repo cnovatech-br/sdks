@@ -51,7 +51,11 @@ table.to_parquet("market_position.parquet")
 
 The DataFrame has one row per product, nested statistics flattened
 (`market_median_price`) and the envelope repeated on each row (`store_id`,
-`summary_product_count`, `usage_query_cost`). Requires the `pandas` extra.
+`summary_product_count`, `usage_query_cost`). When an envelope field shares
+its name with a row field, the envelope column takes the response's name as a
+prefix: `products.get()` gives `product_image_url` next to each offer's
+`image_url`, and `price_history()` gives `price_history_store_count` next to
+each bucket's `store_count`. Requires the `pandas` extra.
 
 ## When to look up one product and when to export
 
@@ -133,6 +137,17 @@ import httpx
 http_client = httpx.Client(proxy="http://proxy.example:3128", verify="/etc/ssl/corp.pem")
 client = DataMarket(http_client=http_client)
 ```
+
+The SDK's `timeout` applies to every request it sends through that client,
+and redirects are never followed, whatever the client's own settings.
+
+## Threads and processes
+
+One client can be shared between threads: the connection pool is thread-safe
+and the `usage` counters are updated without a lock, so they may lag under
+heavy concurrency. For process pools and disk caches, responses, pages and
+exceptions can be pickled; a page restored from a pickle keeps its data and
+can no longer fetch the pages after it.
 
 ## Seeing what the SDK does
 

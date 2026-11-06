@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import pickle
+
 import httpx
 import pytest
 
 from cnovatech.sdk_core.errors import (
+    APIConnectionError,
     APIStatusError,
+    APITimeoutError,
     AuthenticationError,
     BadRequestError,
+    BudgetExceededError,
     CnovatechError,
+    ConfigurationError,
     FieldError,
     NotFoundError,
     PermissionDeniedError,
@@ -15,12 +21,29 @@ from cnovatech.sdk_core.errors import (
     RateLimitError,
     ServerError,
     TrialExpiredError,
+    UnexpectedResponseError,
     UnprocessableEntityError,
     error_class_for,
     error_from_response,
     parse_retry_after,
     response_error_code,
 )
+
+
+def quota_error() -> APIStatusError:
+    return error_from_response(
+        httpx.Response(
+            429,
+            json={
+                "error": "insufficient_quota",
+                "message": "Not enough units left.",
+                "what_to_do": "Renew early.",
+                "usage": {"query_cost": 8, "used": 995, "limit": 1000, "remaining": 5},
+                "upgrade_url": "https://example.test/upgrade",
+            },
+            headers={"Retry-After": "1", "X-Correlation-ID": "corr-q"},
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -252,3 +275,34 @@ def test_json_body_that_is_not_an_object_is_ignored() -> None:
     assert isinstance(error, BadRequestError)
     assert error.body == {}
     assert error.code == "bad_request"
+
+
+def test_connection_errors_show_their_correlation_id() -> None:
+    error = APIConnectionError("Could not reach the API.", retryable=True, correlation_id="corr-7")
+
+    assert str(error) == "Could not reach the API. [correlation_id=corr-7]"
+    assert error.args == ("Could not reach the API.",)
+    assert str(APITimeoutError("Too slow.")) == "Too slow."
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ConfigurationError("No key."),
+        BudgetExceededError("Over.", estimated_cost=8, limit=4, spent=2, items_yielded=10),
+        APIConnectionError("Down.", retryable=True, correlation_id="corr-1"),
+        APITimeoutError("Slow.", correlation_id="corr-2"),
+        UnexpectedResponseError(
+            "HTML.", status_code=200, content_type="text/html", correlation_id="corr-3"
+        ),
+        quota_error(),
+    ],
+    ids=lambda error: type(error).__name__,
+)
+def test_errors_survive_pickling(error: CnovatechError) -> None:
+    """Process pools and error reporters rebuild exceptions through ``pickle``."""
+    restored = pickle.loads(pickle.dumps(error))  # noqa: S301 - our own bytes
+
+    assert type(restored) is type(error)
+    assert str(restored) == str(error)
+    assert vars(restored) == vars(error)

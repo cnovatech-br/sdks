@@ -9,9 +9,9 @@ DataMarketError
 ├── InvalidRequestError           an argument failed local validation; nothing was sent
 ├── BudgetExceededError           the call or walk would cross a quota cap; nothing was sent
 ├── AmbiguousStoreError           stores.find() matched several stores and none exactly
-├── APIConnectionError            no usable response (DNS, TCP, TLS, dropped connection)
+├── APIConnectionError            no usable response (DNS, TCP, TLS, dropped connection, unreadable body)
 │   └── APITimeoutError           the read timeout elapsed; the call may have been billed
-├── UnexpectedResponseError       the body is not the JSON the SDK expected
+├── UnexpectedResponseError       the body is not the JSON the SDK expected, or a redirect
 └── APIStatusError                the API answered with an error status
     ├── BadRequestError           400
     │   └── FilterRequiredError   catalogue beyond page 20 without a filter
@@ -20,7 +20,7 @@ DataMarketError
     ├── PermissionDeniedError     403
     ├── NotFoundError             404
     │   ├── EANNotFoundError      the code is not in the catalogue (free)
-    │   └── StoreNotFoundError    unknown store_id, or stores.find() without a match
+    │   └── StoreNotFoundError    unknown store_id or competitor_id, or stores.find() without a match
     ├── UnprocessableEntityError  422, with .details per field
     ├── RateLimitError            429 per minute; retried, then raised
     ├── QuotaExceededError        429 quota; never retried
@@ -46,19 +46,29 @@ except errors.EANNotFoundError as exc:
 `str(exc)` combines status, code, message, hint and correlation ID. The API
 key never appears in a message, a log line or a traceback.
 
+`APIConnectionError` and `APITimeoutError` carry the `correlation_id` the SDK
+sent with the request, even though no response came back. Quote it to ask
+support whether a timed-out call was billed. A quota error also refreshes
+`client.usage.last` with the balance it reports.
+
+Every exception can be pickled, so it crosses process pools and error
+reporters intact.
+
 ## What is retried
 
 Before raising, the SDK repeats a call up to `max_retries` times (two by
 default) only when the repeat cannot bill the account twice:
 
 - connection failures that happen before the request is sent;
-- 502 and 503, which come from the gateway before the application answers;
+- 502 and 503, which come from the gateway before the application answers,
+  waiting for `Retry-After` when the gateway sends one;
 - 429 `rate_limit_exceeded`, waiting the seconds the API asks for.
 
 Never retried: read timeouts and connections dropped while the response was
-being read (the request may have been processed), 504 (the gateway gave up
-while the application may still be working), 500, every other 4xx and all
-quota errors. Each retry is logged at INFO on the `cnovatech` logger.
+being read (the request may have been processed), a response that arrived but
+could not be read, 504 (the gateway gave up while the application may still be
+working), 500, every other 4xx and all quota errors. Each retry is logged at
+INFO on the `cnovatech` logger.
 
 ## Handling the common cases
 
@@ -89,10 +99,12 @@ except errors.DataMarketError:
 
 `ConfigurationError` comes from the constructor or from the first
 authenticated call without a key: an invalid `base_url`, a timeout out of
-range, no API key. `InvalidRequestError` comes from an argument the SDK can
-tell is wrong before sending: a malformed EAN, a store identifier that is not
-a UUID, a page below 1, a `limit` above the endpoint's maximum, more than 500
-codes in a coverage check. Both are also `ValueError`.
+range, no API key, a key with characters that cannot travel in an HTTP header
+(an invisible character or a line break copied along with it).
+`InvalidRequestError` comes from an argument the SDK can tell is wrong before
+sending: a malformed EAN, a store identifier that is not a UUID, a page below
+1, a `limit` above the endpoint's maximum, more than 500 codes in a coverage
+check, a blank name in `stores.find()`. Both are also `ValueError`.
 
 Value ranges the API validates itself, such as percentages, are left to it:
 the 422 answer names the field and the rule in `UnprocessableEntityError.details`.
@@ -101,8 +113,9 @@ the 422 answer names the field and the rule in `UnprocessableEntityError.details
 
 `UnexpectedResponseError` means the response was not the JSON the SDK
 expected. The usual cause is a wrong `base_url`: paths the API does not know
-are answered by the web application with HTML and status 200. The exception
-carries `status_code` and `content_type`.
+are answered by the web application with HTML and status 200, or with a
+redirect, which the SDK never follows (the key would travel with it). The
+exception carries `status_code` and `content_type`.
 
 ## Looking up a store by name
 

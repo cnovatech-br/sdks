@@ -79,7 +79,8 @@ class RetryPolicy:
         """Decision after attempt number ``attempt`` received ``response``. ``None`` means accept it.
 
         502 and 503 come from the gateway before the application answers and
-        are repeated with backoff. A 504 is not: the application may still be
+        are repeated, waiting for ``Retry-After`` when the gateway sends one
+        and with backoff otherwise. A 504 is not: the application may still be
         processing, and billing, the request. A 429 is repeated only when it
         is the per-minute limit, waiting for ``Retry-After``; quota errors are
         never repeated.
@@ -88,7 +89,10 @@ class RetryPolicy:
             return None
         status_code = response.status_code
         if status_code in RETRYABLE_STATUS_CODES:
-            return RetryDecision(reason=f"HTTP {status_code}", delay_seconds=self.backoff(attempt))
+            return RetryDecision(
+                reason=f"HTTP {status_code}",
+                delay_seconds=self._retry_after_delay(response, attempt),
+            )
         if (
             status_code == PER_MINUTE_LIMIT_STATUS
             and response_error_code(response) == RATE_LIMIT_CODE

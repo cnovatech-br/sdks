@@ -45,6 +45,15 @@ class UsageTracker:
         self.calls += 1
         self._warn_when_low(usage)
 
+    def observe(self, usage: Usage | None) -> None:
+        """Keep the balance reported with an error response, which billed nothing.
+
+        A quota error is the moment the balance matters most; ``last`` reflects
+        it even though no units were spent.
+        """
+        if usage is not None:
+            self.last = usage
+
     def _warn_when_low(self, usage: Usage) -> None:
         if usage.limit is None or usage.remaining is None or usage.limit <= 0:
             self._low_quota_warned = False

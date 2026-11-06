@@ -59,10 +59,23 @@ class _PageBase(TabularResponse, Generic[ItemT]):
         """Units expected to fetch every page after this one, at the estimated page cost."""
         return max(0, self.meta.pages - self.meta.page) * self._page_cost_estimate
 
+    def __getstate__(self) -> dict[Any, Any]:
+        """Pickle the page without the fetch callback, which belongs to the client that made it.
+
+        A page restored from a pickle keeps its data, metadata and usage, and
+        can no longer fetch the pages after it.
+        """
+        state = super().__getstate__()
+        private = state.get("__pydantic_private__")
+        if private:
+            state["__pydantic_private__"] = {**private, "_fetch_page": None}
+        return state
+
     def _fetcher(self) -> Any:
         if self._fetch_page is None:
             raise RuntimeError(
-                "This page was not produced by a client and cannot fetch the one after it."
+                "This page was not produced by a client, or was restored from a pickle, and "
+                "cannot fetch the one after it. Request the page again through the client."
             )
         return self._fetch_page
 

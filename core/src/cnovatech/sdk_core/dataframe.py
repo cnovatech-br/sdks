@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from .models import APIResponse
@@ -13,6 +14,7 @@ if TYPE_CHECKING:
 
 ENVELOPE_FIELDS_SKIPPED = frozenset({"meta"})
 NESTED_ROWS_SEPARATOR = "."
+_CAMEL_CASE_BOUNDARY = re.compile(r"(?<!^)(?=[A-Z])")
 
 
 class TabularResponse(APIResponse):
@@ -31,8 +33,11 @@ class TabularResponse(APIResponse):
         Nested objects are flattened with ``_``: ``stats.median_price`` becomes
         ``stats_median_price``. With ``include_envelope``, the scalar fields
         around the list, such as the queried entity, the summary and the
-        ``usage`` block, are repeated on every row, prefixed by their name.
-        Lists inside items are kept as Python lists.
+        ``usage`` block, are repeated on every row, prefixed by their name. An
+        envelope field that shares its name with a row field is prefixed with
+        the response's name instead, as in ``product_image_url`` next to the
+        offer's ``image_url``, so no value is lost. Lists inside items are kept
+        as Python lists.
 
         Requires pandas, available through the SDK's ``pandas`` extra.
         """
@@ -50,17 +55,37 @@ def build_dataframe(
     parent_field, _, child_field = rows_field.partition(NESTED_ROWS_SEPARATOR)
     payload = response.model_dump(mode="python", exclude=_other_lists(response, parent_field))
     parents = [row for row in payload.pop(parent_field, None) or [] if isinstance(row, dict)]
-    envelope = flatten_envelope(payload) if include_envelope else {}
     if child_field:
-        records = [
-            {**envelope, **flatten(_without(parent, child_field)), **flatten(child)}
+        rows = [
+            {**flatten(_without(parent, child_field)), **flatten(child)}
             for parent in parents
             for child in parent.get(child_field) or []
             if isinstance(child, dict)
         ]
     else:
-        records = [{**envelope, **flatten(row)} for row in parents]
+        rows = [flatten(row) for row in parents]
+    envelope: dict[str, Any] = {}
+    if include_envelope:
+        envelope = disambiguate_envelope(
+            flatten_envelope(payload), rows, prefix=response_prefix(response)
+        )
+    records = [{**envelope, **row} for row in rows]
     return records_to_dataframe(records, columns=column_union(records) or list(envelope))
+
+
+def disambiguate_envelope(
+    envelope: Mapping[str, Any], rows: Sequence[Mapping[str, Any]], *, prefix: str
+) -> dict[str, Any]:
+    """Prefix the envelope columns that a row also uses, so both values get a column."""
+    row_keys = {key for row in rows for key in row}
+    return {
+        (f"{prefix}_{key}" if key in row_keys else key): value for key, value in envelope.items()
+    }
+
+
+def response_prefix(response: APIResponse) -> str:
+    """The response's class name in snake case: ``PriceHistory`` gives ``price_history``."""
+    return _CAMEL_CASE_BOUNDARY.sub("_", type(response).__name__).lower()
 
 
 def column_union(records: Sequence[Mapping[str, Any]]) -> list[str]:

@@ -42,7 +42,7 @@ from cnovatech.sdk_core.validation import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Iterable, Mapping
 
     from cnovatech.datamarket.types import (
         Channel,
@@ -252,7 +252,7 @@ def price_history(
     )
 
 
-def coverage(eans: Sequence[str]) -> Operation[CoverageResponse]:
+def coverage(eans: Iterable[str]) -> Operation[CoverageResponse]:
     """``POST /market/products/coverage``: one unit per started block of 250 codes."""
     codes = validate_batch(eans, name="eans", maximum=MAX_CODES_PER_COVERAGE)
     return COVERAGE.operation(

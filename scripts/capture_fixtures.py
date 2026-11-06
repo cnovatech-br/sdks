@@ -33,6 +33,12 @@ FIXTURES_DIR = Path(__file__).resolve().parent.parent / "datamarket-python" / "t
 OPENAPI_DOCUMENT = FIXTURES_DIR / "openapi.json"
 UNKNOWN_EAN = "0000000000000"
 SAMPLE_SEARCH = "coca cola 2l"
+# Above the API's maximum window, so the request is refused with a 422 and not billed.
+OUT_OF_RANGE_DAYS = 400
+
+# Error bodies worth keeping: the codes the SDK types specially, plus the
+# validation error, whose shape every 422 shares.
+KEPT_ERROR_CODES = frozenset(PRODUCT_SETTINGS.error_overrides) | {"validation_error"}
 
 ANONYMISED_PROFILE = {
     "id": "a3b1c2d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
@@ -80,12 +86,12 @@ def route_names() -> list[tuple[str, re.Pattern[str], str]]:
 def fixture_name(recorded: Recorded, routes: list[tuple[str, re.Pattern[str], str]]) -> str | None:
     """Name of the fixture for a recorded response, or ``None`` when it is not kept.
 
-    Error responses are kept only for the codes the SDK types specially.
+    Error responses are kept only for the codes in :data:`KEPT_ERROR_CODES`.
     """
     method, path, status_code, payload = recorded
     if status_code >= 400:
         code = payload.get("error") if isinstance(payload, dict) else None
-        return f"error_{code}" if code in PRODUCT_SETTINGS.error_overrides else None
+        return f"error_{code}" if code in KEPT_ERROR_CODES else None
     for route_method, pattern, name in routes:
         if route_method == method and pattern.match(path):
             return name
@@ -157,11 +163,13 @@ def exercise(client: DataMarket) -> None:
     client.stores.market_position(store_id, limit=5)
     client.stores.opportunities(store_id, limit=5)
 
-    # Both errors are expected and free; their bodies become the error fixtures.
+    # These errors are expected and free; their bodies become the error fixtures.
     with contextlib.suppress(errors.EANNotFoundError):
         client.products.get(UNKNOWN_EAN)
     with contextlib.suppress(errors.FilterRequiredError):
         client.products.catalog(page=21)
+    with contextlib.suppress(errors.UnprocessableEntityError):
+        client.products.price_history(product.ean, days=OUT_OF_RANGE_DAYS)
 
 
 def write_fixtures(responses: list[Recorded]) -> list[str]:

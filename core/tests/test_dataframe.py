@@ -6,7 +6,12 @@ from typing import Any, ClassVar
 import pytest
 from pydantic import Field
 
-from cnovatech.sdk_core.dataframe import TabularResponse, flatten, flatten_envelope
+from cnovatech.sdk_core.dataframe import (
+    TabularResponse,
+    flatten,
+    flatten_envelope,
+    response_prefix,
+)
 from cnovatech.sdk_core.models import APIResponse
 
 
@@ -108,6 +113,27 @@ def test_rows_field_can_be_renamed() -> None:
 
     assert frame["code"].tolist() == ["x"]
     assert "stats_median" in frame.columns
+
+
+def test_envelope_fields_that_collide_with_row_fields_keep_their_own_column() -> None:
+    """The row wins the plain name; the envelope value is kept under the response's name."""
+    offers = Offers.model_validate(
+        {"code": "c", "offers": [{"code": "x", "stats": {"median": 2.0, "count": 1}}]}
+    )
+
+    frame = offers.to_dataframe()
+
+    assert list(frame.columns) == ["offers_code", "code", "stats_median", "stats_count", "tags"]
+    assert frame["offers_code"].tolist() == ["c"]
+    assert frame["code"].tolist() == ["x"]
+
+
+def test_response_prefix_is_the_class_name_in_snake_case() -> None:
+    class PriceHistory(TabularResponse):
+        data: list[Row] = Field(default_factory=list)
+
+    assert response_prefix(PriceHistory()) == "price_history"
+    assert response_prefix(Offers(code="c", offers=[])) == "offers"
 
 
 def test_columns_are_the_union_of_every_row() -> None:

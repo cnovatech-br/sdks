@@ -1,0 +1,12 @@
+{
+  "error": "validation_error",
+  "message": "The submitted data is invalid",
+  "details": [
+    {
+      "field": "query -> days",
+      "message": "Input should be less than or equal to 180",
+      "type": "less_than_equal"
+    }
+  ],
+  "timestamp": "2026-11-06T20:32:00.243856+00:00"
+}

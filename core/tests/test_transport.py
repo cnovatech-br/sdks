@@ -91,6 +91,15 @@ def test_each_request_gets_its_own_correlation_id(config: ClientConfig) -> None:
     assert first.correlation_id != second.correlation_id
 
 
+def test_prepared_request_repr_leaves_the_headers_out(config: ClientConfig) -> None:
+    """Debuggers and ``pytest --showlocals`` print locals; the key must not be in them."""
+    prepared = prepare_request(config, thing_operation())
+
+    assert prepared.headers["X-API-Key"] == "ex_test_key"
+    assert "ex_test_key" not in repr(prepared)
+    assert "headers" not in repr(prepared)
+
+
 def test_custom_api_key_header() -> None:
     product = dataclasses.replace(EXAMPLE_PRODUCT, api_key_header="Authorization")
     custom = build_client_config(product, api_key="ex_test_key", environ={})
@@ -235,6 +244,32 @@ def test_html_with_status_200_is_an_unexpected_response(
     assert excinfo.value.content_type == "text/html; charset=utf-8"
 
 
+def test_redirects_are_not_followed_even_through_a_redirecting_client(
+    config: ClientConfig,
+) -> None:
+    """The key must never travel to a redirect target, whatever the injected client allows."""
+    paths: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        paths.append(request.url.path)
+        if request.url.path == "/api/v1/things/1":
+            return httpx.Response(
+                302, headers={"Location": "https://elsewhere.example.test/things/1"}
+            )
+        return httpx.Response(200, json=thing_payload())
+
+    http_client = httpx.Client(follow_redirects=True, transport=httpx.MockTransport(handler))
+    try:
+        transport = SyncTransport(config, http_client=http_client)
+        with pytest.raises(UnexpectedResponseError, match=r"elsewhere\.example\.test") as excinfo:
+            transport.execute(thing_operation())
+    finally:
+        http_client.close()
+
+    assert excinfo.value.status_code == 302
+    assert paths == ["/api/v1/things/1"]
+
+
 def test_invalid_json_is_an_unexpected_response(
     make_sync_transport: Callable[..., SyncTransport],
 ) -> None:
@@ -336,10 +371,35 @@ def test_error_families(
         transport.execute(thing_operation())
 
 
+def test_quota_error_refreshes_the_balance_without_counting_a_call(
+    make_sync_transport: Callable[..., SyncTransport],
+) -> None:
+    handler = json_response(
+        429,
+        {
+            "error": "insufficient_quota",
+            "message": "Not enough units left.",
+            "usage": {"query_cost": 8, "used": 995, "limit": 1000, "remaining": 5},
+        },
+    )
+    transport = make_sync_transport(handler)
+
+    with pytest.raises(QuotaExceededError):
+        transport.execute(thing_operation())
+
+    assert transport.usage.last is not None
+    assert transport.usage.last.remaining == 5
+    assert transport.usage.spent == 0
+    assert transport.usage.calls == 0
+
+
 # --- transport failures -----------------------------------------------------
 
 
-def test_connection_failure_is_wrapped(make_sync_transport: Callable[..., SyncTransport]) -> None:
+def test_connection_failure_is_wrapped(
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+) -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("boom")
 
@@ -348,11 +408,14 @@ def test_connection_failure_is_wrapped(make_sync_transport: Callable[..., SyncTr
 
     assert isinstance(excinfo.value.__cause__, httpx.ConnectError)
     assert excinfo.value.retryable is True
+    assert excinfo.value.correlation_id == sent_requests[0].headers["X-Correlation-ID"]
+    assert f"[correlation_id={excinfo.value.correlation_id}]" in str(excinfo.value)
     assert "ex_test_key" not in str(excinfo.value)
 
 
 def test_read_timeout_is_wrapped_and_warns_about_billing(
     make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
 ) -> None:
     def handler(_request: httpx.Request) -> httpx.Response:
         raise httpx.ReadTimeout("slow")
@@ -362,7 +425,37 @@ def test_read_timeout_is_wrapped_and_warns_about_billing(
 
     assert "billed" in str(excinfo.value)
     assert excinfo.value.retryable is False
+    assert excinfo.value.correlation_id == sent_requests[0].headers["X-Correlation-ID"]
     assert isinstance(excinfo.value, APIConnectionError)
+
+
+def test_unreadable_response_is_wrapped_and_not_retried(
+    make_sync_transport: Callable[..., SyncTransport],
+    sent_requests: list[httpx.Request],
+) -> None:
+    """A corrupt body is not a transport failure to httpx, but the API may have billed the call."""
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        raise httpx.DecodingError("corrupt gzip")
+
+    with pytest.raises(APIConnectionError, match="could not be read") as excinfo:
+        make_sync_transport(handler).execute(thing_operation())
+
+    assert isinstance(excinfo.value.__cause__, httpx.DecodingError)
+    assert excinfo.value.retryable is False
+    assert "may have been processed and billed" in str(excinfo.value)
+    assert len(sent_requests) == 1
+
+
+def test_malformed_request_means_nothing_was_sent(config: ClientConfig) -> None:
+    prepared = prepare_request(config, thing_operation())
+
+    error = translate_transport_error(config, prepared, httpx.LocalProtocolError("bad header"))
+
+    assert type(error) is APIConnectionError
+    assert error.retryable is False
+    assert "Nothing was sent" in str(error)
+    assert "billed" not in str(error)
 
 
 @pytest.mark.parametrize(

@@ -1,8 +1,10 @@
 # Fixtures
 
-One JSON response per endpoint and one per error code the SDK handles
-specially, named after the endpoint's `operationId`: `healthCheck.json`,
-`getCatalog.json`, `getProductByEan.json`, `error_ean_not_found.json`, and so on.
+One JSON response per endpoint, one per error code the SDK handles specially
+and one for the validation error every 422 shares, named after the endpoint's
+`operationId` or the error code: `healthCheck.json`, `getCatalog.json`,
+`getProductByEan.json`, `error_ean_not_found.json`, `error_validation_error.json`,
+and so on.
 
 They are captured from production through the SDK itself, anonymised
 (account identity, IP addresses and key prefixes are replaced) and trimmed:

@@ -10,7 +10,7 @@ are declared by the product SDK on top of the shapes defined here.
 from __future__ import annotations
 
 import uuid
-from collections.abc import Collection, Sequence
+from collections.abc import Collection, Iterable, Mapping
 from urllib.parse import quote
 
 from .errors import InvalidRequestError
@@ -27,27 +27,34 @@ def validate_digits(value: str, *, lengths: Collection[int], name: str) -> str:
     return candidate
 
 
-def validate_batch(values: Sequence[str], *, name: str, maximum: int) -> list[str]:
-    """A non-empty list of strings with at most ``maximum`` entries, each stripped."""
-    if isinstance(values, str) or not isinstance(values, Sequence):
+def validate_batch(values: Iterable[str], *, name: str, maximum: int) -> list[str]:
+    """A non-empty collection of strings with at most ``maximum`` entries, each stripped.
+
+    Any iterable of strings is accepted, such as a list, a set, a tuple or a
+    generator; a single string or a mapping is not.
+    """
+    if isinstance(values, (str, bytes, Mapping)) or not isinstance(values, Iterable):
         raise InvalidRequestError(f"{name} must be a list of strings.")
-    if not values:
+    items = list(values)
+    if not items:
         raise InvalidRequestError(f"{name} must not be empty.")
-    if len(values) > maximum:
+    if len(items) > maximum:
         raise InvalidRequestError(
-            f"{name} accepts at most {maximum} entries per call; got {len(values)}. "
+            f"{name} accepts at most {maximum} entries per call; got {len(items)}. "
             "Split the list and call again."
         )
     cleaned: list[str] = []
-    for position, value in enumerate(values):
+    for position, value in enumerate(items):
         if not stripped(value):
             raise InvalidRequestError(f"{name}[{position}] must be a non-empty string.")
         cleaned.append(stripped(value))
     return cleaned
 
 
-def validate_identifier(value: str, *, name: str) -> str:
-    """A UUID in any accepted spelling, returned in its canonical form."""
+def validate_identifier(value: str | uuid.UUID, *, name: str) -> str:
+    """A UUID, as an object or in any accepted spelling, returned in its canonical form."""
+    if isinstance(value, uuid.UUID):
+        return str(value)
     try:
         return str(uuid.UUID(stripped(value)))
     except ValueError as exc:

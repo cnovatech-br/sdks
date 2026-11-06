@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pickle
 from typing import TYPE_CHECKING
 
 import pytest
@@ -66,6 +67,33 @@ def test_candidates_from_every_page_are_reported_when_none_is_exact(api: FakeAPI
         "Mercado Rosa",
     ]
     assert client.usage.spent == 2
+
+
+@pytest.mark.parametrize("name", ["", "   ", "\t"])
+def test_blank_name_is_refused_before_sending(api: FakeAPI, name: str) -> None:
+    """A blank search would match every store and walk five pages for nothing."""
+    with api.client() as client, pytest.raises(errors.InvalidRequestError, match="name"):
+        client.stores.find(name)
+
+    assert api.requests == []
+
+
+def test_ambiguity_names_five_candidates_and_counts_the_rest(api: FakeAPI) -> None:
+    names = [f"Mercado {index}" for index in range(1, 8)]
+    api.respond("GET", STORES_PATH, stores_page(*names))
+
+    with api.client() as client, pytest.raises(errors.AmbiguousStoreError) as excinfo:
+        client.stores.find("Mercado")
+
+    error = excinfo.value
+    assert "'Mercado 5' and 2 more" in str(error)
+    assert "'Mercado 6'" not in str(error)
+    assert [store.store_name for store in error.candidates] == names
+
+    restored = pickle.loads(pickle.dumps(error))  # noqa: S301 - our own bytes
+    assert str(restored) == str(error)
+    assert restored.name == "Mercado"
+    assert restored.candidates == error.candidates
 
 
 def test_search_is_bounded(api: FakeAPI) -> None:

@@ -33,18 +33,23 @@ _CONSTRUCTOR_DOC = """
         base_url: Origin of the API. Defaults to ``DATAMARKET_BASE_URL`` or production.
         timeout: Read timeout in seconds, or an ``httpx.Timeout`` to set every
             phase. The default of 150 s covers the first lookup of an uncached
-            product, which can take about 90 s.
+            product, which can take about 90 s. It applies to every request,
+            also through your own ``http_client``.
         max_retries: Extra attempts for failures that cannot have been billed:
             connection errors, 502/503 and the per-minute 429. Read timeouts,
             504 and quota errors are never retried.
         max_units_per_request: Refuse, before sending, any call estimated to
             cost more than this many quota units. Off by default.
         http_client: Your own httpx client, for proxies, certificates or a
-            shared connection pool. The SDK does not close it.
+            shared connection pool. The SDK does not close it and never follows
+            redirects through it, whatever its own settings.
         transport: An httpx transport, used by tests to answer without a network.
 
     The client keeps a connection pool: create one per process and close it
-    with ``close()`` or a ``with`` block.
+    with ``close()`` or a ``with`` block. It can be shared between threads;
+    the ``usage`` counters are updated without a lock and may lag under heavy
+    concurrency. Responses, pages and exceptions can be pickled; a page
+    restored from a pickle cannot fetch the pages after it.
 """
 
 

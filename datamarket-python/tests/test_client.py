@@ -38,6 +38,18 @@ def test_health_works_without_an_api_key(api: FakeAPI, health_payload: dict[str,
         assert client.health().status == "healthy"
 
 
+def test_health_needs_only_a_status() -> None:
+    """A monitoring probe must not break when the unversioned health body changes."""
+    handler = httpx.MockTransport(lambda _request: httpx.Response(200, json={"status": "healthy"}))
+
+    with DataMarket(transport=handler) as client:
+        health = client.health()
+
+    assert health.healthy is True
+    assert health.version is None
+    assert health.database is None
+
+
 def test_unhealthy_status_is_reported_not_raised(
     api: FakeAPI, health_payload: dict[str, Any]
 ) -> None:

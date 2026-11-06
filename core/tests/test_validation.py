@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import uuid
+
 import pytest
 
 from cnovatech.sdk_core.errors import CnovatechError, InvalidRequestError
@@ -43,12 +45,21 @@ def test_batch_is_stripped_and_bounded() -> None:
     assert validate_batch([" a ", "b"], name="codes", maximum=2) == ["a", "b"]
 
 
+def test_batch_accepts_any_iterable_of_strings() -> None:
+    assert validate_batch(("a", "b"), name="codes", maximum=2) == ["a", "b"]
+    assert validate_batch({"a"}, name="codes", maximum=2) == ["a"]
+    assert validate_batch(iter(["a", "b"]), name="codes", maximum=2) == ["a", "b"]
+
+
 @pytest.mark.parametrize(
     ("values", "message"),
     [
         ([], "must not be empty"),
         (["a", "b", "c"], "at most 2 entries"),
         ("ab", "must be a list"),
+        (b"ab", "must be a list"),
+        ({"a": 1}, "must be a list"),
+        (3, "must be a list"),
         (["a", ""], r"codes\[1\] must be a non-empty string"),
         (["a", 3], r"codes\[1\] must be a non-empty string"),
     ],
@@ -63,6 +74,12 @@ def test_identifier_is_canonicalised() -> None:
         validate_identifier(" 0F8C7D2E6B1A4F3E9C5D2A7B8E1F4C63 ", name="store_id")
         == "0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63"
     )
+
+
+def test_identifier_accepts_uuid_objects() -> None:
+    identifier = uuid.UUID("0f8c7d2e-6b1a-4f3e-9c5d-2a7b8e1f4c63")
+
+    assert validate_identifier(identifier, name="store_id") == str(identifier)
 
 
 @pytest.mark.parametrize("value", ["", "not-a-uuid", "123", "../../etc/passwd"])

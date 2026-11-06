@@ -146,10 +146,10 @@ frame = assortment.to_dataframe()  # one row per item; usage and meta as columns
 |---|---|---|
 | `api_key` | `DATAMARKET_API_KEY` | required, except for `health()` |
 | `base_url` | `DATAMARKET_BASE_URL` | `https://datamarket.cnovatech.com.br` |
-| `timeout` | | 150 s read timeout; pass `httpx.Timeout` to set every phase |
+| `timeout` | | 150 s read timeout; pass `httpx.Timeout` to set every phase. Applies per request, also through your own `http_client` |
 | `max_retries` | | 2 |
 | `max_units_per_request` | | no limit |
-| `http_client` | | your own `httpx.Client`, for proxies, certificates or a shared pool |
+| `http_client` | | your own `httpx.Client`, for proxies, certificates or a shared pool; never closed, redirects never followed |
 
 ## Guides
 

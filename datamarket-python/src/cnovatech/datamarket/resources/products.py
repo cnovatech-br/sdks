@@ -17,7 +17,7 @@ from cnovatech.datamarket.resources import _operations as operations
 from cnovatech.sdk_core.resource import AsyncResource, SyncResource
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterable
 
     from cnovatech.datamarket.models.history import PriceHistory
     from cnovatech.datamarket.models.products import (
@@ -164,7 +164,8 @@ class Products(SyncResource):
         in the catalogue raises :class:`EANNotFoundError` and is not billed.
 
         Args:
-            ean: The product code, 8 or 11 to 14 digits.
+            ean: The product code: 8, 11, 12, 13 or 14 digits, the lengths the
+                catalogue carries. Other lengths are refused before sending.
             state: Only offers from stores in this state.
             city: Only offers from stores in this city (exact name).
             channel: Only offers from this channel.
@@ -206,11 +207,12 @@ class Products(SyncResource):
             )
         )
 
-    def coverage(self, eans: Sequence[str]) -> CoverageResponse:
+    def coverage(self, eans: Iterable[str]) -> CoverageResponse:
         """Which codes of a list the catalogue has. Cost: 1 unit per started block of 250 codes.
 
-        Up to 500 codes per call. Codes that are not valid EANs are counted in
-        ``summary.invalid_count`` rather than rejected.
+        Up to 500 codes per call, from any iterable of strings. Codes that are
+        not valid EANs are counted in ``summary.invalid_count`` rather than
+        rejected.
         """
         return self._execute(operations.coverage(eans))
 
@@ -336,6 +338,6 @@ class AsyncProducts(AsyncResource):
             )
         )
 
-    async def coverage(self, eans: Sequence[str]) -> CoverageResponse:
+    async def coverage(self, eans: Iterable[str]) -> CoverageResponse:
         """Which codes of a list the catalogue has. See :meth:`Products.coverage`."""
         return await self._execute(operations.coverage(eans))

@@ -128,24 +128,43 @@ def test_out_of_range_read_timeout_is_rejected(
         build_client_config(product, timeout=timeout, environ={})
 
 
-@pytest.mark.parametrize("timeout", ["soon", True])
+@pytest.mark.parametrize("timeout", ["soon", "10", True, None])
 def test_non_numeric_timeout_is_rejected(product: ProductSettings, timeout: object) -> None:
     with pytest.raises(ConfigurationError, match="timeout must be a number"):
         build_client_config(product, timeout=timeout, environ={})  # type: ignore[arg-type]
 
 
-@pytest.mark.parametrize("max_retries", [-1, True])
-def test_invalid_max_retries_is_rejected(product: ProductSettings, max_retries: int) -> None:
-    with pytest.raises(ConfigurationError, match="max_retries"):
-        build_client_config(product, max_retries=max_retries, environ={})
+@pytest.mark.parametrize("max_retries", [-1, True, 2.5, "2"])
+def test_invalid_max_retries_is_rejected(product: ProductSettings, max_retries: object) -> None:
+    with pytest.raises(ConfigurationError, match="max_retries must be an integer"):
+        build_client_config(product, max_retries=max_retries, environ={})  # type: ignore[arg-type]
 
 
-@pytest.mark.parametrize("max_units", [0, -5, True])
+@pytest.mark.parametrize("max_units", [0, -5, True, 1.5, "3"])
 def test_invalid_max_units_per_request_is_rejected(
-    product: ProductSettings, max_units: int
+    product: ProductSettings, max_units: object
 ) -> None:
-    with pytest.raises(ConfigurationError, match="max_units_per_request"):
-        build_client_config(product, max_units_per_request=max_units, environ={})
+    with pytest.raises(ConfigurationError, match="max_units_per_request must be an integer"):
+        build_client_config(product, max_units_per_request=max_units, environ={})  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "api_key",
+    ["ex_abc​", "ex_abc\r\ndef", "ex_abc\tdef", "ex_a b", "ex_açaí"],
+    ids=["zero-width-space", "crlf", "tab", "space", "non-ascii"],
+)
+def test_api_key_that_cannot_travel_in_a_header_is_rejected(
+    product: ProductSettings, api_key: str
+) -> None:
+    with pytest.raises(ConfigurationError, match="HTTP header") as excinfo:
+        build_client_config(product, api_key=api_key, environ={})
+
+    assert "ex_a" not in str(excinfo.value), "the key itself stays out of the message"
+
+
+def test_api_key_from_the_environment_is_validated_too(product: ProductSettings) -> None:
+    with pytest.raises(ConfigurationError, match="HTTP header"):
+        build_client_config(product, environ={"EXAMPLE_API_KEY": "ex_abc​"})
 
 
 def test_max_units_per_request_is_optional(product: ProductSettings) -> None:

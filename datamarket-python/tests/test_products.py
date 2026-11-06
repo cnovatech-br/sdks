@@ -161,6 +161,20 @@ def test_get_product_by_ean(api: FakeAPI) -> None:
     assert frame["price"].tolist() == [offer["price"] for offer in PRODUCT_FIXTURE["offers"]]
 
 
+def test_get_sends_the_city_and_channel_filters(api: FakeAPI) -> None:
+    api.respond("GET", PRODUCT, PRODUCT_FIXTURE)
+
+    with api.client() as client:
+        client.products.get(EAN, city="Campinas", channel="delivery", sort_order="desc")
+
+    assert api.last_params == {
+        "city": "Campinas",
+        "channel": "delivery",
+        "sort_by": "price",
+        "sort_order": "desc",
+    }
+
+
 def test_get_rejects_a_malformed_ean_before_sending(api: FakeAPI) -> None:
     with api.client() as client, pytest.raises(errors.InvalidRequestError, match="ean"):
         client.products.get("7894900011")
@@ -219,6 +233,33 @@ def test_price_history(api: FakeAPI) -> None:
     assert len(stores) == sum(len(series["points"]) for series in expected["store_series"])
     assert stores["store_name"].iloc[0] == expected["store_series"][0]["store_name"]
     assert "points" not in stores.columns
+
+
+def test_price_history_out_of_range_is_a_typed_validation_error(api: FakeAPI) -> None:
+    """The API validates value ranges itself; its 422 names the field and the rule."""
+    api.respond("GET", f"{PRODUCT}/price-history", "error_validation_error.json", status_code=422)
+
+    with api.client() as client, pytest.raises(errors.UnprocessableEntityError) as excinfo:
+        client.products.price_history(EAN, days=400)
+
+    assert excinfo.value.code == "validation_error"
+    assert excinfo.value.details == [
+        errors.FieldError(
+            field="query -> days",
+            message="Input should be less than or equal to 180",
+            type="less_than_equal",
+        )
+    ]
+    assert client.usage.spent == 0
+
+
+def test_coverage_accepts_any_iterable_of_codes(api: FakeAPI) -> None:
+    api.respond("POST", "/api/v1/market/products/coverage", "checkCatalogCoverage.json")
+
+    with api.client() as client:
+        client.products.coverage(code for code in (EAN, "0000000000000"))
+
+    assert api.last_request.read() == f'{{"eans":["{EAN}","0000000000000"]}}'.encode()
 
 
 def test_coverage_posts_the_codes(api: FakeAPI) -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from conftest import STORES_PATH, load_fixture, stores_page
@@ -126,6 +126,25 @@ def test_assortment_costs_two_units_per_block_of_250_rows(api: FakeAPI) -> None:
     assert frame["ean"].tolist() == [item["ean"] for item in ASSORTMENT_FIXTURE["data"]]
 
 
+def test_export_walk_refuses_the_page_that_would_cross_max_units(api: FakeAPI) -> None:
+    """Export pages cost 2 units each; the walk must count that, not the 1 unit of a query."""
+    first: dict[str, Any] = {
+        **ASSORTMENT_FIXTURE,
+        "meta": {**ASSORTMENT_FIXTURE["meta"], "page": 1, "pages": 3},
+    }
+    api.respond("GET", f"{STORE}/assortment", first)
+
+    with api.client() as client:
+        page = client.stores.assortment(STORE_ID, limit=5)
+        with pytest.raises(errors.BudgetExceededError) as excinfo:
+            list(page.iter_all(max_units=1))
+
+    assert excinfo.value.estimated_cost == 2
+    assert excinfo.value.limit == 1
+    assert excinfo.value.items_yielded == len(ASSORTMENT_FIXTURE["data"])
+    assert len(api.requests) == 1
+
+
 def test_assortment_above_the_budget_is_refused_before_sending(api: FakeAPI) -> None:
     with (
         api.client(max_units_per_request=4) as client,
@@ -193,6 +212,30 @@ def test_competitiveness(api: FakeAPI) -> None:
     assert result.summary.competitiveness_score == expected["summary"]["competitiveness_score"]
     assert result.data[0].below_pct == expected["data"][0]["below_pct"]
     assert api.last_params == {"min_overlap_pct": "5.0", "limit": "2", "market_scope": "same_state"}
+
+
+def test_competitiveness_upper_cases_the_state(api: FakeAPI) -> None:
+    api.respond("GET", f"{STORE}/competitiveness", load_fixture("getStoreCompetitiveness.json"))
+
+    with api.client() as client:
+        client.stores.competitiveness(STORE_ID, state="pr")
+
+    assert api.last_params["state"] == "PR"
+
+
+def test_compare_with_an_unknown_competitor_is_typed(api: FakeAPI) -> None:
+    api.respond(
+        "GET",
+        f"{STORE}/competitors/{COMPETITOR_ID}/products",
+        {"error": "not_found", "message": "Concorrente não encontrado."},
+        status_code=404,
+    )
+
+    with api.client() as client, pytest.raises(errors.StoreNotFoundError) as excinfo:
+        client.stores.compare(STORE_ID, COMPETITOR_ID)
+
+    assert excinfo.value.status_code == 404
+    assert client.usage.spent == 0
 
 
 def test_compare_with_a_competitor(api: FakeAPI) -> None:
