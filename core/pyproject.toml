@@ -37,7 +37,7 @@ Repository = "https://github.com/cnovatech-br/sdks"
 Changelog = "https://github.com/cnovatech-br/sdks/blob/main/core/CHANGELOG.md"
 
 [build-system]
-requires = ["hatchling>=1.27,<2"]
+requires = ["hatchling>=1.33.0,<2"]
 build-backend = "hatchling.build"
 
 # `src/cnovatech/` has no __init__.py on purpose: it is a PEP 420 namespace
