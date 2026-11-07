@@ -7,12 +7,15 @@ Usage::
 
     python scripts/check_release_version.py v0.1.0
 
-Exits with status 1 and lists the problems when any package disagrees.
-Requires Python 3.11 or newer for ``tomllib``.
+Exits with status 1 and lists the problems when any package disagrees. When
+``GITHUB_OUTPUT`` is set, writes ``final=true`` for a final version such as
+``1.2.3`` and ``final=false`` for a pre-release, so the release workflow can
+stop pre-releases at TestPyPI. Requires Python 3.11 or newer for ``tomllib``.
 """
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 import tomllib
@@ -23,6 +26,7 @@ PACKAGE_DIRECTORIES = (
     WORKSPACE_ROOT / "core",
     WORKSPACE_ROOT / "datamarket-python",
 )
+FINAL_VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 def declared_version(package: Path) -> str:
@@ -50,6 +54,16 @@ def problems(expected: str) -> list[str]:
     return found
 
 
+def report_release_kind(version: str) -> None:
+    """Say whether ``version`` is final, to the console and to ``GITHUB_OUTPUT`` when set."""
+    final = FINAL_VERSION.match(version) is not None
+    print(f"{version} is a {'final version' if final else 'pre-release'}.")
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if output_path:
+        with open(output_path, "a", encoding="utf-8") as handle:
+            handle.write(f"final={'true' if final else 'false'}\n")
+
+
 def main(argv: list[str]) -> int:
     """Compare the tag in ``argv[1]`` with every package."""
     if len(argv) != 2:
@@ -62,6 +76,7 @@ def main(argv: list[str]) -> int:
             print(f"  {problem}")
         return 1
     print(f"Every package declares and documents {expected}.")
+    report_release_kind(expected)
     return 0
 
 
