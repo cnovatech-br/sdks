@@ -118,18 +118,26 @@ To release:
 3. Commit, then tag: `git tag v0.1.0 && git push origin v0.1.0`.
 4. `release.yml` checks that both packages declare the tagged version and have
    a changelog section for it, runs the whole CI workflow as its quality gate,
-   and publishes the distributions built there to TestPyPI through the
-   `testpypi` environment, with PEP 740 attestations. Publication to PyPI is
-   enabled once the first stable release is approved.
+   and publishes the distributions built there to TestPyPI, the core first,
+   with PEP 740 attestations. A final version then continues to PyPI through
+   the `pypi-core` and `pypi` environments; pre-releases stop at TestPyPI.
 
 Dependabot proposes weekly updates to the pinned GitHub Actions and to
 `uv.lock` (`.github/dependabot.yml`); actions are pinned by commit SHA with the
 version in a comment.
 
 Publishing uses [trusted publishing](https://docs.pypi.org/trusted-publishers/):
-no token is stored in the repository. Each package needs a pending publisher
-registered on TestPyPI (and later PyPI) with owner `cnovatech-br`, repository
-`sdks`, workflow `release.yml` and environment `testpypi`.
+no token is stored in the repository. An index accepts one pending publisher
+per environment, so each package publishes from its own deployment
+environment. Before the first release of a package, register a pending
+publisher on the index with owner `cnovatech-br`, repository `sdks`, workflow
+`release.yml` and the environment below; afterwards the publisher stays
+attached to the project.
+
+| Package | TestPyPI environment | PyPI environment |
+|---|---|---|
+| `cnovatech-sdk-core` | `testpypi-core` | `pypi-core` |
+| `cnovatech-datamarket` | `testpypi` | `pypi` |
 
 Installing a pre-release from TestPyPI, which does not mirror every dependency:
 
