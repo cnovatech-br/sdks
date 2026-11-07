@@ -6,9 +6,9 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [0.1.0.dev1] - 2026-11-06
+## [0.1.0] - 2026-11-06
 
-First pre-release, published to TestPyPI.
+First release. Rehearsed on TestPyPI as 0.1.0.dev1.
 
 ### Added
 

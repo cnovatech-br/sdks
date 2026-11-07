@@ -1,6 +1,6 @@
 [project]
 name = "cnovatech-datamarket"
-version = "0.1.0.dev1"
+version = "0.1.0"
 description = "Official Python SDK for the Cnovatech Data Market API: price, availability and assortment intelligence for Brazilian supermarkets."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,7 +30,7 @@ classifiers = [
 # The core and this package are released together; the pin follows the core's
 # minor series and moves with every release.
 dependencies = [
-    "cnovatech-sdk-core>=0.1.0.dev1,<0.2",
+    "cnovatech-sdk-core>=0.1.0,<0.2",
 ]
 
 [project.optional-dependencies]

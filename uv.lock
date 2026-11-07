@@ -142,7 +142,7 @@ wheels = [
 
 [[package]]
 name = "cnovatech-datamarket"
-version = "0.1.0.dev1"
+version = "0.1.0"
 source = { editable = "datamarket-python" }
 dependencies = [
     { name = "cnovatech-sdk-core" },
@@ -162,7 +162,7 @@ provides-extras = ["pandas"]
 
 [[package]]
 name = "cnovatech-sdk-core"
-version = "0.1.0.dev1"
+version = "0.1.0"
 source = { editable = "core" }
 dependencies = [
     { name = "httpx" },

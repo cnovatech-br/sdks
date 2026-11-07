@@ -1,6 +1,6 @@
 [project]
 name = "cnovatech-sdk-core"
-version = "0.1.0.dev1"
+version = "0.1.0"
 description = "Shared HTTP transport, configuration, errors and pagination for the Cnovatech Python SDKs."
 readme = "README.md"
 requires-python = ">=3.10"
