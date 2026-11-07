@@ -6,6 +6,10 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.0.dev1] - 2026-11-06
+
+First pre-release, published to TestPyPI together with `cnovatech-datamarket`.
+
 ### Added
 
 - `ProductSettings` and `ClientConfig` with validation of API key (printable

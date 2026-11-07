@@ -9,9 +9,10 @@ across 240+ online supermarkets in 23 Brazilian states.
 - Retries only where a repeat cannot be billed twice
 - Typed end to end: pydantic models, `py.typed`, `mypy --strict`
 
-> **Status: pre-release.** Every read endpoint of the API is implemented,
-> validated against production and tested offline against recorded responses.
-> The first release to PyPI is next. See the
+> **Status: 0.x.** Every read endpoint of the API is implemented, validated
+> against production and tested offline against recorded responses. Until 1.0
+> a minor release may change the public surface; every such change is listed
+> in the
 > [changelog](https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/CHANGELOG.md).
 
 ## Installation
@@ -198,5 +199,5 @@ Each method's docstring states its cost. The API reference is at
 
 ## License
 
-To be defined before the first stable release. The API terms of use are at
-<https://cnovatech.com.br/termos-de-uso>.
+[MIT](https://github.com/cnovatech-br/sdks/blob/main/LICENSE). The API terms
+of use are at <https://cnovatech.com.br/termos-de-uso>.

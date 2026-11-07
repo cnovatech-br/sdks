@@ -1,19 +1,19 @@
 [project]
 name = "cnovatech-datamarket"
-version = "0.1.0.dev0"
+version = "0.1.0.dev1"
 description = "Official Python SDK for the Cnovatech Data Market API: price, availability and assortment intelligence for Brazilian supermarkets."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary" }
-authors = [{ name = "Cnova Tech", email = "suporte@cnovatech.com.br" }]
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Cnovatech", email = "suporte@cnovatech.com.br" }]
 keywords = [
     "cnovatech", "datamarket", "data market", "pricing", "retail",
     "supermarket", "assortment", "ean", "sdk", "api",
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: Other/Proprietary License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -30,7 +30,7 @@ classifiers = [
 # The core and this package are released together; the pin follows the core's
 # minor series and moves with every release.
 dependencies = [
-    "cnovatech-sdk-core>=0.1.0.dev0,<0.2",
+    "cnovatech-sdk-core>=0.1.0.dev1,<0.2",
 ]
 
 [project.optional-dependencies]
@@ -46,7 +46,7 @@ Changelog = "https://github.com/cnovatech-br/sdks/blob/main/datamarket-python/CH
 cnovatech-sdk-core = { workspace = true }
 
 [build-system]
-requires = ["hatchling>=1.25,<2"]
+requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 # `src/cnovatech/` has no __init__.py on purpose: it is a PEP 420 namespace

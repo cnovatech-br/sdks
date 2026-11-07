@@ -1,18 +1,21 @@
-Copyright (c) 2026 Cnova Tech. All rights reserved.
+MIT License
 
-This software and its source code are proprietary and confidential.
+Copyright (c) 2026 Cnovatech
 
-No part of this software may be reproduced, distributed, modified, published,
-sublicensed, or used to create derivative works without the prior written
-permission of Cnova Tech.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Access to this repository does not grant any licence, express or implied, to any
-patent, copyright, trademark, or other intellectual property right of Cnova Tech.
-
-Terms of use for the Cnovatech Data Market API, which this software accesses, are
-published at https://cnovatech.com.br/termos-de-uso and apply independently of
-this notice.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
