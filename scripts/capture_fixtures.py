@@ -3,7 +3,7 @@
 Two purposes: prove that every model parses what production really returns,
 and refresh the test fixtures with real data, anonymised and with every list
 cut to its first five items. The smallest possible requests are used; the run
-costs about 21 quota units and prints the exact figure at the end.
+costs about 31 quota units and prints the exact figure at the end.
 
 Fixtures are named after the ``operationId`` of the matching path in the
 OpenAPI document kept next to them, so a new endpoint only needs the document
@@ -153,6 +153,14 @@ def exercise(client: DataMarket) -> None:
     client.products.coverage([product.ean, UNKNOWN_EAN])
     client.brands.stores(product.brand or brands.data[0].brand)
 
+    brand = product.brand or brands.data[0].brand
+    client.products.price_changes(brand=brand, limit=5)
+    client.products.promotions(brand=brand, limit=5)
+    client.products.stockouts(brand=brand, limit=5)
+    client.products.price_change_detail(product.ean, min_price_change_count=1, limit=5)
+    client.products.promotion_detail(product.ean, limit=5)
+    client.products.stockout_detail(product.ean, limit=5)
+
     stores = client.stores.list(limit=5)
     store_id = stores.data[0].store_id
     client.stores.assortment(store_id, limit=5)
@@ -162,6 +170,8 @@ def exercise(client: DataMarket) -> None:
         client.stores.compare(store_id, competitors.data[0].store_id, limit=5)
     client.stores.market_position(store_id, limit=5)
     client.stores.opportunities(store_id, limit=5)
+    client.stores.stockouts(store_id, limit=5)
+    client.stores.promotions(store_id, on_promotion=True, limit=5)
 
     # These errors are expected and free; their bodies become the error fixtures.
     with contextlib.suppress(errors.EANNotFoundError):

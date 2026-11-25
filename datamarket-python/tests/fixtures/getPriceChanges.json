@@ -1,0 +1,99 @@
+{
+  "period_days": 30,
+  "summary": {
+    "product_count": 69,
+    "price_change_count": 1497,
+    "median_repriced_store_pct": 26.8,
+    "median_price_variation_pct": 10.0,
+    "last_collected_at": "2026-11-24T16:07:09-03:00"
+  },
+  "data": [
+    {
+      "ean": "7894900093483",
+      "product_name": "REFRIGERANTE DUAL PACK COCA-COLA + FANTA GUARANA 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://superprix.vteximg.com.br/arquivos/ids/211339/mUw-mjHQ--1-.png?v=638116480244870000",
+      "store_count": 8,
+      "repriced_store_count": 6,
+      "repriced_store_pct": 75.0,
+      "price_change_count": 8,
+      "price_increase_store_count": 5,
+      "price_decrease_store_count": 1,
+      "price_variation_pct": 8.8
+    },
+    {
+      "ean": "7894900039061",
+      "product_name": "REFRIGERANTE COCA COLA 2L + REFRIGERANTE FANTA LARANJA 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/04913af3-af8f-477f-bf84-5e82fd309e78.jpg",
+      "store_count": 31,
+      "repriced_store_count": 17,
+      "repriced_store_pct": 54.8,
+      "price_change_count": 21,
+      "price_increase_store_count": 8,
+      "price_decrease_store_count": 8,
+      "price_variation_pct": 13.8
+    },
+    {
+      "ean": "7894900708394",
+      "product_name": "REFRIGERANTE COCA-COLA SEM ACUCAR PET 2 LITROS GRATIS 250ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/183422/6571bea7558925a4e8897d71.jpg?v=638375499951000000",
+      "store_count": 6,
+      "repriced_store_count": 3,
+      "repriced_store_pct": 50.0,
+      "price_change_count": 3,
+      "price_increase_store_count": 1,
+      "price_decrease_store_count": 2,
+      "price_variation_pct": 15.0
+    },
+    {
+      "ean": "7894900709926",
+      "product_name": "COCA-COLA ZERO 2LTS",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/a3576df7-c554-4743-a212-ea3834854843.jpg",
+      "store_count": 6,
+      "repriced_store_count": 3,
+      "repriced_store_pct": 50.0,
+      "price_change_count": 5,
+      "price_increase_store_count": 1,
+      "price_decrease_store_count": 2,
+      "price_variation_pct": 20.0
+    },
+    {
+      "ean": "7894900010077",
+      "product_name": "REFRIGERANTE COCA-COLA 350ML PACK C/ 12",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://superprix.vteximg.com.br/arquivos/ids/211338/Refrigerante-Coca-Cola-350ml-Pack-c-12.png?v=638116425892100000",
+      "store_count": 9,
+      "repriced_store_count": 4,
+      "repriced_store_pct": 44.4,
+      "price_change_count": 7,
+      "price_increase_store_count": 1,
+      "price_decrease_store_count": 2,
+      "price_variation_pct": 13.6
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 69,
+    "pages": 14
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": 29,
+    "limit": 50,
+    "remaining": 21
+  }
+}

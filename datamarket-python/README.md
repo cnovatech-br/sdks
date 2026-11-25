@@ -94,6 +94,43 @@ comparison.data[0].price_position  # "above"
 comparison.data[0].price_diff_pct  # 12.3
 ```
 
+## Trends: what moved, where and since when
+
+Three rankings say which products changed price, went on promotion or went out
+of stock in the last 30 or 90 days. Each has a detail that opens one product
+store by store, and the store resource lists what one store is promoting and
+what is missing from its shelf.
+
+```python
+ranking = client.products.stockouts(brand="MARCA EXEMPLO", min_store_count=10)  # 1 unit
+top = ranking.data[0]
+top.product_name  # "Creme Dental Exemplo 90g"
+top.stockout_store_count, top.store_count  # 7, 42
+top.stockout_store_pct  # 16.7
+
+detail = client.products.stockout_detail(top.ean, available=False)  # 1 unit
+detail.summary.never_available_store_count  # 101, listings left out of the count
+store = detail.data[0]
+store.store_name  # "Supermercado Modelo"
+store.unavailable_since_date  # datetime.date(2026, 11, 5)
+store.unavailable_day_count  # 19
+
+changes = client.products.price_change_detail(top.ean, min_price_change_count=1)
+changes.data[0].changes[0].change_date  # datetime.date(2026, 11, 12)
+changes.data[0].changes[0].previous_price  # 10.99
+changes.data[0].changes[0].price  # 12.49
+
+shelf = client.stores.stockouts(store.store_id, available=False)  # 2 units per page
+shelf.data[0].market.stockout_store_pct  # 7.8: missing here, not across the market
+```
+
+A stockout is a store that sold the product in the window and has it
+unavailable now; a listing that was never available in the window is a product
+the store stopped selling and is counted apart. Rankings are ordered by the
+share of stores involved, because a total only follows how widely a product is
+distributed. The details return events with a date (each price change, each
+promotion period, each gap in stock), not the log of collections.
+
 ## Errors
 
 ```python
@@ -181,10 +218,12 @@ logging.getLogger("cnovatech").setLevel(logging.DEBUG)
 | Resource | Methods | Cost |
 |---|---|---|
 | `client.products` | `catalog`, `departments`, `brands`, `by_brand`, `get`, `price_history` | 1 unit |
+| | `price_changes`, `promotions`, `stockouts` (rankings) | 1 unit per page |
+| | `price_change_detail`, `promotion_detail`, `stockout_detail` (one product, store by store) | 1 unit per page of stores |
 | | `coverage` | ceil(codes / 250) units; up to 500 codes per call |
 | `client.stores` | `list`, `find` | 1 unit |
 | | `competitors`, `competitiveness` | 1 unit per competitor |
-| | `assortment`, `compare`, `market_position`, `opportunities` | ceil(rows / 250) × 2 units per page |
+| | `assortment`, `compare`, `market_position`, `opportunities`, `promotions`, `stockouts` | ceil(rows / 250) × 2 units per page |
 | `client.brands` | `stores` | 1 unit |
 | `client.account` | `profile`, `usage`, `logs`, `api_keys` | free |
 | `client` | `health`, `usage`, `rate_limit`, `close` | free |

@@ -1,0 +1,187 @@
+{
+  "store": {
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
+    "channel": "e-commerce"
+  },
+  "period_days": 30,
+  "summary": {
+    "sold_product_count": 4742,
+    "stockout_count": 228,
+    "stockout_pct": 4.8,
+    "recovered_count": 288
+  },
+  "by_category": [
+    {
+      "category": "LATICINIOS",
+      "product_count": 282,
+      "stockout_count": 30,
+      "stockout_pct": 10.6
+    },
+    {
+      "category": "BISCOITOS E COOKIES",
+      "product_count": 388,
+      "stockout_count": 23,
+      "stockout_pct": 5.9
+    },
+    {
+      "category": "CAFES E CHAS",
+      "product_count": 236,
+      "stockout_count": 16,
+      "stockout_pct": 6.8
+    },
+    {
+      "category": "CABELOS",
+      "product_count": 203,
+      "stockout_count": 15,
+      "stockout_pct": 7.4
+    },
+    {
+      "category": "PRODUTOS DE LIMPEZA",
+      "product_count": 521,
+      "stockout_count": 15,
+      "stockout_pct": 2.9
+    }
+  ],
+  "data": [
+    {
+      "ean": "7891079000229",
+      "product_name": "MACARRAO INSTANTANEO NISSIN 85G GALINHA CAIPIRA",
+      "brand": "NISSIN",
+      "category": "MASSAS E MACARROES",
+      "department": "MERCEARIA",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/290814/MacarraoInstantaneoNissin85gGalinha.jpg?v=638080396585470000",
+      "available": false,
+      "unavailable_since_date": "2026-11-10",
+      "unavailable_day_count": 14,
+      "last_available_date": "2026-11-03",
+      "last_collected_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-10",
+          "end_date": null,
+          "day_count": 14
+        }
+      ],
+      "market": {
+        "store_count": 198,
+        "stockout_store_count": 7,
+        "stockout_store_pct": 3.5
+      }
+    },
+    {
+      "ean": "7896002100014",
+      "product_name": "CACHACA PIRASSUNUNGA 51 965ML",
+      "brand": "51",
+      "category": "DESTILADOS",
+      "department": "BEBIDAS",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/405320/CachacaPirassununga51965ml1.jpg?v=638824082302600000",
+      "available": false,
+      "unavailable_since_date": "2026-11-20",
+      "unavailable_day_count": 4,
+      "last_available_date": "2026-11-10",
+      "last_collected_date": "2026-11-20",
+      "periods": [
+        {
+          "start_date": "2026-11-20",
+          "end_date": null,
+          "day_count": 4
+        }
+      ],
+      "market": {
+        "store_count": 193,
+        "stockout_store_count": 14,
+        "stockout_store_pct": 7.3
+      }
+    },
+    {
+      "ean": "7891132019038",
+      "product_name": "SABOR A MI SEM PIMENTA 300G",
+      "brand": "SABOR AMI",
+      "category": "MOLHOS E CONDIMENTOS",
+      "department": "MERCEARIA",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/298634/SaboraMiSemPimenta300g1.jpg?v=638080592871300000",
+      "available": true,
+      "unavailable_since_date": null,
+      "unavailable_day_count": 13,
+      "last_available_date": "2026-11-20",
+      "last_collected_date": "2026-11-20",
+      "periods": [
+        {
+          "start_date": "2026-10-28",
+          "end_date": "2026-11-10",
+          "day_count": 13
+        }
+      ],
+      "market": {
+        "store_count": 191,
+        "stockout_store_count": 10,
+        "stockout_store_pct": 5.2
+      }
+    },
+    {
+      "ean": "4005900521910",
+      "product_name": "SABONETE EM BARRA LEITE NIVEA 85G",
+      "brand": "NIVEA",
+      "category": "SABONETES",
+      "department": "HIGIENE E BELEZA",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/198383/6571cb52558925a4e889b76f.jpg?v=638375532375330000",
+      "available": true,
+      "unavailable_since_date": null,
+      "unavailable_day_count": 18,
+      "last_available_date": "2026-11-21",
+      "last_collected_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-03",
+          "end_date": "2026-11-21",
+          "day_count": 18
+        }
+      ],
+      "market": {
+        "store_count": 184,
+        "stockout_store_count": 10,
+        "stockout_store_pct": 5.4
+      }
+    },
+    {
+      "ean": "7891150037397",
+      "product_name": "SHAMPOO SEDA CERAMIDAS INFUSAO ATIVA RETINOL E COLAGENO 325ML",
+      "brand": "SEDA",
+      "category": "CABELOS",
+      "department": "HIGIENE E BELEZA",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/409251/ShampooSedaCeramidasInfusaoAtiva1.jpg?v=638852722173200000",
+      "available": true,
+      "unavailable_since_date": null,
+      "unavailable_day_count": 13,
+      "last_available_date": "2026-11-20",
+      "last_collected_date": "2026-11-20",
+      "periods": [
+        {
+          "start_date": "2026-10-28",
+          "end_date": "2026-11-10",
+          "day_count": 13
+        }
+      ],
+      "market": {
+        "store_count": 184,
+        "stockout_store_count": 4,
+        "stockout_store_pct": 2.2
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 516,
+    "pages": 104
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": 36,
+    "limit": 50,
+    "remaining": 14
+  }
+}

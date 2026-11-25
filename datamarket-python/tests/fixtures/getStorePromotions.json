@@ -1,0 +1,230 @@
+{
+  "store": {
+    "store_id": "962a5321-d7b6-48fc-b1a5-447c7d153367",
+    "store_name": "Alvorada Max",
+    "city": "Quedas do Iguacu",
+    "state": "PR",
+    "channel": "e-commerce"
+  },
+  "period_days": 30,
+  "summary": {
+    "sold_product_count": 4742,
+    "promo_product_count": 74,
+    "on_promotion_count": 16,
+    "on_promotion_pct": 0.3,
+    "ended_promotion_count": 58,
+    "always_on_promotion_count": 5,
+    "median_discount_pct": 27.6
+  },
+  "by_category": [
+    {
+      "category": "DESTILADOS",
+      "product_count": 46,
+      "on_promotion_count": 3,
+      "on_promotion_pct": 6.5
+    },
+    {
+      "category": "LATICINIOS",
+      "product_count": 282,
+      "on_promotion_count": 3,
+      "on_promotion_pct": 1.1
+    },
+    {
+      "category": "CERVEJAS",
+      "product_count": 106,
+      "on_promotion_count": 2,
+      "on_promotion_pct": 1.9
+    },
+    {
+      "category": "DOCES E SOBREMESAS",
+      "product_count": 163,
+      "on_promotion_count": 2,
+      "on_promotion_pct": 1.2
+    },
+    {
+      "category": "BISCOITOS E COOKIES",
+      "product_count": 388,
+      "on_promotion_count": 1,
+      "on_promotion_pct": 0.3
+    }
+  ],
+  "data": [
+    {
+      "ean": "82184000328",
+      "product_name": "WHISKY JACK DANIELS HONEY 1L",
+      "brand": "JACK DANIELS",
+      "category": "DESTILADOS",
+      "department": "BEBIDAS",
+      "image_url": "https://d3gdr9n5lqb5z7.cloudfront.net/fotos/2949.jpg",
+      "available": true,
+      "on_promotion": true,
+      "always_on_promotion": false,
+      "list_price": 189.9,
+      "price": 119.9,
+      "discount_pct": 36.9,
+      "min_discount_pct": 36.9,
+      "max_discount_pct": 36.9,
+      "median_discount_pct": 36.9,
+      "promo_day_count": 1,
+      "last_promo_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-21",
+          "end_date": "2026-11-21",
+          "list_price": 189.9,
+          "price": 119.9,
+          "discount_pct": 36.9
+        }
+      ],
+      "market": {
+        "store_count": 134,
+        "promo_store_count": 32,
+        "promo_store_pct": 23.9
+      }
+    },
+    {
+      "ean": "82184090442",
+      "product_name": "WHISKY JACK DANIELS 1L",
+      "brand": "JACK DANIELS",
+      "category": "DESTILADOS",
+      "department": "BEBIDAS",
+      "image_url": "https://carrefourbr.vteximg.com.br/arquivos/ids/194169484/186368_1.jpg?v=638894060439630000",
+      "available": true,
+      "on_promotion": true,
+      "always_on_promotion": false,
+      "list_price": 189.9,
+      "price": 119.9,
+      "discount_pct": 36.9,
+      "min_discount_pct": 36.9,
+      "max_discount_pct": 36.9,
+      "median_discount_pct": 36.9,
+      "promo_day_count": 1,
+      "last_promo_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-21",
+          "end_date": "2026-11-21",
+          "list_price": 189.9,
+          "price": 119.9,
+          "discount_pct": 36.9
+        }
+      ],
+      "market": {
+        "store_count": 122,
+        "promo_store_count": 31,
+        "promo_store_pct": 25.4
+      }
+    },
+    {
+      "ean": "82184004364",
+      "product_name": "WHISKY APPLE JACK DANIELS 1L",
+      "brand": "JACK DANIELS",
+      "category": "DESTILADOS",
+      "department": "BEBIDAS",
+      "image_url": "https://d3gdr9n5lqb5z7.cloudfront.net/fotos/1597175696361.jpg",
+      "available": true,
+      "on_promotion": true,
+      "always_on_promotion": false,
+      "list_price": 189.9,
+      "price": 119.9,
+      "discount_pct": 36.9,
+      "min_discount_pct": 36.9,
+      "max_discount_pct": 36.9,
+      "median_discount_pct": 36.9,
+      "promo_day_count": 1,
+      "last_promo_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-21",
+          "end_date": "2026-11-21",
+          "list_price": 189.9,
+          "price": 119.9,
+          "discount_pct": 36.9
+        }
+      ],
+      "market": {
+        "store_count": 115,
+        "promo_store_count": 27,
+        "promo_store_pct": 23.5
+      }
+    },
+    {
+      "ean": "7896004006406",
+      "product_name": "SALGADINHO BATATA PRINGLES CHURRASCO 109G",
+      "brand": "PRINGLES",
+      "category": "SNACKS E SALGADINHOS",
+      "department": "MERCEARIA",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/363930/SalgadinhoBatataPringlesChurrasco1.jpg?v=638392149374800000",
+      "available": true,
+      "on_promotion": true,
+      "always_on_promotion": false,
+      "list_price": 13.99,
+      "price": 8.99,
+      "discount_pct": 35.7,
+      "min_discount_pct": 35.7,
+      "max_discount_pct": 35.7,
+      "median_discount_pct": 35.7,
+      "promo_day_count": 11,
+      "last_promo_date": "2026-11-20",
+      "periods": [
+        {
+          "start_date": "2026-11-10",
+          "end_date": "2026-11-20",
+          "list_price": 13.99,
+          "price": 8.99,
+          "discount_pct": 35.7
+        }
+      ],
+      "market": {
+        "store_count": 167,
+        "promo_store_count": 55,
+        "promo_store_pct": 32.9
+      }
+    },
+    {
+      "ean": "7891025122067",
+      "product_name": "BEBIDA LACTEA UHT YOPRO SHAKE 15G PROTEINA ZERO LACTOSE MORANGO CAIXA 250ML",
+      "brand": "YOPRO",
+      "category": "LATICINIOS",
+      "department": "FRIOS E LATICINIOS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/198681/6571cb90558925a4e889b8be.jpg?v=638375532990900000",
+      "available": true,
+      "on_promotion": true,
+      "always_on_promotion": false,
+      "list_price": 9.99,
+      "price": 6.99,
+      "discount_pct": 30.0,
+      "min_discount_pct": 30.0,
+      "max_discount_pct": 30.0,
+      "median_discount_pct": 30.0,
+      "promo_day_count": 1,
+      "last_promo_date": "2026-11-20",
+      "periods": [
+        {
+          "start_date": "2026-11-20",
+          "end_date": "2026-11-20",
+          "list_price": 9.99,
+          "price": 6.99,
+          "discount_pct": 30.0
+        }
+      ],
+      "market": {
+        "store_count": 162,
+        "promo_store_count": 52,
+        "promo_store_pct": 32.1
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 16,
+    "pages": 4
+  },
+  "usage": {
+    "query_cost": 2,
+    "used": 37,
+    "limit": 50,
+    "remaining": 13
+  }
+}

@@ -6,6 +6,34 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+Follows the trend endpoints of the API. The fixtures of these endpoints were
+built from the API code against the production base before the endpoints were
+deployed; refresh them with `make capture` once they are live.
+
+### Added
+
+- Trend rankings on `products`: `price_changes()`, `promotions()` and
+  `stockouts()`, over a window of 30 or 90 days, filtered by brand, category,
+  department, state or free text and ordered by the share of stores involved.
+- Per-product detail on `products`: `price_change_detail()`,
+  `promotion_detail()` and `stockout_detail()`. One product, store by store,
+  as events with a date: each price change with both prices, each promotion
+  period, each gap in stock and since when, plus the totals and the breakdown
+  by state and by day. The stores are paginated, and each method takes a
+  filter named after the field it filters (`min_price_change_count`,
+  `on_promotion`, `available`).
+- Per-store lists on `stores`: `promotions()` and `stockouts()`, with the
+  situation of the same product in the rest of the market next to each row.
+- `products.catalog()` takes `sort_by`, `sort_order` and `min_store_count`,
+  and `CatalogProduct` carries `state_store_count`, the stores of the filtered
+  state selling the product: `catalog(state="SC", sort_by="state_store_count")`
+  lists the products sold by the most stores in SC.
+- Models for all of the above in `cnovatech.datamarket.models`, and the
+  `Literal` types `TrendWindow`, `CatalogSortBy`, `PriceChangeSortBy`,
+  `PromotionSortBy`, `StockoutSortBy`, `StorePromotionSortBy` and
+  `StoreStockoutSortBy` in `cnovatech.datamarket.types`.
+- A window other than 30 or 90 days is refused before the request is sent.
+
 ## [0.1.0] - 2026-11-06
 
 First release. Rehearsed on TestPyPI as 0.1.0.dev1.

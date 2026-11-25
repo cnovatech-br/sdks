@@ -37,7 +37,7 @@ def test_every_live_operation_has_an_sdk_counterpart() -> None:
 
 
 def test_endpoint_count_matches_the_documented_scope() -> None:
-    assert len(operations.ENDPOINTS) == 20
+    assert len(operations.ENDPOINTS) == 28
 
 
 def test_only_the_health_check_sits_outside_the_prefix() -> None:

@@ -19,7 +19,7 @@ Refresh them from the workspace root, with `DATAMARKET_API_KEY` set or
 present in `.env`:
 
 ```bash
-make capture   # about 21 quota units
+make capture   # about 31 quota units
 ```
 
 `openapi.json` is the OpenAPI document of the API. `test_contract.py` uses it

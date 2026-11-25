@@ -22,6 +22,12 @@ from cnovatech.datamarket.models.stores import (
     OpportunitiesPage,
     StoresPage,
 )
+from cnovatech.datamarket.models.trends import (
+    AsyncStorePromotionsPage,
+    AsyncStoreStockoutsPage,
+    StorePromotionsPage,
+    StoreStockoutsPage,
+)
 from cnovatech.datamarket.resources import _operations as operations
 from cnovatech.sdk_core.resource import AsyncResource, SyncResource
 from cnovatech.sdk_core.validation import stripped
@@ -41,6 +47,9 @@ if TYPE_CHECKING:
         OpportunityType,
         PricePosition,
         SortOrder,
+        StorePromotionSortBy,
+        StoreStockoutSortBy,
+        TrendWindow,
     )
 
 FIND_PAGE_SIZE = 100
@@ -320,6 +329,126 @@ class Stores(SyncResource):
             page=page,
         )
 
+    def promotions(
+        self,
+        store_id: str,
+        *,
+        days: TrendWindow = 30,
+        on_promotion: bool | None = None,
+        brand: str | None = None,
+        category: str | None = None,
+        department: str | None = None,
+        search: str | None = None,
+        min_discount_pct: float | None = None,
+        sort_by: StorePromotionSortBy = "discount_pct",
+        sort_order: SortOrder = "desc",
+        page: int = 1,
+        limit: int = 50,
+    ) -> StorePromotionsPage:
+        """What a store advertised on promotion in the window, product by product.
+
+        Cost: 2 units per started block of 250 rows, per page (``limit=50``
+        costs 2).
+
+        Each product carries its list price, sale price and discount, its
+        promotion ``periods`` and ``market``: how many stores sell it and how
+        many promoted it. ``always_on_promotion`` marks a product that was on
+        promotion every time it was seen available: a list price nobody was
+        charged. Totals reflect the base as of its last refresh.
+
+        Args:
+            store_id: Identifier from :meth:`list` or :meth:`find`.
+            days: Window in days: 30 or 90.
+            on_promotion: ``True`` for the promotions running now, ``False``
+                for the ones that ended.
+            brand: Exact brand.
+            category: Exact category.
+            department: Exact department.
+            search: Words of the product name, brand or EAN.
+            min_discount_pct: Smallest current discount, up to 70.
+            sort_by: Field to order by.
+            sort_order: ``"asc"`` or ``"desc"``.
+            page: Page number, from 1.
+            limit: Products per page, up to 200.
+        """
+        return self._execute_paginated(
+            partial(
+                operations.store_promotions,
+                StorePromotionsPage,
+                store_id=store_id,
+                days=days,
+                on_promotion=on_promotion,
+                brand=brand,
+                category=category,
+                department=department,
+                search=search,
+                min_discount_pct=min_discount_pct,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                limit=limit,
+            ),
+            page=page,
+        )
+
+    def stockouts(
+        self,
+        store_id: str,
+        *,
+        days: TrendWindow = 30,
+        available: bool | None = None,
+        brand: str | None = None,
+        category: str | None = None,
+        department: str | None = None,
+        search: str | None = None,
+        sort_by: StoreStockoutSortBy = "store_count",
+        sort_order: SortOrder = "desc",
+        page: int = 1,
+        limit: int = 50,
+    ) -> StoreStockoutsPage:
+        """What went missing in a store in the window, product by product.
+
+        Cost: 2 units per started block of 250 rows, per page (``limit=50``
+        costs 2).
+
+        Each product carries since when it is missing, for how many days, its
+        stockout ``periods`` and ``market``: in how many other stores the
+        same product is also out, which tells a problem of this store from a
+        product missing everywhere. The default order puts first the
+        products sold by the most stores, the ones a shopper finds elsewhere.
+        Totals reflect the base as of its last refresh.
+
+        Args:
+            store_id: Identifier from :meth:`list` or :meth:`find`.
+            days: Window in days: 30 or 90.
+            available: ``False`` for the products missing now, ``True`` for
+                the ones that ran out and came back.
+            brand: Exact brand.
+            category: Exact category.
+            department: Exact department.
+            search: Words of the product name, brand or EAN.
+            sort_by: Field to order by.
+            sort_order: ``"asc"`` or ``"desc"``.
+            page: Page number, from 1.
+            limit: Products per page, up to 200.
+        """
+        return self._execute_paginated(
+            partial(
+                operations.store_stockouts,
+                StoreStockoutsPage,
+                store_id=store_id,
+                days=days,
+                available=available,
+                brand=brand,
+                category=category,
+                department=department,
+                search=search,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                limit=limit,
+            ),
+            page=page,
+        )
+
 
 class AsyncStores(AsyncResource):
     """Listing, lookup by name, assortment, competitors and price analyses of stores."""
@@ -469,6 +598,76 @@ class AsyncStores(AsyncResource):
                 max_diff_pct=max_diff_pct,
                 min_store_count=min_store_count,
                 state=state,
+                limit=limit,
+            ),
+            page=page,
+        )
+
+    async def promotions(
+        self,
+        store_id: str,
+        *,
+        days: TrendWindow = 30,
+        on_promotion: bool | None = None,
+        brand: str | None = None,
+        category: str | None = None,
+        department: str | None = None,
+        search: str | None = None,
+        min_discount_pct: float | None = None,
+        sort_by: StorePromotionSortBy = "discount_pct",
+        sort_order: SortOrder = "desc",
+        page: int = 1,
+        limit: int = 50,
+    ) -> AsyncStorePromotionsPage:
+        """What a store advertised on promotion. See :meth:`Stores.promotions`."""
+        return await self._execute_paginated(
+            partial(
+                operations.store_promotions,
+                AsyncStorePromotionsPage,
+                store_id=store_id,
+                days=days,
+                on_promotion=on_promotion,
+                brand=brand,
+                category=category,
+                department=department,
+                search=search,
+                min_discount_pct=min_discount_pct,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                limit=limit,
+            ),
+            page=page,
+        )
+
+    async def stockouts(
+        self,
+        store_id: str,
+        *,
+        days: TrendWindow = 30,
+        available: bool | None = None,
+        brand: str | None = None,
+        category: str | None = None,
+        department: str | None = None,
+        search: str | None = None,
+        sort_by: StoreStockoutSortBy = "store_count",
+        sort_order: SortOrder = "desc",
+        page: int = 1,
+        limit: int = 50,
+    ) -> AsyncStoreStockoutsPage:
+        """What went missing in a store. See :meth:`Stores.stockouts`."""
+        return await self._execute_paginated(
+            partial(
+                operations.store_stockouts,
+                AsyncStoreStockoutsPage,
+                store_id=store_id,
+                days=days,
+                available=available,
+                brand=brand,
+                category=category,
+                department=department,
+                search=search,
+                sort_by=sort_by,
+                sort_order=sort_order,
                 limit=limit,
             ),
             page=page,

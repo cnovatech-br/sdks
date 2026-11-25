@@ -57,7 +57,7 @@ matrix:  ## Offline test suite on every supported Python, each in its own enviro
 live:  ## Smoke test against the real API; free endpoints only
 	cd datamarket-python && uv run $(ENV_FILE) pytest tests/test_live.py --live
 
-capture:  ## Call every endpoint once through the SDK and refresh the fixtures (about 21 units)
+capture:  ## Call every endpoint once through the SDK and refresh the fixtures (about 31 units)
 	uv run $(ENV_FILE) python scripts/capture_fixtures.py
 
 build:  ## Build sdist and wheel of every package into dist/

@@ -26,3 +26,14 @@ def validate_state(value: str | None, *, name: str = "state") -> str | None:
             f"{name} must be a two-letter state code such as 'SP'; got {value!r}."
         )
     return candidate.upper()
+
+
+TREND_WINDOWS = frozenset({30, 90})
+"""Windows the trend endpoints keep, in days."""
+
+
+def validate_window(value: int) -> int:
+    """A trend window: 30 or 90 days, the two the API keeps."""
+    if isinstance(value, bool) or value not in TREND_WINDOWS:
+        raise InvalidRequestError(f"days must be 30 or 90; got {value!r}.")
+    return value

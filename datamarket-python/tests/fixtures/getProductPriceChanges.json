@@ -1,0 +1,238 @@
+{
+  "ean": "7894900027013",
+  "product_name": "REFRIGERANTE COCA-COLA PET 2L",
+  "brand": "COCA-COLA",
+  "category": "REFRIGERANTES",
+  "department": "BEBIDAS",
+  "image_url": "https://bretas.vteximg.com.br/arquivos/ids/192050/6571c5df558925a4e8899eef.jpg?v=638375518430000000",
+  "period_days": 30,
+  "summary": {
+    "store_count": 179,
+    "repriced_store_count": 64,
+    "repriced_store_pct": 35.8,
+    "price_change_count": 92,
+    "price_increase_store_count": 42,
+    "price_decrease_store_count": 20,
+    "median_price": 11.79,
+    "min_price": 9.48,
+    "max_price": 22.99,
+    "price_variation_pct": 8.3,
+    "last_collected_date": "2026-11-24"
+  },
+  "by_state": [
+    {
+      "state": "SP",
+      "store_count": 50,
+      "repriced_store_count": 19,
+      "repriced_store_pct": 38.0
+    },
+    {
+      "state": "RS",
+      "store_count": 25,
+      "repriced_store_count": 11,
+      "repriced_store_pct": 44.0
+    },
+    {
+      "state": "SC",
+      "store_count": 22,
+      "repriced_store_count": 11,
+      "repriced_store_pct": 50.0
+    },
+    {
+      "state": "MG",
+      "store_count": 17,
+      "repriced_store_count": 6,
+      "repriced_store_pct": 35.3
+    },
+    {
+      "state": "PR",
+      "store_count": 15,
+      "repriced_store_count": 6,
+      "repriced_store_pct": 40.0
+    }
+  ],
+  "data": [
+    {
+      "store_id": "bdbe748b-89f1-43b5-983a-188d4bfce3b9",
+      "store_name": "Carrefour Mercado",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "product_url": "https://mercado.carrefour.com.br/refrigerante-cocacola-garrafa-2-l-5761719/p",
+      "price": 11.99,
+      "price_change_count": 3,
+      "min_price": 10.59,
+      "max_price": 12.49,
+      "price_variation_pct": 17.9,
+      "price_diff_pct": 1.7,
+      "last_collected_date": "2026-11-17",
+      "changes": [
+        {
+          "change_date": "2026-11-03",
+          "previous_price": 12.49,
+          "price": 10.59,
+          "change_pct": -15.2
+        },
+        {
+          "change_date": "2026-11-09",
+          "previous_price": 10.59,
+          "price": 12.49,
+          "change_pct": 17.9
+        },
+        {
+          "change_date": "2026-11-17",
+          "previous_price": 12.49,
+          "price": 11.99,
+          "change_pct": -4.0
+        }
+      ]
+    },
+    {
+      "store_id": "4be7bd64-8c77-4b38-81f2-79e48b0ea388",
+      "store_name": "Comercial Zaffari Online",
+      "city": "Passo Fundo",
+      "state": "RS",
+      "product_url": "https://www.comercialzaffarionline.com.br/produtos/detalhe/8390/refrigerante-coca-cola-2l",
+      "price": 9.99,
+      "price_change_count": 3,
+      "min_price": 9.99,
+      "max_price": 12.05,
+      "price_variation_pct": 20.6,
+      "price_diff_pct": -15.27,
+      "last_collected_date": "2026-11-18",
+      "changes": [
+        {
+          "change_date": "2026-11-03",
+          "previous_price": 12.05,
+          "price": 10.49,
+          "change_pct": -12.9
+        },
+        {
+          "change_date": "2026-11-09",
+          "previous_price": 10.49,
+          "price": 12.05,
+          "change_pct": 14.9
+        },
+        {
+          "change_date": "2026-11-18",
+          "previous_price": 12.05,
+          "price": 9.99,
+          "change_pct": -17.1
+        }
+      ]
+    },
+    {
+      "store_id": "222940dc-510d-41d5-ad6d-800fdc1833d4",
+      "store_name": "Lar em Casa",
+      "city": "Medianeira",
+      "state": "PR",
+      "product_url": "https://laremcasa.com.br/produtos/6090005/refrigerante-de-cola-cocacola-garrafa-2lt",
+      "price": 12.99,
+      "price_change_count": 3,
+      "min_price": 10.49,
+      "max_price": 12.99,
+      "price_variation_pct": 23.8,
+      "price_diff_pct": 10.18,
+      "last_collected_date": "2026-11-22",
+      "changes": [
+        {
+          "change_date": "2026-11-04",
+          "previous_price": 11.99,
+          "price": 10.49,
+          "change_pct": -12.5
+        },
+        {
+          "change_date": "2026-11-11",
+          "previous_price": 10.49,
+          "price": 11.99,
+          "change_pct": 14.3
+        },
+        {
+          "change_date": "2026-11-22",
+          "previous_price": 11.99,
+          "price": 12.99,
+          "change_pct": 8.3
+        }
+      ]
+    },
+    {
+      "store_id": "461f2f00-9812-489b-8b67-981a0b15a86e",
+      "store_name": "Miranda em Casa",
+      "city": "Carangola",
+      "state": "MG",
+      "product_url": "https://www.mirandaemcasa.com.br/produtos/detalhe/11564/refrigerante-coca-cola-original-pet-2l",
+      "price": 13.11,
+      "price_change_count": 3,
+      "min_price": 10.29,
+      "max_price": 13.11,
+      "price_variation_pct": 27.4,
+      "price_diff_pct": 11.2,
+      "last_collected_date": "2026-11-20",
+      "changes": [
+        {
+          "change_date": "2026-11-05",
+          "previous_price": 12.59,
+          "price": 13.11,
+          "change_pct": 4.1
+        },
+        {
+          "change_date": "2026-11-10",
+          "previous_price": 13.11,
+          "price": 10.29,
+          "change_pct": -21.5
+        },
+        {
+          "change_date": "2026-11-20",
+          "previous_price": 10.29,
+          "price": 13.11,
+          "change_pct": 27.4
+        }
+      ]
+    },
+    {
+      "store_id": "a84741e7-f204-4558-8d3c-0892339d55b8",
+      "store_name": "Str Lajeado",
+      "city": "Lajeado",
+      "state": "RS",
+      "product_url": "https://strlajeado.com.br/produtos/1291120/refrig-coca-cola-2l",
+      "price": 11.49,
+      "price_change_count": 3,
+      "min_price": 9.98,
+      "max_price": 11.49,
+      "price_variation_pct": 15.1,
+      "price_diff_pct": -2.54,
+      "last_collected_date": "2026-11-23",
+      "changes": [
+        {
+          "change_date": "2026-11-04",
+          "previous_price": 10.99,
+          "price": 11.49,
+          "change_pct": 4.5
+        },
+        {
+          "change_date": "2026-11-11",
+          "previous_price": 11.49,
+          "price": 9.98,
+          "change_pct": -13.1
+        },
+        {
+          "change_date": "2026-11-23",
+          "previous_price": 9.98,
+          "price": 11.49,
+          "change_pct": 15.1
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 64,
+    "pages": 13
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": 32,
+    "limit": 50,
+    "remaining": 18
+  }
+}

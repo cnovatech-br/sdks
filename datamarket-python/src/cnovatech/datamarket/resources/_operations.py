@@ -31,7 +31,11 @@ from cnovatech.datamarket.resources._pricing import (
     coverage_cost,
     export_cost,
 )
-from cnovatech.datamarket.resources._validation import validate_ean, validate_state
+from cnovatech.datamarket.resources._validation import (
+    validate_ean,
+    validate_state,
+    validate_window,
+)
 from cnovatech.sdk_core.operation import Endpoint, Operation
 from cnovatech.sdk_core.validation import (
     validate_batch,
@@ -45,6 +49,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
 
     from cnovatech.datamarket.types import (
+        CatalogSortBy,
         Channel,
         ComparisonSortBy,
         Granularity,
@@ -52,8 +57,13 @@ if TYPE_CHECKING:
         MarketScope,
         OfferSortBy,
         OpportunityType,
+        PriceChangeSortBy,
         PricePosition,
+        PromotionSortBy,
         SortOrder,
+        StockoutSortBy,
+        StorePromotionSortBy,
+        StoreStockoutSortBy,
     )
 
 PageT = TypeVar("PageT", bound=BaseModel)
@@ -65,6 +75,12 @@ PRODUCTS_BY_BRAND = Endpoint("GET", "/market/products/by-brand")
 PRODUCT = Endpoint("GET", "/market/products/ean/{ean}")
 PRICE_HISTORY = Endpoint("GET", "/market/products/ean/{ean}/price-history")
 COVERAGE = Endpoint("POST", "/market/products/coverage")
+PRICE_CHANGES = Endpoint("GET", "/market/products/price-changes")
+PROMOTIONS = Endpoint("GET", "/market/products/promotions")
+STOCKOUTS = Endpoint("GET", "/market/products/stockouts")
+PRODUCT_PRICE_CHANGES = Endpoint("GET", "/market/products/ean/{ean}/price-changes")
+PRODUCT_PROMOTIONS = Endpoint("GET", "/market/products/ean/{ean}/promotions")
+PRODUCT_STOCKOUTS = Endpoint("GET", "/market/products/ean/{ean}/stockouts")
 STORES = Endpoint("GET", "/market/stores")
 ASSORTMENT = Endpoint("GET", "/market/stores/{store_id}/assortment")
 COMPETITIVENESS = Endpoint("GET", "/market/stores/{store_id}/competitiveness")
@@ -72,6 +88,8 @@ COMPETITORS = Endpoint("GET", "/market/stores/{store_id}/competitors")
 COMPARISON = Endpoint("GET", "/market/stores/{store_id}/competitors/{competitor_id}/products")
 MARKET_POSITION = Endpoint("GET", "/market/stores/{store_id}/market-position")
 OPPORTUNITIES = Endpoint("GET", "/market/stores/{store_id}/opportunities")
+STORE_PROMOTIONS = Endpoint("GET", "/market/stores/{store_id}/promotions")
+STORE_STOCKOUTS = Endpoint("GET", "/market/stores/{store_id}/stockouts")
 STORES_BY_BRAND = Endpoint("GET", "/market/brands/{brand}/stores")
 PROFILE = Endpoint("GET", "/user/profile")
 USAGE = Endpoint("GET", "/user/usage")
@@ -87,6 +105,12 @@ ENDPOINTS: tuple[Endpoint, ...] = (
     PRODUCT,
     PRICE_HISTORY,
     COVERAGE,
+    PRICE_CHANGES,
+    PROMOTIONS,
+    STOCKOUTS,
+    PRODUCT_PRICE_CHANGES,
+    PRODUCT_PROMOTIONS,
+    PRODUCT_STOCKOUTS,
     STORES,
     ASSORTMENT,
     COMPETITIVENESS,
@@ -94,6 +118,8 @@ ENDPOINTS: tuple[Endpoint, ...] = (
     COMPARISON,
     MARKET_POSITION,
     OPPORTUNITIES,
+    STORE_PROMOTIONS,
+    STORE_STOCKOUTS,
     STORES_BY_BRAND,
     PROFILE,
     USAGE,
@@ -114,6 +140,9 @@ MAX_LIMIT_COMPARISON = 100
 MAX_LIMIT_MARKET_POSITION = 10_000
 MAX_LIMIT_OPPORTUNITIES = 1000
 MAX_LIMIT_LOGS = 100
+MAX_LIMIT_TRENDS = 100
+MAX_LIMIT_TREND_STORES = 300
+MAX_LIMIT_STORE_TRENDS = 200
 MAX_CODES_PER_COVERAGE = 500
 
 _STORE_ROUTE_ERRORS: Mapping[int, type[StoreNotFoundError]] = {404: StoreNotFoundError}
@@ -133,6 +162,9 @@ def catalog(
     channel: Channel | None,
     min_price: float | None,
     max_price: float | None,
+    min_store_count: int | None,
+    sort_by: CatalogSortBy | None,
+    sort_order: SortOrder,
     limit: int,
     page: int,
 ) -> Operation[PageT]:
@@ -148,6 +180,10 @@ def catalog(
             "channel": channel,
             "min_price": min_price,
             "max_price": max_price,
+            "min_store_count": min_store_count,
+            "sort_by": sort_by,
+            # The default order has no direction to set, so it travels only with a sort.
+            "sort_order": sort_order if sort_by else None,
             "page": validate_page(page),
             "limit": validate_limit(limit, maximum=MAX_LIMIT_CATALOG),
         },
@@ -259,6 +295,218 @@ def coverage(eans: Iterable[str]) -> Operation[CoverageResponse]:
         CoverageResponse.model_validate,
         json_body={"eans": codes},
         estimated_cost=coverage_cost(len(codes)),
+    )
+
+
+# --- trends -------------------------------------------------------------------
+
+
+def _trend_params(
+    *,
+    days: int,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    state: str | None,
+    search: str | None,
+    min_store_count: int,
+    sort_by: str,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> dict[str, object]:
+    """Window, filters, ordering and paging shared by the three rankings."""
+    return {
+        "days": validate_window(days),
+        "brand": brand,
+        "category": category,
+        "department": department,
+        "state": validate_state(state),
+        "search": search,
+        "min_store_count": min_store_count,
+        "sort_by": sort_by,
+        "sort_order": sort_order,
+        "page": validate_page(page),
+        "limit": validate_limit(limit, maximum=MAX_LIMIT_TRENDS),
+    }
+
+
+def price_changes(
+    page_model: type[PageT],
+    *,
+    days: int,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    state: str | None,
+    search: str | None,
+    min_store_count: int,
+    sort_by: PriceChangeSortBy,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/price-changes``: one unit per page."""
+    return PRICE_CHANGES.operation(
+        page_model.model_validate,
+        params=_trend_params(
+            days=days,
+            brand=brand,
+            category=category,
+            department=department,
+            state=state,
+            search=search,
+            min_store_count=min_store_count,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            limit=limit,
+            page=page,
+        ),
+        estimated_cost=QUERY_COST,
+    )
+
+
+def promotions(
+    page_model: type[PageT],
+    *,
+    days: int,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    state: str | None,
+    search: str | None,
+    min_store_count: int,
+    min_discount_pct: float | None,
+    sort_by: PromotionSortBy,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/promotions``: one unit per page."""
+    params = _trend_params(
+        days=days,
+        brand=brand,
+        category=category,
+        department=department,
+        state=state,
+        search=search,
+        min_store_count=min_store_count,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        limit=limit,
+        page=page,
+    )
+    params["min_discount_pct"] = min_discount_pct
+    return PROMOTIONS.operation(page_model.model_validate, params=params, estimated_cost=QUERY_COST)
+
+
+def stockouts(
+    page_model: type[PageT],
+    *,
+    days: int,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    state: str | None,
+    search: str | None,
+    min_store_count: int,
+    sort_by: StockoutSortBy,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/stockouts``: one unit per page."""
+    return STOCKOUTS.operation(
+        page_model.model_validate,
+        params=_trend_params(
+            days=days,
+            brand=brand,
+            category=category,
+            department=department,
+            state=state,
+            search=search,
+            min_store_count=min_store_count,
+            sort_by=sort_by,
+            sort_order=sort_order,
+            limit=limit,
+            page=page,
+        ),
+        estimated_cost=QUERY_COST,
+    )
+
+
+def product_price_changes(
+    page_model: type[PageT],
+    *,
+    ean: str,
+    days: int,
+    state: str | None,
+    min_price_change_count: int,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/ean/{ean}/price-changes``: one unit per page of stores."""
+    return PRODUCT_PRICE_CHANGES.operation(
+        page_model.model_validate,
+        params={
+            "days": validate_window(days),
+            "state": validate_state(state),
+            "min_price_change_count": min_price_change_count,
+            "page": validate_page(page),
+            "limit": validate_limit(limit, maximum=MAX_LIMIT_TREND_STORES),
+        },
+        estimated_cost=QUERY_COST,
+        ean=validate_ean(ean),
+    )
+
+
+def product_promotions(
+    page_model: type[PageT],
+    *,
+    ean: str,
+    days: int,
+    state: str | None,
+    on_promotion: bool | None,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/ean/{ean}/promotions``: one unit per page of stores."""
+    return PRODUCT_PROMOTIONS.operation(
+        page_model.model_validate,
+        params={
+            "days": validate_window(days),
+            "state": validate_state(state),
+            "on_promotion": on_promotion,
+            "page": validate_page(page),
+            "limit": validate_limit(limit, maximum=MAX_LIMIT_TREND_STORES),
+        },
+        estimated_cost=QUERY_COST,
+        ean=validate_ean(ean),
+    )
+
+
+def product_stockouts(
+    page_model: type[PageT],
+    *,
+    ean: str,
+    days: int,
+    state: str | None,
+    available: bool | None,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/products/ean/{ean}/stockouts``: one unit per page of stores."""
+    return PRODUCT_STOCKOUTS.operation(
+        page_model.model_validate,
+        params={
+            "days": validate_window(days),
+            "state": validate_state(state),
+            "available": available,
+            "page": validate_page(page),
+            "limit": validate_limit(limit, maximum=MAX_LIMIT_TREND_STORES),
+        },
+        estimated_cost=QUERY_COST,
+        ean=validate_ean(ean),
     )
 
 
@@ -420,6 +668,82 @@ def opportunities(
             "max_diff_pct": max_diff_pct,
             "min_store_count": min_store_count,
             "state": validate_state(state),
+            "page": validate_page(page),
+            "limit": rows,
+        },
+        estimated_cost=export_cost(rows),
+        status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
+    )
+
+
+def store_promotions(
+    page_model: type[PageT],
+    *,
+    store_id: str,
+    days: int,
+    on_promotion: bool | None,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    search: str | None,
+    min_discount_pct: float | None,
+    sort_by: StorePromotionSortBy,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/stores/{store_id}/promotions``: two units per started block of 250 rows."""
+    rows = validate_limit(limit, maximum=MAX_LIMIT_STORE_TRENDS)
+    return STORE_PROMOTIONS.operation(
+        page_model.model_validate,
+        params={
+            "days": validate_window(days),
+            "on_promotion": on_promotion,
+            "brand": brand,
+            "category": category,
+            "department": department,
+            "search": search,
+            "min_discount_pct": min_discount_pct,
+            "sort_by": sort_by,
+            "sort_order": sort_order,
+            "page": validate_page(page),
+            "limit": rows,
+        },
+        estimated_cost=export_cost(rows),
+        status_overrides=_STORE_ROUTE_ERRORS,
+        store_id=validate_identifier(store_id, name="store_id"),
+    )
+
+
+def store_stockouts(
+    page_model: type[PageT],
+    *,
+    store_id: str,
+    days: int,
+    available: bool | None,
+    brand: str | None,
+    category: str | None,
+    department: str | None,
+    search: str | None,
+    sort_by: StoreStockoutSortBy,
+    sort_order: SortOrder,
+    limit: int,
+    page: int,
+) -> Operation[PageT]:
+    """``GET /market/stores/{store_id}/stockouts``: two units per started block of 250 rows."""
+    rows = validate_limit(limit, maximum=MAX_LIMIT_STORE_TRENDS)
+    return STORE_STOCKOUTS.operation(
+        page_model.model_validate,
+        params={
+            "days": validate_window(days),
+            "available": available,
+            "brand": brand,
+            "category": category,
+            "department": department,
+            "search": search,
+            "sort_by": sort_by,
+            "sort_order": sort_order,
             "page": validate_page(page),
             "limit": rows,
         },

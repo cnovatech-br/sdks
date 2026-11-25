@@ -1,0 +1,88 @@
+{
+  "period_days": 30,
+  "summary": {
+    "product_count": 292,
+    "median_promo_store_pct": 16.5,
+    "median_discount_pct": 13.5,
+    "last_collected_at": "2026-11-24T13:59:35-03:00"
+  },
+  "data": [
+    {
+      "ean": "7899916919925",
+      "product_name": "NEC CRAN NATON 900ML",
+      "brand": "NATURAL ONE",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://www.paodeacucar.com/img/uploads/1/212/32997212.png",
+      "store_count": 21,
+      "promo_store_count": 10,
+      "promo_store_pct": 47.6,
+      "median_discount_pct": 20.0,
+      "max_discount_pct": 30.0
+    },
+    {
+      "ean": "7894900184303",
+      "product_name": "BEBIDA MISTA SPTRIZ SCHWEPPES 250ML",
+      "brand": "SCHWEPPES",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://amigao.vteximg.com.br/arquivos/ids/172184/2mis.jpg?v=638876018400270000",
+      "store_count": 62,
+      "promo_store_count": 29,
+      "promo_store_pct": 46.8,
+      "median_discount_pct": 15.6,
+      "max_discount_pct": 55.6
+    },
+    {
+      "ean": "7898692302655",
+      "product_name": "ISOTONICO ORGANICO MARACUJA JUNGLE 500ML",
+      "brand": "JUNGLE",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://mambodelivery.vteximg.com.br/arquivos/ids/241784/286084.jpg?v=639032980858330000",
+      "store_count": 30,
+      "promo_store_count": 14,
+      "promo_store_pct": 46.7,
+      "median_discount_pct": 19.2,
+      "max_discount_pct": 39.4
+    },
+    {
+      "ean": "7894900039061",
+      "product_name": "REFRIGERANTE COCA COLA 2L + REFRIGERANTE FANTA LARANJA 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/04913af3-af8f-477f-bf84-5e82fd309e78.jpg",
+      "store_count": 31,
+      "promo_store_count": 14,
+      "promo_store_pct": 45.2,
+      "median_discount_pct": 12.8,
+      "max_discount_pct": 26.3
+    },
+    {
+      "ean": "7897947621336",
+      "product_name": "HIDRATANTE LABIAL CARMED COCA COLA MARROM 10G",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/562044b6-b0f8-45e1-8fea-ead4c4fc7ff6.jpg",
+      "store_count": 20,
+      "promo_store_count": 9,
+      "promo_store_pct": 45.0,
+      "median_discount_pct": 32.0,
+      "max_discount_pct": 49.6
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 292,
+    "pages": 59
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": 30,
+    "limit": 50,
+    "remaining": 20
+  }
+}

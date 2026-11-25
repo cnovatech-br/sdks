@@ -44,6 +44,8 @@ class CatalogProduct(Record):
     department: str | None = None
     image_url: str | None = None
     store_count: int
+    state_store_count: int | None = None
+    """Stores of the filtered state selling the product; ``None`` without the ``state`` filter."""
     state_count: int
     states: list[str] = Field(default_factory=list)
     channels: list[str] = Field(default_factory=list)

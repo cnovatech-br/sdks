@@ -35,3 +35,47 @@ SortOrder = Literal["asc", "desc"]
 
 LogStatus = Literal["success", "error"]
 """Outcome filter of the request log: 2xx responses, or 4xx and above."""
+
+CatalogSortBy = Literal[
+    "store_count",
+    "state_store_count",
+    "median_price",
+    "min_price",
+    "max_price",
+    "price_range_pct",
+    "availability_pct",
+    "product_name",
+]
+"""Ordering of the catalogue. ``state_store_count`` needs the ``state`` filter."""
+
+TrendWindow = Literal[30, 90]
+"""Window of the trend endpoints, in days."""
+
+PriceChangeSortBy = Literal[
+    "repriced_store_pct",
+    "repriced_store_count",
+    "price_change_count",
+    "price_variation_pct",
+    "store_count",
+]
+"""Ordering of the price change ranking."""
+
+PromotionSortBy = Literal[
+    "promo_store_pct",
+    "promo_store_count",
+    "median_discount_pct",
+    "max_discount_pct",
+    "store_count",
+]
+"""Ordering of the promotion ranking."""
+
+StockoutSortBy = Literal["stockout_store_pct", "stockout_store_count", "store_count"]
+"""Ordering of the stockout ranking."""
+
+StoreStockoutSortBy = Literal["store_count", "stockout_store_pct", "product_name"]
+"""Ordering of the stockouts of a store: by the market that sells the product, or by name."""
+
+StorePromotionSortBy = Literal[
+    "discount_pct", "median_discount_pct", "promo_store_pct", "store_count", "product_name"
+]
+"""Ordering of the promotions of a store."""

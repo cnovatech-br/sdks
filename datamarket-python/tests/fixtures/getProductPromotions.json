@@ -1,0 +1,231 @@
+{
+  "ean": "7894900027013",
+  "product_name": "REFRIGERANTE COCA-COLA PET 2L",
+  "brand": "COCA-COLA",
+  "category": "REFRIGERANTES",
+  "department": "BEBIDAS",
+  "image_url": "https://bretas.vteximg.com.br/arquivos/ids/192050/6571c5df558925a4e8899eef.jpg?v=638375518430000000",
+  "period_days": 30,
+  "summary": {
+    "store_count": 179,
+    "promo_store_count": 50,
+    "promo_store_pct": 27.9,
+    "on_promotion_store_count": 25,
+    "median_list_price": 11.98,
+    "median_price": 10.62,
+    "min_price": 8.98,
+    "max_price": 11.99,
+    "median_discount_pct": 9.3,
+    "max_discount_pct": 33.4,
+    "promo_day_count": 31,
+    "last_promo_date": "2026-11-23"
+  },
+  "by_day": [
+    {
+      "date": "2026-10-25",
+      "store_count": 160,
+      "promo_store_count": 24,
+      "promo_store_pct": 15.0,
+      "median_discount_pct": 10.2
+    },
+    {
+      "date": "2026-10-26",
+      "store_count": 160,
+      "promo_store_count": 24,
+      "promo_store_pct": 15.0,
+      "median_discount_pct": 10.2
+    },
+    {
+      "date": "2026-10-27",
+      "store_count": 159,
+      "promo_store_count": 25,
+      "promo_store_pct": 15.7,
+      "median_discount_pct": 9.6
+    },
+    {
+      "date": "2026-10-28",
+      "store_count": 161,
+      "promo_store_count": 25,
+      "promo_store_pct": 15.5,
+      "median_discount_pct": 8.8
+    },
+    {
+      "date": "2026-10-29",
+      "store_count": 161,
+      "promo_store_count": 25,
+      "promo_store_pct": 15.5,
+      "median_discount_pct": 7.4
+    }
+  ],
+  "by_state": [
+    {
+      "state": "SP",
+      "store_count": 50,
+      "promo_store_count": 15,
+      "promo_store_pct": 30.0
+    },
+    {
+      "state": "RS",
+      "store_count": 25,
+      "promo_store_count": 6,
+      "promo_store_pct": 24.0
+    },
+    {
+      "state": "SC",
+      "store_count": 22,
+      "promo_store_count": 6,
+      "promo_store_pct": 27.3
+    },
+    {
+      "state": "MG",
+      "store_count": 17,
+      "promo_store_count": 4,
+      "promo_store_pct": 23.5
+    },
+    {
+      "state": "PR",
+      "store_count": 15,
+      "promo_store_count": 3,
+      "promo_store_pct": 20.0
+    }
+  ],
+  "data": [
+    {
+      "store_id": "885228d0-20d8-46f7-8dbe-9909786454cf",
+      "store_name": "Bemol",
+      "city": "Manaus",
+      "state": "AM",
+      "product_url": "https://www.bemol.com.br/refrigerante-coca-cola-original-pet-2-litros/p",
+      "on_promotion": true,
+      "list_price": 13.0,
+      "price": 9.9,
+      "discount_pct": 23.8,
+      "promo_day_count": 9,
+      "min_discount_pct": 23.8,
+      "max_discount_pct": 23.8,
+      "median_discount_pct": 23.8,
+      "last_promo_date": "2026-11-16",
+      "periods": [
+        {
+          "start_date": "2026-11-08",
+          "end_date": "2026-11-16",
+          "list_price": 13.0,
+          "price": 9.9,
+          "discount_pct": 23.8
+        }
+      ]
+    },
+    {
+      "store_id": "9c4d8efb-50c4-4dec-aef5-fa4abdcfc379",
+      "store_name": "Supermercado Ibiúna",
+      "city": "Ibiuna",
+      "state": "SP",
+      "product_url": "https://www.loja.supermercadoibiuna.com.br/produtos/detalhe/10439/refrigerante-menos-acucar-cocacola-garrafa-2l",
+      "on_promotion": true,
+      "list_price": 11.29,
+      "price": 9.49,
+      "discount_pct": 15.9,
+      "promo_day_count": 1,
+      "min_discount_pct": 15.9,
+      "max_discount_pct": 15.9,
+      "median_discount_pct": 15.9,
+      "last_promo_date": "2026-11-21",
+      "periods": [
+        {
+          "start_date": "2026-11-21",
+          "end_date": "2026-11-21",
+          "list_price": 11.29,
+          "price": 9.49,
+          "discount_pct": 15.9
+        }
+      ]
+    },
+    {
+      "store_id": "1b27ab85-2982-4b0d-9896-3a12d3296ee6",
+      "store_name": "Villa Real Online",
+      "city": "Cacapava",
+      "state": "SP",
+      "product_url": "https://www.villarrealonline.com.br/produtos/detalhe/9622/refrigerante-coca-cola-2l-trad",
+      "on_promotion": true,
+      "list_price": 12.9,
+      "price": 10.9,
+      "discount_pct": 15.5,
+      "promo_day_count": 1,
+      "min_discount_pct": 15.5,
+      "max_discount_pct": 15.5,
+      "median_discount_pct": 15.5,
+      "last_promo_date": "2026-11-22",
+      "periods": [
+        {
+          "start_date": "2026-11-22",
+          "end_date": "2026-11-22",
+          "list_price": 12.9,
+          "price": 10.9,
+          "discount_pct": 15.5
+        }
+      ]
+    },
+    {
+      "store_id": "5658875c-f1dc-49bf-9ea1-75b20b9ffb9a",
+      "store_name": "Super Silveira",
+      "city": "Garopaba",
+      "state": "SC",
+      "product_url": "https://supersilveira.com.br/produtos/5524742/refrigerante-coca-cola-2l",
+      "on_promotion": true,
+      "list_price": 12.45,
+      "price": 10.89,
+      "discount_pct": 12.5,
+      "promo_day_count": 15,
+      "min_discount_pct": 12.5,
+      "max_discount_pct": 19.8,
+      "median_discount_pct": 12.5,
+      "last_promo_date": "2026-11-11",
+      "periods": [
+        {
+          "start_date": "2026-10-28",
+          "end_date": "2026-11-11",
+          "list_price": 12.45,
+          "price": 10.89,
+          "discount_pct": 12.5
+        }
+      ]
+    },
+    {
+      "store_id": "decafe19-64cb-4bd3-b6a5-441b7d5e9561",
+      "store_name": "Pão de Açúcar",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "product_url": "https://www.paodeacucar.com/produto/449568/refrigerante-coca-cola-original-garrafa-2l",
+      "on_promotion": true,
+      "list_price": 12.49,
+      "price": 10.99,
+      "discount_pct": 12.0,
+      "promo_day_count": 27,
+      "min_discount_pct": 12.0,
+      "max_discount_pct": 12.0,
+      "median_discount_pct": 12.0,
+      "last_promo_date": "2026-11-23",
+      "periods": [
+        {
+          "start_date": "2026-10-28",
+          "end_date": "2026-11-23",
+          "list_price": 12.49,
+          "price": 10.99,
+          "discount_pct": 12.0
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 50,
+    "pages": 10
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": 33,
+    "limit": 50,
+    "remaining": 17
+  }
+}

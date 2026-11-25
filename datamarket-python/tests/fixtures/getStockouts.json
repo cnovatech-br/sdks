@@ -1,0 +1,77 @@
+{
+  "period_days": 30,
+  "summary": {
+    "product_count": 166,
+    "median_stockout_store_pct": 8.3,
+    "last_collected_at": "2026-11-24T15:54:19-03:00"
+  },
+  "data": [
+    {
+      "ean": "7891000103913",
+      "product_name": "PETIT CHAMBINHO MORANGO 480G",
+      "brand": "NESTLE",
+      "category": "LATICINIOS",
+      "department": "FRIOS E LATICINIOS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/218340/6675b79e48a079339b1d449b.jpg?v=638545875540300000",
+      "store_count": 31,
+      "stockout_store_count": 17,
+      "stockout_store_pct": 54.8
+    },
+    {
+      "ean": "7898755200119",
+      "product_name": "IOGURTE GREGO NESTLE MORANGO POTE 450G",
+      "brand": "NESTLE",
+      "category": "LATICINIOS",
+      "department": "FRIOS E LATICINIOS",
+      "image_url": "https://hiperideal.vteximg.com.br/arquivos/ids/232813/2202557.png?v=638919833019730000",
+      "store_count": 31,
+      "stockout_store_count": 13,
+      "stockout_store_pct": 41.9
+    },
+    {
+      "ean": "7898755200102",
+      "product_name": "IOGURTE NESTLE GREGO POTAO TRADICIONAL 450G",
+      "brand": "NESTLE",
+      "category": "LATICINIOS",
+      "department": "FRIOS E LATICINIOS",
+      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/974853/p.jpg?v=639047136367370000",
+      "store_count": 31,
+      "stockout_store_count": 12,
+      "stockout_store_pct": 38.7
+    },
+    {
+      "ean": "7891000106907",
+      "product_name": "SORVETE NESTLE 1.5L PRESTIGIO",
+      "brand": "NESTLE",
+      "category": "SORVETES E GELADOS",
+      "department": "CONGELADOS",
+      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/286801/figura1frente.jpg?v=638080334320500000",
+      "store_count": 15,
+      "stockout_store_count": 5,
+      "stockout_store_pct": 33.3
+    },
+    {
+      "ean": "7891000094396",
+      "product_name": "LEITE FERMENTADO NINHO MORANGO 250G",
+      "brand": "NESTLE",
+      "category": "LATICINIOS",
+      "department": "FRIOS E LATICINIOS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/187454/6571c1f1558925a4e8898cf4.jpg?v=638375508374930000",
+      "store_count": 41,
+      "stockout_store_count": 12,
+      "stockout_store_pct": 29.3
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 5,
+    "total": 166,
+    "pages": 34
+  },
+  "usage": {
+    "query_cost": 1,
+    "used": 31,
+    "limit": 50,
+    "remaining": 19
+  }
+}

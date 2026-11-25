@@ -75,6 +75,29 @@ units per 250 rows. The rule of thumb:
 | How does each of my products sit against the market? | `stores.market_position` | 40 |
 | Which products should I reprice? | `stores.opportunities` | 2 per page of 50 |
 
+## Where my brand is out of stock, and since when
+
+The ranking finds the products; the detail opens each one store by store.
+
+```python
+ranking = client.products.stockouts(brand="MARCA EXEMPLO", min_store_count=10)
+
+for product in ranking.data[:5]:
+    detail = client.products.stockout_detail(product.ean, available=False)
+    for store in detail:
+        print(product.product_name, store.store_name, store.state, store.unavailable_since_date)
+```
+
+Six units: one for the ranking and one per product. `detail.summary` and
+`detail.by_state` describe every store even though only the ones out of stock
+are listed, and `summary.never_available_store_count` is the stores that list
+the product without having had it in the window, which are not a stockout.
+
+For one store instead of one brand, `client.stores.stockouts(store_id,
+available=False)` lists what is missing from its shelf, with
+`market.stockout_store_pct` telling a problem of that store from a product
+missing everywhere.
+
 ## Price history of a product
 
 ```python
