@@ -29,20 +29,20 @@
       }
     },
     "billing_cycle": "monthly",
-    "current_period_end": "2026-11-12T02:54:20.044896Z",
+    "current_period_end": "2026-12-09T04:58:25.464809Z",
     "cancel_at_period_end": false
   },
   "trial": {
     "is_trial": true,
-    "started_at": "2026-10-29T02:54:20.044896Z",
-    "ends_at": "2026-11-12T02:54:20.044896Z",
-    "days_remaining": 5,
+    "started_at": "2026-11-25T04:58:25.464809Z",
+    "ends_at": "2026-12-09T04:58:25.464809Z",
+    "days_remaining": 13,
     "expired": false
   },
   "usage": {
-    "used": 6,
+    "used": 3,
     "limit": 50,
-    "remaining": 44,
+    "remaining": 47,
     "plan_limit": 50,
     "bonus": 0,
     "can_early_renew": false,

@@ -210,8 +210,8 @@
       ],
       "market": {
         "store_count": 162,
-        "promo_store_count": 52,
-        "promo_store_pct": 32.1
+        "promo_store_count": 51,
+        "promo_store_pct": 31.5
       }
     }
   ],
@@ -223,8 +223,8 @@
   },
   "usage": {
     "query_cost": 2,
-    "used": 37,
+    "used": 34,
     "limit": 50,
-    "remaining": 13
+    "remaining": 16
   }
 }

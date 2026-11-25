@@ -2,7 +2,7 @@
   "data": [
     {
       "brand": "HAVAIANAS",
-      "product_count": 1825,
+      "product_count": 1832,
       "department_count": 4,
       "category_count": 3,
       "departments": [
@@ -19,7 +19,7 @@
     },
     {
       "brand": "TRAMONTINA",
-      "product_count": 1288,
+      "product_count": 1290,
       "department_count": 4,
       "category_count": 16,
       "departments": [
@@ -38,7 +38,7 @@
     },
     {
       "brand": "PLASUTIL",
-      "product_count": 1187,
+      "product_count": 1190,
       "department_count": 6,
       "category_count": 18,
       "departments": [
@@ -100,13 +100,13 @@
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 20635,
-    "pages": 4127
+    "total": 20649,
+    "pages": 4130
   },
   "usage": {
     "query_cost": 1,
-    "used": 8,
+    "used": 5,
     "limit": 50,
-    "remaining": 42
+    "remaining": 45
   }
 }

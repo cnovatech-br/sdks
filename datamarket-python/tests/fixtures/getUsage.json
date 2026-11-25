@@ -1,31 +1,16 @@
 {
   "daily": [
     {
-      "date": "2026-10-29",
-      "used": 6,
-      "call_count": 4
-    },
-    {
-      "date": "2026-08-14",
-      "used": 4,
-      "call_count": 4
-    },
-    {
-      "date": "2026-08-13",
-      "used": 14,
-      "call_count": 11
+      "date": "2026-11-25",
+      "used": 3,
+      "call_count": 3
     }
   ],
   "monthly": [
     {
-      "month": "2026-10",
-      "used": 6,
-      "call_count": 4
-    },
-    {
-      "month": "2026-08",
-      "used": 18,
-      "call_count": 15
+      "month": "2026-11",
+      "used": 3,
+      "call_count": 3
     }
   ]
 }

@@ -55,14 +55,14 @@
       "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/290814/MacarraoInstantaneoNissin85gGalinha.jpg?v=638080396585470000",
       "available": false,
       "unavailable_since_date": "2026-11-10",
-      "unavailable_day_count": 14,
+      "unavailable_day_count": 15,
       "last_available_date": "2026-11-03",
       "last_collected_date": "2026-11-21",
       "periods": [
         {
           "start_date": "2026-11-10",
           "end_date": null,
-          "day_count": 14
+          "day_count": 15
         }
       ],
       "market": {
@@ -80,14 +80,14 @@
       "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/405320/CachacaPirassununga51965ml1.jpg?v=638824082302600000",
       "available": false,
       "unavailable_since_date": "2026-11-20",
-      "unavailable_day_count": 4,
+      "unavailable_day_count": 5,
       "last_available_date": "2026-11-10",
       "last_collected_date": "2026-11-20",
       "periods": [
         {
           "start_date": "2026-11-20",
           "end_date": null,
-          "day_count": 4
+          "day_count": 5
         }
       ],
       "market": {
@@ -167,8 +167,8 @@
       ],
       "market": {
         "store_count": 184,
-        "stockout_store_count": 4,
-        "stockout_store_pct": 2.2
+        "stockout_store_count": 3,
+        "stockout_store_pct": 1.6
       }
     }
   ],
@@ -180,8 +180,8 @@
   },
   "usage": {
     "query_cost": 2,
-    "used": 36,
+    "used": 32,
     "limit": 50,
-    "remaining": 14
+    "remaining": 18
   }
 }

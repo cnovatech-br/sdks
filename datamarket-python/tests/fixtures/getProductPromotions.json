@@ -18,16 +18,9 @@
     "median_discount_pct": 9.3,
     "max_discount_pct": 33.4,
     "promo_day_count": 31,
-    "last_promo_date": "2026-11-23"
+    "last_promo_date": "2026-11-25"
   },
   "by_day": [
-    {
-      "date": "2026-10-25",
-      "store_count": 160,
-      "promo_store_count": 24,
-      "promo_store_pct": 15.0,
-      "median_discount_pct": 10.2
-    },
     {
       "date": "2026-10-26",
       "store_count": 160,
@@ -55,6 +48,13 @@
       "promo_store_count": 25,
       "promo_store_pct": 15.5,
       "median_discount_pct": 7.4
+    },
+    {
+      "date": "2026-10-30",
+      "store_count": 154,
+      "promo_store_count": 23,
+      "promo_store_pct": 14.9,
+      "median_discount_pct": 7.1
     }
   ],
   "by_state": [
@@ -224,8 +224,8 @@
   },
   "usage": {
     "query_cost": 1,
-    "used": 33,
+    "used": 16,
     "limit": 50,
-    "remaining": 17
+    "remaining": 34
   }
 }

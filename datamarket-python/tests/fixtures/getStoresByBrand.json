@@ -1,11 +1,11 @@
 {
   "brand": "COCA-COLA",
   "summary": {
-    "store_count": 257,
+    "store_count": 258,
     "state_count": 23,
-    "offer_count": 5066,
-    "avg_price": 8.55,
-    "avg_availability_pct": 83.76
+    "offer_count": 5085,
+    "avg_price": 8.53,
+    "avg_availability_pct": 83.93
   },
   "data": [
     {
@@ -17,14 +17,14 @@
       "product_count": 36,
       "category_count": 1,
       "department_count": 1,
-      "avg_price": 12.02,
-      "min_price": 2.09,
+      "avg_price": 12.08,
+      "min_price": 1.99,
       "max_price": 74.94,
-      "price_cv_pct": 110.25,
+      "price_cv_pct": 109.66,
       "availability_pct": 97.22,
       "available_count": 35,
       "unavailable_count": 1,
-      "last_collected_date": "2026-11-03"
+      "last_collected_date": "2026-11-18"
     },
     {
       "store_id": "af15468f-273f-44b8-973b-7c77bd8ace27",
@@ -35,14 +35,14 @@
       "product_count": 33,
       "category_count": 2,
       "department_count": 2,
-      "avg_price": 9.03,
-      "min_price": 1.98,
+      "avg_price": 8.84,
+      "min_price": 2.19,
       "max_price": 27.69,
-      "price_cv_pct": 76.59,
-      "availability_pct": 75.76,
-      "available_count": 25,
-      "unavailable_count": 8,
-      "last_collected_date": "2026-11-04"
+      "price_cv_pct": 78.23,
+      "availability_pct": 78.79,
+      "available_count": 26,
+      "unavailable_count": 7,
+      "last_collected_date": "2026-11-20"
     },
     {
       "store_id": "000fb4e0-6dff-4753-b72e-5076b4fe557d",
@@ -53,14 +53,14 @@
       "product_count": 33,
       "category_count": 1,
       "department_count": 1,
-      "avg_price": 10.12,
-      "min_price": 1.99,
+      "avg_price": 9.98,
+      "min_price": 1.89,
       "max_price": 64.9,
-      "price_cv_pct": 119.3,
+      "price_cv_pct": 120.44,
       "availability_pct": 72.73,
       "available_count": 24,
       "unavailable_count": 9,
-      "last_collected_date": "2026-11-05"
+      "last_collected_date": "2026-11-21"
     },
     {
       "store_id": "769cef51-567e-4492-b961-d2ea7278f2a1",
@@ -71,14 +71,14 @@
       "product_count": 32,
       "category_count": 1,
       "department_count": 1,
-      "avg_price": 10.59,
-      "min_price": 2.19,
+      "avg_price": 10.58,
+      "min_price": 1.89,
       "max_price": 26.28,
-      "price_cv_pct": 74.58,
+      "price_cv_pct": 74.88,
       "availability_pct": 87.5,
       "available_count": 28,
       "unavailable_count": 4,
-      "last_collected_date": "2026-11-02"
+      "last_collected_date": "2026-11-23"
     },
     {
       "store_id": "1bc8f621-b77f-44c5-81d3-f0b33c609196",
@@ -89,20 +89,20 @@
       "product_count": 31,
       "category_count": 2,
       "department_count": 2,
-      "avg_price": 7.83,
+      "avg_price": 7.82,
       "min_price": 1.99,
       "max_price": 22.19,
-      "price_cv_pct": 73.48,
-      "availability_pct": 96.77,
-      "available_count": 30,
-      "unavailable_count": 1,
-      "last_collected_date": "2026-10-29"
+      "price_cv_pct": 73.8,
+      "availability_pct": 100.0,
+      "available_count": 31,
+      "unavailable_count": 0,
+      "last_collected_date": "2026-11-22"
     }
   ],
   "usage": {
     "query_cost": 1,
-    "used": 14,
+    "used": 11,
     "limit": 50,
-    "remaining": 36
+    "remaining": 39
   }
 }

@@ -1,77 +1,77 @@
 {
   "period_days": 30,
   "summary": {
-    "product_count": 166,
-    "median_stockout_store_pct": 8.3,
-    "last_collected_at": "2026-11-24T15:54:19-03:00"
+    "product_count": 52,
+    "median_stockout_store_pct": 7.1,
+    "last_collected_at": "2026-11-25T01:45:07-03:00"
   },
   "data": [
     {
-      "ean": "7891000103913",
-      "product_name": "PETIT CHAMBINHO MORANGO 480G",
-      "brand": "NESTLE",
-      "category": "LATICINIOS",
-      "department": "FRIOS E LATICINIOS",
-      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/218340/6675b79e48a079339b1d449b.jpg?v=638545875540300000",
-      "store_count": 31,
-      "stockout_store_count": 17,
-      "stockout_store_pct": 54.8
+      "ean": "7896371020135",
+      "product_name": "KIT 1 COCA-COLA ORIGINAL + 1 FANTA LARANJA 2L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://static-images.ifood.com.br/image/upload/t_high/pratos/820af392-002c-47b1-bfae-d7ef31743c7f/202310112203_3w0pqoma4kc.jpg",
+      "store_count": 5,
+      "stockout_store_count": 2,
+      "stockout_store_pct": 40.0
     },
     {
-      "ean": "7898755200119",
-      "product_name": "IOGURTE GREGO NESTLE MORANGO POTE 450G",
-      "brand": "NESTLE",
-      "category": "LATICINIOS",
-      "department": "FRIOS E LATICINIOS",
-      "image_url": "https://hiperideal.vteximg.com.br/arquivos/ids/232813/2202557.png?v=638919833019730000",
-      "store_count": 31,
-      "stockout_store_count": 13,
-      "stockout_store_pct": 41.9
+      "ean": "7894900013566",
+      "product_name": "REFRIGERANTE COCA COLA 500ML",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://s3.amazonaws.com/produtos.vipcommerce.com.br/250x250/817df6f3-c0b6-11e7-a6aa-063e6e4e9f3a.jpg",
+      "store_count": 7,
+      "stockout_store_count": 2,
+      "stockout_store_pct": 28.6
     },
     {
-      "ean": "7898755200102",
-      "product_name": "IOGURTE NESTLE GREGO POTAO TRADICIONAL 450G",
-      "brand": "NESTLE",
-      "category": "LATICINIOS",
-      "department": "FRIOS E LATICINIOS",
-      "image_url": "https://atacadaobr.vteximg.com.br/arquivos/ids/974853/p.jpg?v=639047136367370000",
-      "store_count": 31,
-      "stockout_store_count": 12,
-      "stockout_store_pct": 38.7
+      "ean": "7894900027365",
+      "product_name": "KIT REFRIGERANTE COCA-COLA PET 2L + FANTA LARANJA PET 2 LITROS",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/186241/6571c0fc558925a4e889880b.jpg?v=638375505910200000",
+      "store_count": 18,
+      "stockout_store_count": 4,
+      "stockout_store_pct": 22.2
     },
     {
-      "ean": "7891000106907",
-      "product_name": "SORVETE NESTLE 1.5L PRESTIGIO",
-      "brand": "NESTLE",
-      "category": "SORVETES E GELADOS",
-      "department": "CONGELADOS",
-      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/286801/figura1frente.jpg?v=638080334320500000",
-      "store_count": 15,
-      "stockout_store_count": 5,
-      "stockout_store_pct": 33.3
+      "ean": "7894900027099",
+      "product_name": "REFRI COCA COLA RETORNAVEL 1L",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://d21wiczbqxib04.cloudfront.net/lb0tZjUiwWbfvcfz7LbgymbLvj4=/fit-in/400x400/filters:fill(FFFFFF):background_color(white)/https://osuper-product-vault.s3.sa-east-1.amazonaws.com/934f78e66b9c78d0e284128058dc18e45a33fa0c/33109-a913d066.webp",
+      "store_count": 10,
+      "stockout_store_count": 2,
+      "stockout_store_pct": 20.0
     },
     {
-      "ean": "7891000094396",
-      "product_name": "LEITE FERMENTADO NINHO MORANGO 250G",
-      "brand": "NESTLE",
-      "category": "LATICINIOS",
-      "department": "FRIOS E LATICINIOS",
-      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/187454/6571c1f1558925a4e8898cf4.jpg?v=638375508374930000",
-      "store_count": 41,
-      "stockout_store_count": 12,
-      "stockout_store_pct": 29.3
+      "ean": "7894900027372",
+      "product_name": "KIT REFRIGERANTE COCA-COLA ORIGINAL + GUARANA FANTA 2L CADA LEVE MAIS PAGUE MENOS",
+      "brand": "COCA-COLA",
+      "category": "REFRIGERANTES",
+      "department": "BEBIDAS",
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/191382/6571c550558925a4e8899c65.jpg?v=638375517004400000",
+      "store_count": 5,
+      "stockout_store_count": 1,
+      "stockout_store_pct": 20.0
     }
   ],
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 166,
-    "pages": 34
+    "total": 52,
+    "pages": 11
   },
   "usage": {
     "query_cost": 1,
-    "used": 31,
+    "used": 14,
     "limit": 50,
-    "remaining": 19
+    "remaining": 36
   }
 }

@@ -8,7 +8,7 @@
       "channel": "e-commerce",
       "omnichannel": false,
       "product_count": 5557,
-      "last_collected_date": "2026-11-05"
+      "last_collected_date": "2026-11-21"
     },
     {
       "store_id": "9519c557-458a-4f9e-9dce-a707f2ab18be",
@@ -17,8 +17,8 @@
       "state": "RJ",
       "channel": "e-commerce",
       "omnichannel": true,
-      "product_count": 25014,
-      "last_collected_date": "2026-11-05"
+      "product_count": 25015,
+      "last_collected_date": "2026-11-21"
     },
     {
       "store_id": "db74d0a3-f8e1-41a3-a5b9-381f62b0eddb",
@@ -28,7 +28,7 @@
       "channel": "e-commerce",
       "omnichannel": true,
       "product_count": 21612,
-      "last_collected_date": "2026-11-05"
+      "last_collected_date": "2026-11-21"
     },
     {
       "store_id": "ed8f5b21-6fa5-4c32-9290-a7a33b9c5728",
@@ -38,7 +38,7 @@
       "channel": "e-commerce",
       "omnichannel": false,
       "product_count": 7166,
-      "last_collected_date": "2026-11-05"
+      "last_collected_date": "2026-11-16"
     },
     {
       "store_id": "ddda1794-3075-4f44-a649-60167bd7e524",
@@ -48,19 +48,19 @@
       "channel": "e-commerce",
       "omnichannel": false,
       "product_count": 2996,
-      "last_collected_date": "2026-11-05"
+      "last_collected_date": "2026-11-20"
     }
   ],
   "meta": {
     "page": 1,
     "limit": 5,
-    "total": 266,
+    "total": 267,
     "pages": 54
   },
   "usage": {
     "query_cost": 1,
-    "used": 15,
+    "used": 18,
     "limit": 50,
-    "remaining": 35
+    "remaining": 32
   }
 }

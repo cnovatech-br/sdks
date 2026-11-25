@@ -17,7 +17,7 @@
     "min_price": 9.48,
     "max_price": 22.99,
     "price_variation_pct": 8.3,
-    "last_collected_date": "2026-11-24"
+    "last_collected_date": "2026-11-25"
   },
   "by_state": [
     {
@@ -231,8 +231,8 @@
   },
   "usage": {
     "query_cost": 1,
-    "used": 32,
+    "used": 15,
     "limit": 50,
-    "remaining": 18
+    "remaining": 35
   }
 }

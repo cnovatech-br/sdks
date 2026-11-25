@@ -13,17 +13,11 @@
     "stockout_in_period_store_count": 9,
     "stockout_day_count": 31,
     "stockout_state_count": 3,
-    "median_unavailable_day_count": 6.0,
+    "median_unavailable_day_count": 7.0,
     "never_available_store_count": 5,
-    "last_collected_date": "2026-11-24"
+    "last_collected_date": "2026-11-25"
   },
   "by_day": [
-    {
-      "date": "2026-10-25",
-      "store_count": 162,
-      "unavailable_store_count": 3,
-      "unavailable_store_pct": 1.9
-    },
     {
       "date": "2026-10-26",
       "store_count": 162,
@@ -47,6 +41,12 @@
       "store_count": 164,
       "unavailable_store_count": 4,
       "unavailable_store_pct": 2.4
+    },
+    {
+      "date": "2026-10-30",
+      "store_count": 156,
+      "unavailable_store_count": 3,
+      "unavailable_store_pct": 1.9
     }
   ],
   "by_state": [
@@ -90,7 +90,7 @@
       "product_url": "https://super.btjak.com.br/produtos/6692432/refrigerante-coca-cola-original-2l",
       "available": false,
       "unavailable_since_date": "2026-11-11",
-      "unavailable_day_count": 20,
+      "unavailable_day_count": 21,
       "last_available_date": "2026-11-04",
       "last_collected_date": "2026-11-23",
       "periods": [
@@ -102,7 +102,7 @@
         {
           "start_date": "2026-11-11",
           "end_date": null,
-          "day_count": 13
+          "day_count": 14
         }
       ]
     },
@@ -114,14 +114,14 @@
       "product_url": "https://www.semarentrega.com.br/produtos/7994412/refrigerante-coca-cola-2l-coca-cola-2l",
       "available": false,
       "unavailable_since_date": "2026-11-11",
-      "unavailable_day_count": 13,
+      "unavailable_day_count": 14,
       "last_available_date": "2026-11-04",
       "last_collected_date": "2026-11-23",
       "periods": [
         {
           "start_date": "2026-11-11",
           "end_date": null,
-          "day_count": 13
+          "day_count": 14
         }
       ]
     },
@@ -133,14 +133,14 @@
       "product_url": "https://www.prezunic.com.br/refrigerante-coca-cola-original-pet-2-litros/p",
       "available": false,
       "unavailable_since_date": "2026-11-18",
-      "unavailable_day_count": 6,
+      "unavailable_day_count": 7,
       "last_available_date": "2026-11-10",
       "last_collected_date": "2026-11-18",
       "periods": [
         {
           "start_date": "2026-11-18",
           "end_date": null,
-          "day_count": 6
+          "day_count": 7
         }
       ]
     },
@@ -152,14 +152,14 @@
       "product_url": "https://cotrifacil.com.br/produtos/3697127/refrig-coca-cola-2l-075612",
       "available": false,
       "unavailable_since_date": "2026-11-22",
-      "unavailable_day_count": 2,
+      "unavailable_day_count": 3,
       "last_available_date": "2026-11-11",
       "last_collected_date": "2026-11-22",
       "periods": [
         {
           "start_date": "2026-11-22",
           "end_date": null,
-          "day_count": 2
+          "day_count": 3
         }
       ]
     },
@@ -171,14 +171,14 @@
       "product_url": "https://www.rossidelivery.com.br/produtos/detalhe/8670/refrigerante-coca-cola-pet-2l",
       "available": false,
       "unavailable_since_date": "2026-11-22",
-      "unavailable_day_count": 2,
+      "unavailable_day_count": 3,
       "last_available_date": "2026-11-11",
       "last_collected_date": "2026-11-22",
       "periods": [
         {
           "start_date": "2026-11-22",
           "end_date": null,
-          "day_count": 2
+          "day_count": 3
         }
       ]
     }
@@ -191,8 +191,8 @@
   },
   "usage": {
     "query_cost": 1,
-    "used": 34,
+    "used": 17,
     "limit": 50,
-    "remaining": 16
+    "remaining": 33
   }
 }

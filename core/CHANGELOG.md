@@ -6,6 +6,11 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-25
+
+No changes to the core. Released together with `cnovatech-datamarket` 0.2.0,
+which shares its version.
+
 ## [0.1.0] - 2026-11-06
 
 First release, together with `cnovatech-datamarket`. Rehearsed on TestPyPI as

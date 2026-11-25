@@ -15,10 +15,10 @@
   },
   "summary": {
     "common_product_count": 2654,
-    "below_count": 328,
-    "aligned_count": 327,
-    "above_count": 1067,
-    "unavailable_count": 932
+    "below_count": 314,
+    "aligned_count": 325,
+    "above_count": 1149,
+    "unavailable_count": 866
   },
   "data": [
     {
@@ -64,17 +64,17 @@
       "price_position": "above"
     },
     {
-      "ean": "7896090100101",
-      "product_name": "LA DE ACO ASSOLAN 8UN 45G - MAXIMO BRILHO/ MINIMO ESFORCO",
-      "brand": "YPE",
+      "ean": "7891035000072",
+      "product_name": "VEJA BANHEIRO ANTIBAC SACHET 400ML",
+      "brand": "VEJA",
       "department": "LIMPEZA",
       "category": "PRODUTOS DE LIMPEZA",
-      "image_url": "https://paulistaoatacadista.vteximg.com.br/arquivos/ids/396236/LaDeAcoAssolan8Un45GMaximoBr1.jpg?v=638706423088400000",
-      "price": 2.99,
+      "image_url": "https://bretas.vteximg.com.br/arquivos/ids/218787/6675b7ef48a079339b1d4636.jpg?v=638545876349900000",
+      "price": 17.99,
       "available": true,
-      "competitor_price": 1.49,
+      "competitor_price": 8.99,
       "competitor_available": true,
-      "price_diff_pct": 100.67,
+      "price_diff_pct": 100.11,
       "price_position": "above"
     },
     {
@@ -100,8 +100,8 @@
   },
   "usage": {
     "query_cost": 2,
-    "used": 23,
+    "used": 26,
     "limit": 50,
-    "remaining": 27
+    "remaining": 24
   }
 }

@@ -2,10 +2,10 @@
   "period_days": 30,
   "summary": {
     "product_count": 69,
-    "price_change_count": 1497,
+    "price_change_count": 1501,
     "median_repriced_store_pct": 26.8,
     "median_price_variation_pct": 10.0,
-    "last_collected_at": "2026-11-24T16:07:09-03:00"
+    "last_collected_at": "2026-11-25T00:47:40-03:00"
   },
   "data": [
     {
@@ -92,8 +92,8 @@
   },
   "usage": {
     "query_cost": 1,
-    "used": 29,
+    "used": 12,
     "limit": 50,
-    "remaining": 21
+    "remaining": 38
   }
 }

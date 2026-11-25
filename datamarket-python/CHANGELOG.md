@@ -6,9 +6,10 @@ project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-Follows the trend endpoints of the API. The fixtures of these endpoints were
-built from the API code against the production base before the endpoints were
-deployed; refresh them with `make capture` once they are live.
+## [0.2.0] - 2026-11-25
+
+Follows the trend endpoints of the API, live since 2026-11-25. Every fixture
+was captured again from production through the SDK.
 
 ### Added
 

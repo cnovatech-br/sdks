@@ -17,9 +17,9 @@
       "department": "BEBIDAS",
       "store_count": 187,
       "state_count": 22,
-      "min_price": 8.98,
+      "min_price": 9.48,
       "max_price": 22.99,
-      "median_price": 11.54
+      "median_price": 11.79
     },
     {
       "ean": "0000000000000",
@@ -38,8 +38,8 @@
   ],
   "usage": {
     "query_cost": 1,
-    "used": 13,
+    "used": 10,
     "limit": 50,
-    "remaining": 37
+    "remaining": 40
   }
 }
